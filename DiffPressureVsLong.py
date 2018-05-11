@@ -149,7 +149,7 @@ for var in variables:
 
 	control.ExtractData(var, box)
 	test.ExtractData(var, box)
-	
+	print control.data
 	master = Niezgoda(numlons)
 
 	for p in pressures:
