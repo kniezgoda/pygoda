@@ -1,4 +1,4 @@
-#!/glade/u/apps/ch/opt/python/2.7.13/gnu/6.2.0/bin/python
+#! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
 '''
 This code creates test, control, and difference maps for a collection of netcdf variables from iCAM5.
 The three maps are plotted to a figure and saved to a user-entered directory.
@@ -31,18 +31,6 @@ or some file structure and then have the user supply the file in a
 command line flag or argument.
 '''
 
-#------------- Custom subplot title names 
-# these are the names of the subplots, not the main figure --- the main figure always has the same name (the variable long name from the netcdf file)
-# Set to None (no quotes) for default subplot names, the name of the file used
-# Default 
-user_test_plot_title = None 
-user_control_plot_title = None
-# Regular 
-#user_test_plot_title = "Test: Mid-Holocene (6kya)"
-#user_control_plot_title = "Control: Pre-industrial (1850)"
-#user_test_plot_title = "Test: Estimated MH"
-#user_control_plot_title = "Control: Simulated MH"
-
 
 ##############################################
 ###### Don't change anything below here ######
@@ -67,20 +55,22 @@ user_control_plot_title = None
 '''
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-r', '--region', dest = 'region', default = '')
-parser.add_argument('-s', '--season', dest = 'season', default = 'ANN')
-parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = '.')
-parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = '.')
+parser.add_argument('-r', '--region', dest = 'region', default = None)
+parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = "F.C5.2deg.wiso.defaultSSTICE_kn002")
+parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = "F.C5.2deg.wiso.obs6kSST_kn003")
+parser.add_argument('-grep', dest = 'grep', default = None)
+parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90,90])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
-parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
+parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
+parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
 parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = None)
 parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = 3, default = None)
-parser.add_argument('-ft', '--file_type', dest = 'file_type', default = 'ps')
 parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
-parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
+
 
 ARGS = parser.parse_args()
 region = ARGS.region
@@ -90,7 +80,6 @@ controldatafname = ARGS.controldatafname
 findFile = True
 if (testdatafname is not None) & (controldatafname is not None):
 	findFile = False
-season = ARGS.season
 testdir = ARGS.testdir
 controldir = ARGS.controldir
 clev = ARGS.clev
@@ -113,11 +102,9 @@ if ARGS.developer_mode:
 
 # Set the lat bounds
 # Default global tropics
-region_name = "GlobalTropics"
-southern_lat = -85
-northern_lat = 85
-left_lon = 0
-right_lon = 355
+region_name = "Box"
+southern_lat, northern_lat = [int(l) for l in ARGS.lats]
+left_lon, right_lon = [int(l) for l in ARGS.lons]
 
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
@@ -169,40 +156,37 @@ if (region == "4P") | (region == "FourProxies"):
 
 if mkdir:
 	# Create maps directory is it doesn't exist
-	if not os.path.exists("Maps"):
-		os.mkdir("Maps")
-		print "Created directory " + "Maps"
+	if not os.path.exists("PressureVsLat"):
+		os.mkdir("PressureVsLat")
+		print "Created directory " + "PressureVsLat"
 
 	# Create the region directory if it doesn't already exist
-	if not os.path.exists("Maps/" + region_name):
-		os.mkdir("Maps/" + region_name)
-		print "Created directory " + "Maps/" + region_name
+	if not os.path.exists("PressureVsLat/" + region_name):
+		os.mkdir("PressureVsLat/" + region_name)
+		print "Created directory " + "PressureVsLat/" + region_name
 
-	# Create season directory inside region directory
-	if not os.path.exists("Maps/" + region_name + "/" + season):
-		os.mkdir("Maps/" + region_name + "/" + season)
-		print "Created directory " + "Maps/" + region_name + "/" + season
+	# Create grep directory inside region directory
+	if not os.path.exists("PressureVsLat/" + region_name + "/" + grep):
+		os.mkdir("PressureVsLat/" + region_name + "/" + grep)
+		print "Created directory " + "PressureVsLat/" + region_name + "/" + grep
 
 if findFile:
 	# Look for the climo files in the root directory
-	print "\nLooking for control " + season + " files in " + controldir + "..."
-	controldatafname, controlfn = findClimoFile("*" + season + "*", controldir)
+	print "\nLooking for control " + grep + " files in " + controldir
+	controldatafname, controlfn = findClimoFile("*" + grep + "*", controldir)
 	if not controldatafname:
 		sys.exit()
-	else:
-		print "Found file " + controlfn
-	print "\nLooking for test " + season + " files in " + testdir + "..."
-	testdatafname, testfn = findClimoFile("*" + season + "*", testdir)
+	print "Found control file: " + controlfn
+	print "\nLooking for test " + grep + " files in " + testdir
+	testdatafname, testfn = findClimoFile("*" + grep + "*", testdir)
 	if not testdatafname:
 		sys.exit()
+	print "Found test file: " + testfn
 	else:
-		print "Found file " + testfn
-
-else:
-	print "\nControl file is " + controldatafname
-	print "\nTest file is " + testdatafname
-	controlfn = os.path.splitext(os.path.split(controldatafname)[1])[0]
-	testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
+		print "\nControl file is " + controldatafname
+		print "\nTest file is " + testdatafname
+		controlfn = os.path.splitext(os.path.split(controldatafname)[1])[0]
+		testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
 
 # Read the data
 controldata = camgoda(controldatafname)
