@@ -33,16 +33,6 @@ if ARGS.developer_mode:
 	showfig = True
 	mkdir = False
 
-# Set the new variable list if variable is not None
-if variable is not None:
-	use = {u : 0 for u in use}
-	for v in variable:
-		if v in use:
-			use[v] = 1
-		else:
-			print "\nVariable " + v + " not in master variable list.\nWill not plot this variable."
-
-
 # Set the lat bounds
 # Default arguments
 region_name = "Box"
