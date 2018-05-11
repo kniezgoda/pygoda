@@ -124,7 +124,7 @@ test = camgoda(testdatafname)
 
 # Initialize a variable extraction from camgoda so that boxlat and boxlon are set to correct values
 control.variable("T", box)
-lat = control.boxlon
+lon = control.boxlon
 numlons = len(lon)
 
 class Niezgoda:
