@@ -1215,7 +1215,7 @@ d18OV and dDV : returns 2d numpy array data.
 				return
 		if var_is_3d:
 			self.isobar(pressure)
-		return self.data
+		return [var_is_3d, var, pressure]
 
 
 class popgoda:

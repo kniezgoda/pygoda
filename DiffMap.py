@@ -244,8 +244,8 @@ for V in variable:
 		diff_u = diff_u[:,colsby4]
 
 	# Extract variable info (sets var, vname, and pressure)
-	controldata.ExtractData(V, box)
-	testdata.ExtractData(V, box)
+	var_is_3d, var, pressure = controldata.ExtractData(V, box)
+	var_is_3d, var, pressure = testdata.ExtractData(V, box)
 	
 	fig = plt.figure()
 	
