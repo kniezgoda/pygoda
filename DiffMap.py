@@ -80,7 +80,7 @@ if barbs is not None:
 	show_barbs = True
 savefig = ARGS.savefig
 showfig = ARGS.showfig
-variable = ARGS.variable
+variable = ARGS.variables
 ftype = ARGS.file_type
 mkdir = True
 if ARGS.developer_mode:
