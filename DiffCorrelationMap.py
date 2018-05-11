@@ -18,17 +18,17 @@ and the field variable (-fv) over the globe for a specified time (-dates)
 #########################
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-cdir', '--control_directory', dest = 'cdir', nargs = 1, default = 'fc5.2deg.wiso.piControl_kn028/atm/hist')
-parser.add_argument('-tdir', '--test_directory', dest = 'tdir', nargs = 1, default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
-parser.add_argument('-loc_var', '--local_variable', dest = 'lv', nargs = 1, default = None)
-parser.add_argument('-field_var', '--field_variable', dest = 'fv', nargs = 1, default = None)
+parser.add_argument('-cdir', '--control_directory', dest = 'cdir', default = 'fc5.2deg.wiso.piControl_kn028/atm/hist')
+parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
+parser.add_argument('-loc_var', '--local_variable', dest = 'lv', default = None)
+parser.add_argument('-field_var', '--field_variable', dest = 'fv', default = None)
 parser.add_argument('-latlon', dest = 'latlon', nargs = 2, default = (0,0))
-parser.add_argument('-del', dest = 'delta', nargs = 1, default = [0])
+parser.add_argument('-del', dest = 'delta', default = 0)
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [10,30])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
-parser.add_argument('-grep_pre', dest = 'grep_pre', nargs = 1, default = [''])
-parser.add_argument('-grep_post', dest = 'grep_post', nargs = 1, default = [''])
-parser.add_argument('-alpha', '--alpha', dest = 'alpha', nargs = 1, default = .05)
+parser.add_argument('-grep_pre', dest = 'grep_pre', default = '')
+parser.add_argument('-grep_post', dest = 'grep_post', default = '')
+parser.add_argument('-alpha', '--alpha', dest = 'alpha', default = .05)
 parser.add_argument('-stiple', '--stiple', dest = 'stiple', action = "store_true")
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
@@ -37,14 +37,14 @@ parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action 
 ARGS = parser.parse_args()
 cdir = ARGS.cdir
 tdir = ARGS.tdir
-lv = ARGS.lv[0]
-fv = ARGS.fv[0]
+lv = ARGS.lv
+fv = ARGS.fv
 lat, lon = [int(x) for x in ARGS.latlon]
-delta = int(ARGS.delta[0])
+delta = int(ARGS.delta)
 start, end = [int(x) for x in ARGS.years]
 months = [int(m) for m in ARGS.months]
-grep_pre = ARGS.grep_pre[0]
-grep_post = ARGS.grep_post[0]
+grep_pre = ARGS.grep_pre
+grep_post = ARGS.grep_post
 savefig = ARGS.savefig
 showfig = ARGS.showfig
 alpha = float(ARGS.alpha)
