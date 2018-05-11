@@ -182,11 +182,11 @@ if findFile:
 	if not testdatafname:
 		sys.exit()
 	print "Found test file: " + testfn
-	else:
-		print "\nControl file is " + controldatafname
-		print "\nTest file is " + testdatafname
-		controlfn = os.path.splitext(os.path.split(controldatafname)[1])[0]
-		testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
+else:
+	print "\nControl file is " + controldatafname
+	print "\nTest file is " + testdatafname
+	controlfn = os.path.splitext(os.path.split(controldatafname)[1])[0]
+	testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
 
 # Read the data
 controldata = camgoda(controldatafname)
