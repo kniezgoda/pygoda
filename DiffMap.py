@@ -244,7 +244,7 @@ for V in variable:
 
 	# Extract variable info (sets var, vname, and pressure)
 	controldata.ExtractData(V, box)
-	testdata.ExtractDate(V, box)
+	testdata.ExtractData(V, box)
 	
 	fig = plt.figure()
 	
