@@ -1,5 +1,5 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-from pygoda import camgoda, h0dates, findClimoFile
+from pygoda import camgoda, camdates, findClimoFile
 import numpy as np
 from scipy.stats import pearsonr as regress
 import matplotlib.pyplot as plt
@@ -60,7 +60,7 @@ if ARGS.developer_mode:
 #############
 
 # Make the date array
-dates = h0dates(start, end, months)
+dates = camdates(start, end, months)
 
 # Read in each file, extract the local variable at the point and field variable on the globe, track them in a master array
 # Correlate the local variable 1-d array to each grid cell of the field variable array
