@@ -147,6 +147,9 @@ if mkdir:
 
 for var in variables:
 	print "\nPlotting " + var + " data...\n"
+
+	control.ExtractData(var, box)
+	test.ExtractData(var, box)
 	master = Niezgoda(numlats)
 	for p in pressures:
 		print p
