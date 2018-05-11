@@ -165,6 +165,8 @@ for i in range(dim1):
 
 
 # Make the map of the corr array
+fig = plt.figure()
+
 plt.subplot(3,1,1)
 bmlon, bmlat = np.meshgrid(lons, lats)
 m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=lon-180,urcrnrlon=lon+180,resolution='c')
@@ -213,7 +215,7 @@ else:
 	else:
 		title = "Correlation between\n" + lv + " at lats=" + str(bottom) + "-" + str(top) + ", lons=" + str(left) + "-" + str(right) + "\nand global " + fv
 		
-plt.title(title)
+fig.suptitle(title)
 if savefig:
 	plt.savefig("correlationMap.pdf")
 if showfig:
