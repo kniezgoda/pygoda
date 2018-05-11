@@ -64,6 +64,7 @@ parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure
 
 ARGS = parser.parse_args()
 region = ARGS.region
+season = '' # This needs to be set to comply with legacy coding schemes
 testdatafname = ARGS.testdatafname
 controldatafname = ARGS.controldatafname
 findFile = True
