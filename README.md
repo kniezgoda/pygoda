@@ -8,10 +8,17 @@ Outside of pygoda, the remaining .py files are for making graphs and maps. MOST 
 2) Code that creates one figure from one file should be named similar to above, but without "Difference", i.e. Map.py, PressureVsLat.py, etc..
 
 The code should always be able to handle multiple input files and multiple variables. Standard flags that are included in most (if not all) code parser args are:
-1) -v VARIABLE {no default}       ---> variable name that can be used in camgoda.ExtractData()
-2) -lats BOTTOM_LAT TOP_LAT {-90 90}  ---> latitude bounds for the "box" argument in camgoda and popgoda
-3) -lons LEFT_LON RIGHT_LON {0 360} ---> similar to -lats. LONS ARE ALWAYS > 0
-4) -nosave, -show, -dev {False False, False} ---> Provides functionality for saving and/or displaying plots to the screen. These flags do not take arguments, they are either set or not. -nosave will not write out figures to a file, -show will display the figure on the screen, and -dev will set -nosave and -show (so nothing is saved and figures are printed to the screen.)
-5) -cdir, -tdir {./ ./} : the control and test directory, where files will be searched for.
-6) -grep : a string to search for in cdir and tdir. This flag is used as the first argument in findClimoFile, and is surrounded by the "*" wildcard.
-7) -t -c {None None} : a specified test and control file. If set, these will override any -cdir/-tdir and grep functionality. 
+
+1) -v VARIABLE {no default}                    : variable name that can be used in camgoda.ExtractData()
+
+2) -lats BOTTOM_LAT TOP_LAT {-90 90}           : latitude bounds for the "box" argument in camgoda and popgoda
+
+3) -lons LEFT_LON RIGHT_LON {0 360}            : similar to -lats. LONS ARE ALWAYS > 0
+
+4) -nosave, -show, -dev {False False, False}   : Provides functionality for saving and/or displaying plots to the screen. These flags do not take arguments, they are either set or not. -nosave will not write out figures to a file, -show will display the figure on the screen, and -dev will set -nosave and -show (so nothing is saved and figures are printed to the screen.)
+
+5) -cdir, -tdir {./ ./}                        : the control and test directory, where files will be searched for.
+
+6) -grep                                       : a string to search for in cdir and tdir. This flag is used as the first argument in findClimoFile, and is surrounded by the "*" wildcard.
+
+7) -t -c {None None}                           : a specified test and control file. If set, these will override any -cdir/-tdir and grep functionality. 
