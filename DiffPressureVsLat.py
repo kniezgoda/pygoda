@@ -33,17 +33,7 @@ if ARGS.developer_mode:
 	savfig = False
 	showfig = True
 	mkdir = False
-
-# Set the new variable list if variable is not None
-if variable is not None:
-	use = {u : 0 for u in use}
-	for v in variable:
-		if v in use:
-			use[v] = 1
-		else:
-			print "\nVariable " + v + " not in master variable list.\nWill not plot this variable."
-
-
+	
 # Set the lat bounds
 # Default arguments
 region_name = "Box"
@@ -160,33 +150,9 @@ for var in variables:
 	master = Niezgoda(numlats)
 	for p in pressures:
 		print p
-		if var == "d18OV":
-			hold_c = control.d18OV(box)
-			hold_c = control.isobar(p)
-			hold_t = test.d18OV(box)
-			hold_t = test.isobar(p)
-		elif var == "dDV":
-			hold_c = control.dDV(box)
-			hold_t = test.dDV(box)
-			hold_t = test.isobar(p)
-			hold_c = control.isobar(p)
-		elif var == 'dxsV':
-			hold_c = control.dxsV(box)
-			hold_c = control.isobar(p)
-			hold_t = test.dxsV(box)
-			hold_t = test.isobar(p)
-		else:
-			try:
-				hold_c = control.variable(var, box)
-				hold_c = control.isobar(p)
-				hold_t = test.variable(var, box)
-				hold_t = test.isobar(p)
-			except KeyError:
-				print "Not able to plot variable " + var + "...\nSkipping this variable."
-				continue
 		# Average down to 1 horizontal dimension
-		hold_c = np.mean(hold_c, axis = 1)
-		hold_t = np.mean(hold_t, axis = 1)
+		hold_c = np.nanmean(control.isobar(p, setData = False), axis = 1)
+		hold_t = np.nanmean(test.isobar(p, setData = False), axis = 1)
 		
 		master.stack(hold_c, hold_t)
 
