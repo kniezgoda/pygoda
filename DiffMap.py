@@ -307,8 +307,6 @@ for V in variable:
 	# Make things pretty
 	suptitle = testdata.long_name
 	savetitle = vname
-	if var_is_3d:
-		suptitle += " at " + str(pressure/100) + " mb"
 	if show_barbs:
 		suptitle += " with " + str(barb_pressure/100) + " hPa winds"
 		savetitle += str(int(round(barb_pressure/100))) + "winds"
