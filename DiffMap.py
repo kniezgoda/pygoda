@@ -273,10 +273,7 @@ for V in variable:
 		m.quiver(barb_lon, barb_lat, test_u, test_v, scale = 50, scale_units = "inches", cmap = plt.cm.autumn, latlon = True)
 	cbar = m.colorbar(cs, location='right', pad="5%")
 	cbar.set_label(testdata.units, fontsize = 8)
-	if user_test_plot_title is None:
-		test_title = "test: " + testfn
-	else:
-		test_title = user_test_plot_title
+	test_title = "test: " + testfn
 	plt.title(test_title, fontsize = 8)
 	
 	# control data
@@ -289,9 +286,7 @@ for V in variable:
 		m.quiver(barb_lon, barb_lat, control_u, control_v, scale = 50, scale_units = "inches", cmap = plt.cm.autumn, latlon = True)
 	cbar = m.colorbar(cs, location='right', pad="5%")
 	cbar.set_label(controldata.units, fontsize = 8)
-	control_title = user_control_plot_title 
-	if user_control_plot_title is None:
-		control_title = "control: " + controlfn
+	control_title = "control: " + controlfn
 	plt.title(control_title, fontsize = 8)
 	
 	# difference data 
