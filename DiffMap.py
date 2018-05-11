@@ -44,16 +44,6 @@ command line flag or argument.
 ####### Parse arguments from command line #######
 #################################################
 
-'''
-6 optional args:
--r (--region) REGION : sets the region, default to '' (global tropics)
--s (--season) SEASON : sets season, defaults to 'ANN'
--tdir (test_directory) TDIR : sets the directory to look for test files in, defaults to *_kn003 directory
--cdir (control_directory) CDIR : see above, for control, defaults to *_kn002 directory
--show : sets showfig to True, will print all plots to screen. Default is not to show figs
--nosave : sets savefig to False, will not save figures to current directory. Default is to save images to current directory
-'''
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--region', dest = 'region', default = None)
 parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = "F.C5.2deg.wiso.defaultSSTICE_kn002")
@@ -74,7 +64,6 @@ parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure
 
 ARGS = parser.parse_args()
 region = ARGS.region
-print "Region is " + region
 testdatafname = ARGS.testdatafname
 controldatafname = ARGS.controldatafname
 findFile = True
