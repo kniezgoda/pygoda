@@ -1,5 +1,5 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-from pygoda import camgoda, h0dates, findClimoFile
+from pygoda import camgoda, camdates, findClimoFile
 import numpy as np
 from scipy.stats import pearsonr as regress
 import matplotlib.pyplot as plt
@@ -18,17 +18,17 @@ and the field variable (-fv) over the globe for a specified time (-dates)
 #########################
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-cdir', '--control_directory', dest = 'cdir', nargs = 1, default = 'fc5.2deg.wiso.piControl_kn028/atm/hist')
-parser.add_argument('-tdir', '--test_directory', dest = 'tdir', nargs = 1, default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
-parser.add_argument('-loc_var', '--local_variable', dest = 'lv', nargs = 1, default = None)
-parser.add_argument('-field_var', '--field_variable', dest = 'fv', nargs = 1, default = None)
+parser.add_argument('-cdir', '--control_directory', dest = 'cdir', default = 'fc5.2deg.wiso.piControl_kn028/atm/hist')
+parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
+parser.add_argument('-loc_var', '--local_variable', dest = 'lv', default = None)
+parser.add_argument('-field_var', '--field_variable', dest = 'fv', default = None)
 parser.add_argument('-latlon', dest = 'latlon', nargs = 2, default = (0,0))
-parser.add_argument('-del', dest = 'delta', nargs = 1, default = [0])
+parser.add_argument('-del', dest = 'delta', default = 0)
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [10,30])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
-parser.add_argument('-grep_pre', dest = 'grep_pre', nargs = 1, default = [''])
-parser.add_argument('-grep_post', dest = 'grep_post', nargs = 1, default = [''])
-parser.add_argument('-alpha', '--alpha', dest = 'alpha', nargs = 1, default = .05)
+parser.add_argument('-grep_pre', dest = 'grep_pre', default = '')
+parser.add_argument('-grep_post', dest = 'grep_post', default = '')
+parser.add_argument('-alpha', '--alpha', dest = 'alpha', default = .05)
 parser.add_argument('-stiple', '--stiple', dest = 'stiple', action = "store_true")
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
@@ -37,14 +37,14 @@ parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action 
 ARGS = parser.parse_args()
 cdir = ARGS.cdir
 tdir = ARGS.tdir
-lv = ARGS.lv[0]
-fv = ARGS.fv[0]
+lv = ARGS.lv
+fv = ARGS.fv
 lat, lon = [int(x) for x in ARGS.latlon]
-delta = int(ARGS.delta[0])
+delta = int(ARGS.delta)
 start, end = [int(x) for x in ARGS.years]
 months = [int(m) for m in ARGS.months]
-grep_pre = ARGS.grep_pre[0]
-grep_post = ARGS.grep_post[0]
+grep_pre = ARGS.grep_pre
+grep_post = ARGS.grep_post
 savefig = ARGS.savefig
 showfig = ARGS.showfig
 alpha = float(ARGS.alpha)
@@ -60,7 +60,7 @@ if ARGS.developer_mode:
 #############
 
 # Make the date array
-dates = h0dates(start, end, months)
+dates = camdates(start, end, months)
 
 # Read in each file, extract the local variable at the point and field variable on the globe, track them in a master array
 # Correlate the local variable 1-d array to each grid cell of the field variable array
@@ -100,124 +100,9 @@ for n, d in enumerate(dates):
 			V = fv
 			box = None
 
-		# Extract variable info (sets var, vname, and pressure)
-		var_is_3d = False
-		if V[:3] == '3d_':
-			var_is_3d = True
-		if not var_is_3d:
-			var = V
-			vname = V
-			pressure = None
-		else:
-			var = V[3:-3]
-			vname = V[3:]
-			pressure = int(V[-3:]) * 100
-
-		# Extract the variable data
-		# Special variables
-		if var == "PRECT_d18O":
-			tnc.PRECT_d18O(box)
-			cnc.PRECT_d18O(box)
-
-		elif var == "PRECT_dD":
-			tnc.PRECT_dD(box)
-			cnc.PRECT_dD(box)
-
-		elif var == "PRECT_dxs":
-			tnc.PRECT_dxs(box)
-			cnc.PRECT_dxs(box)
-
-		elif var == "QFLX_d18O":
-			tnc.QFLX_d18O(box)
-			cnc.QFLX_d18O(box)
-
-		elif var == "QFLX_dD":
-			tnc.QFLX_dD(box)
-			cnc.QFLX_dD(box)
-
-		elif var == "fluxDelta":
-			tnc.fluxDelta(box)
-			cnc.fluxDelta(box)
-
-		elif var == "Column_d18OV":
-			tnc.variable('H2OV', box)
-			denom = tnc.columnSum(box)
-			tnc.variable('H218OV', box)
-			num = tnc.columnSum(box)
-			tnc.data = (num/denom - 1) * 1000
-
-			cnc.variable('H2OV', box)
-			denom = cnc.columnSum(box)
-			cnc.variable('H218OV', box)
-			num = cnc.columnSum(box)
-			cnc.data = (num/denom - 1) * 1000
-
-		elif var == "Column_dDV":
-			tnc.variable('H2OV', box)
-			denom = tnc.columnSum(box)
-			tnc.variable('HDOV', box)
-			num = tnc.columnSum(box)
-			tnc.data = (num/denom - 1) * 1000
-
-			cnc.variable('H2OV', box)
-			denom = cnc.columnSum(box)
-			cnc.variable('HDOV', box)
-			num = cnc.columnSum(box)
-			cnc.data = (num/denom - 1) * 1000
-
-		elif var == "P_E":
-			tnc.data = (tnc.variable('PRECT', box, math = False)*1000 - tnc.variable('QFLX', box, math = False)) * 60 * 60 * 24
-			tnc.units = "kg/m2/day"
-			tnc.long_name = "Moisture flux"
-
-			cnc.data = (cnc.variable('PRECT', box, math = False)*1000 - cnc.variable('QFLX', box, math = False)) * 60 * 60 * 24
-			cnc.units = "kg/m2/day"
-			cnc.long_name = "Moisture flux"
-
-		elif var == "d18OV":
-			tnc.d18OV(box)
-			cnc.d18OV(box)
-		elif var == "dDV":
-			tnc.dDV(box)
-			cnc.dDV(box)
-		elif var == "dxsV":
-			tnc.dxsV(box)
-			cnc.dxsV(box)
-		elif var == "psi":
-			tnc.psi(box)
-			cnc.psi(box)
-		elif var == "RH":
-			tnc.RH(box)
-			cnc.RH(box)
-		elif var == "VQ_d18O":
-			tnc.VQ_d18O(box)
-			cnc.VQ_d18O(box)
-		elif var == "VQ_dD":
-			tnc.VQ_dD(box)
-			cnc.VQ_dD(box)
-		elif var == "UQ_d18O":
-			tnc.UQ_d18O(box)
-			cnc.UQ_d18O(box)
-		elif var == "UQ_dD":
-			tnc.UQ_dD(box)
-			cnc.UQ_dD(box)
-		elif var == "QFLX_d18O":
-			tnc.QFLX_d18O(box)
-			cnc.QFLX_d18O(box)
-
-		# Regular variables inside the netcdf file
-		else:
-			try:
-				tnc.variable(var, box, verb = True)
-				cnc.variable(var, box, verb = True)
-			except KeyError:
-				print "Not able to plot variable " + var + "...\nSkipping this variable."
-				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
-				continue
-		if var_is_3d:
-			tnc.data = tnc.isobar(pressure)
-			cnc.data = cnc.isobar(pressure)
-
+		tnc.ExtractData(V, box)
+		cnc.ExtractData(V, box)
+		
 		if each == 0:
 			tloc_var = tnc.data
 			cloc_var = cnc.data
