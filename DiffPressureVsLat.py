@@ -1,82 +1,44 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
 
 
-from pygoda import ncgoda, findClimoFile, niceClev
+from pygoda import camgoda, findClimoFile, niceClev
 import os, sys
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
-use = {           \
-	"Q" : 1,      \
-	"V" : 1,      \
-	"VT" : 1,     \
-	"VQ" : 1,     \
-	"U" : 1,      \
-	"UT" : 1,     \
-	"UQ" : 1,     \
-	"T" : 1,      \
-	"OMEGA" : 1,  \
-	"Z3" : 0,     \
-	"dDV" : 1,    \
-	"d18OV" : 1,  \
-	"dxsV" : 1    \
-	}
-
-
-'''
-6 optional args:
--r (--region) REGION : sets the region, default to '' (global tropics)
--s (--season) SEASON : sets season, defaults to 'ANN'
--tdir (test_directory) TDIR : sets the directory to look for test files in, defaults to *_kn003 directory
--cdir (control_directory) CDIR : see above, for control, defaults to *_kn002 directory
--show : sets showfig to True, will print all plots to screen. Default is not to show figs
--nosave : sets savefig to False, will not save figures to current directory. Default is to save images to current directory
-'''
-
 parser = argparse.ArgumentParser()
-parser.add_argument('-r', '--region', dest = 'region', default = '')
-parser.add_argument('-s', '--season', dest = 'season', default = 'ANN')
+parser.add_argument('-r', '--region', dest = 'region', default = None)
 parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = "F.C5.2deg.wiso.defaultSSTICE_kn002")
 parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = "F.C5.2deg.wiso.obs6kSST_kn003")
+parser.add_argument('-grep', dest = 'grep', default = None)
+parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90,90])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
-parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
+parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 
 ARGS = parser.parse_args()
-season = ARGS.season
-print "Season is " + season
 region = ARGS.region
-print "Region is " + region
+season = '' # This needs to be set to comply with legacy coding schemes
+grep = ARGS.grep
 testdir = ARGS.testdir
 controldir = ARGS.controldir
 savefig = ARGS.savefig # default is True
 showfig = ARGS.showfig # default is false
-variable = ARGS.variable
+variables = ARGS.variables
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
 	savfig = False
 	showfig = True
 	mkdir = False
-
-# Set the new variable list if variable is not None
-if variable is not None:
-	use = {u : 0 for u in use}
-	for v in variable:
-		if v in use:
-			use[v] = 1
-		else:
-			print "\nVariable " + v + " not in master variable list.\nWill not plot this variable."
-
-
+	
 # Set the lat bounds
-# Default global tropics
-region_name = "GlobalTropics"
-southern_lat = -10
-northern_lat = 10
-left_lon = 0
-right_lon = 359
+# Default arguments
+region_name = "Box"
+southern_lat, northern_lat = [int(l) for l in ARGS.lats]
+left_lon, right_lon = [int(l) for l in ARGS.lons]
 
 # Arabian Sea
 if (region == "AS") | (region == "ArabianSea"):
@@ -140,29 +102,28 @@ if mkdir:
 		os.mkdir("PressureVsLat/" + region_name)
 		print "Created directory " + "PressureVsLat/" + region_name
 
-	# Create season directory inside region directory
-	if not os.path.exists("PressureVsLat/" + region_name + "/" + season):
-		os.mkdir("PressureVsLat/" + region_name + "/" + season)
-		print "Created directory " + "PressureVsLat/" + region_name + "/" + season
+	# Create grep directory inside region directory
+	if not os.path.exists("PressureVsLat/" + region_name + "/" + grep):
+		os.mkdir("PressureVsLat/" + region_name + "/" + grep)
+		print "Created directory " + "PressureVsLat/" + region_name + "/" + grep
 
 # Look for the climo files in the root directory
-print "\nLooking for control " + season + " files in " + controldir
-controldatafname, controlfn = findClimoFile("*" + season + "*", controldir)
+print "\nLooking for control " + grep + " files in " + controldir
+controldatafname, controlfn = findClimoFile("*" + grep + "*", controldir)
 if not controldatafname:
 	sys.exit()
 print "Found control file: " + controlfn
-print "\nLooking for test " + season + " files in " + testdir
-testdatafname, testfn = findClimoFile("*" + season + "*", testdir)
+print "\nLooking for test " + grep + " files in " + testdir
+testdatafname, testfn = findClimoFile("*" + grep + "*", testdir)
 if not testdatafname:
 	sys.exit()
 print "Found test file: " + testfn
 
 # Read the data
-control = ncgoda(controldatafname)
-test = ncgoda(testdatafname)
+control = camgoda(controldatafname)
+test = camgoda(testdatafname)
 
-
-# Initialize a variable extraction from ncgoda so that boxlat and boxlon are set to correct values
+# Initialize a variable extraction from camgoda so that boxlat and boxlon are set to correct values
 control.variable("T", box)
 lat = control.boxlat
 numlats = len(lat)
@@ -182,42 +143,19 @@ class Niezgoda:
 		self.test = np.delete(self.test, np.where(np.sum(self.test,1)==0)[0][0], 0)
 
 if mkdir:
-	os.chdir("PressureVsLat/" + region_name + "/" + season)
+	os.chdir("PressureVsLat/" + region_name + "/" + grep)
 
-for var in use:
-	if not use.get(var):
-		continue
+for var in variables:
 	print "\nPlotting " + var + " data...\n"
+
+	control.ExtractData(var, box)
+	test.ExtractData(var, box)
 	master = Niezgoda(numlats)
 	for p in pressures:
 		print p
-		if var == "d18OV":
-			hold_c = control.d18OV(box)
-			hold_c = control.isobar(p)
-			hold_t = test.d18OV(box)
-			hold_t = test.isobar(p)
-		elif var == "dDV":
-			hold_c = control.dDV(box)
-			hold_t = test.dDV(box)
-			hold_t = test.isobar(p)
-			hold_c = control.isobar(p)
-		elif var == 'dxsV':
-			hold_c = control.dxsV(box)
-			hold_c = control.isobar(p)
-			hold_t = test.dxsV(box)
-			hold_t = test.isobar(p)
-		else:
-			try:
-				hold_c = control.variable(var, box)
-				hold_c = control.isobar(p)
-				hold_t = test.variable(var, box)
-				hold_t = test.isobar(p)
-			except KeyError:
-				print "Not able to plot variable " + var + "...\nSkipping this variable."
-				continue
 		# Average down to 1 horizontal dimension
-		hold_c = np.mean(hold_c, axis = 1)
-		hold_t = np.mean(hold_t, axis = 1)
+		hold_c = np.nanmean(control.isobar(p, setData = False), axis = 1)
+		hold_t = np.nanmean(test.isobar(p, setData = False), axis = 1)
 		
 		master.stack(hold_c, hold_t)
 
