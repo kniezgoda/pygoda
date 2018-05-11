@@ -149,14 +149,14 @@ for var in variables:
 
 	control.ExtractData(var, box)
 	test.ExtractData(var, box)
-	print control.data
 	master = Niezgoda(numlons)
 
 	for p in pressures:
 		print p
 		# Average down to 1 horizontal dimension
-		hold_c = np.nanmean(control.isobar(p), axis = 0)
-		hold_t = np.nanmean(test.isobar(p), axis = 0)
+		print control.isobar(p, setData = False)
+		hold_c = np.nanmean(control.isobar(p, setData = False), axis = 0)
+		hold_t = np.nanmean(test.isobar(p, setData = False), axis = 0)
 
 		master.stack(hold_c, hold_t)
 
