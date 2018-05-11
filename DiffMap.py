@@ -71,6 +71,7 @@ if (testdatafname is not None) & (controldatafname is not None):
 	findFile = False
 testdir = ARGS.testdir
 controldir = ARGS.controldir
+grep = ARGS.grep
 clev = ARGS.clev
 diffclev = ARGS.diffclev
 barbs = ARGS.wind_barb_pressure
