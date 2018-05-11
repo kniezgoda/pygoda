@@ -154,7 +154,6 @@ for var in variables:
 	for p in pressures:
 		print p
 		# Average down to 1 horizontal dimension
-		print control.isobar(p, setData = False)
 		hold_c = np.nanmean(control.isobar(p, setData = False), axis = 0)
 		hold_t = np.nanmean(test.isobar(p, setData = False), axis = 0)
 
