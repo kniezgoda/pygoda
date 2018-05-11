@@ -17,8 +17,8 @@ The code should always be able to handle multiple input files and multiple varia
 
 4) -nosave, -show, -dev {False False, False}   : Provides functionality for saving and/or displaying plots to the screen. These flags do not take arguments, they are either set or not. -nosave will not write out figures to a file, -show will display the figure on the screen, and -dev will set -nosave and -show (so nothing is saved and figures are printed to the screen.)
 
-5) -cdir, -tdir {./ ./}                        : the control and test directory, where files will be searched for.
+5) -cdir CDIR -tdir TDIR {./ ./}                        : the control and test directory, where files will be searched for.
 
-6) -grep                                       : a string to search for in cdir and tdir. This flag is used as the first argument in findClimoFile, and is surrounded by the "*" wildcard.
+6) -grep GREP                               : a string to search for in cdir and tdir. This flag is used as the first argument in findClimoFile, and is surrounded by the "*" wildcard.
 
-7) -t -c {None None}                           : a specified test and control file. If set, these will override any -cdir/-tdir and grep functionality. 
+7) -t TFILE -c CFILE {None None}                           : a specified test and control file. If set, these will override any -cdir/-tdir and grep functionality. 
