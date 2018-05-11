@@ -20,7 +20,7 @@ import os, sys, glob, argparse
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.basemap import Basemap as bm 
-from pygoda import ncgoda, findClimoFile, niceClev, RegularClev
+from pygoda import camgoda, findClimoFile, niceClev, RegularClev
 root = os.getcwd()
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -205,8 +205,8 @@ else:
 	testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
 
 # Read the data
-controldata = ncgoda(controldatafname)
-testdata = ncgoda(testdatafname)
+controldata = camgoda(controldatafname)
+testdata = camgoda(testdatafname)
 
 # Set the boxlat and boxlon
 box = (southern_lat, northern_lat, left_lon, right_lon)
@@ -269,127 +269,8 @@ for V in variable:
 		diff_u = diff_u[:,colsby4]
 
 	# Extract variable info (sets var, vname, and pressure)
-	var_is_3d = False
-	if V[:3] == '3d_':
-		var_is_3d = True
-		
-	if not var_is_3d:
-		var = V
-		vname = V
-		pressure = None
-	else:
-		var = V[3:-3]
-		vname = V[3:]
-		pressure = int(V[-3:]) * 100
-
-	print("\nPlotting " + season + " " + vname  +  " data...")
-
-	# Extract the variable data
-	# Special variables
-	if var == "PRECT_d18O":
-		testdata.PRECT_d18O(box)
-		controldata.PRECT_d18O(box)
-
-	elif var == "PRECT_dD":
-		testdata.PRECT_dD(box)
-		controldata.PRECT_dD(box)
-
-	elif var == "PRECT_dxs":
-		testdata.PRECT_dxs(box)
-		controldata.PRECT_dxs(box)
-
-	elif var == "QFLX_d18O":
-		testdata.QFLX_d18O(box)
-		controldata.QFLX_d18O(box)
-
-	elif var == "QFLX_dD":
-		testdata.QFLX_dD(box)
-		controldata.QFLX_dD(box)
-
-	elif var == "fluxDelta":
-		testdata.fluxDelta(box)
-		controldata.fluxDelta(box)
-
-	elif var == "Column_d18OV":
-		#test
-		testdata.variable('H2OV', box)
-		denom = testdata.columnSum(box)
-		testdata.variable('H218OV', box)
-		num = testdata.columnSum(box)
-		testdata.data = (num/denom - 1) * 1000
-		#control
-		controldata.variable('H2OV', box)
-		denom = controldata.columnSum(box)
-		controldata.variable('H218OV', box)
-		num = controldata.columnSum(box)
-		controldata.data = (num/denom - 1) * 1000
-
-	elif var == "Column_dDV":
-		#test
-		testdata.variable('H2OV', box)
-		denom = testdata.columnSum(box)
-		testdata.variable('HDOV', box)
-		num = testdata.columnSum(box)
-		testdata.data = (num/denom - 1) * 1000
-		#control
-		controldata.variable('H2OV', box)
-		denom = controldata.columnSum(box)
-		controldata.variable('HDOV', box)
-		num = controldata.columnSum(box)
-		controldata.data = (num/denom - 1) * 1000
-
-	elif var == "P_E":
-		#test
-		testdata.data = (testdata.variable('PRECT', box, math = False)*1000 - testdata.variable('QFLX', box, math = False)) * 60 * 60 * 24
-		controldata.data = (controldata.variable('PRECT', box, math = False)*1000 - controldata.variable('QFLX', box, math = False)) * 60 * 60 * 24
-		testdata.units = "kg/m2/day"
-		testdata.long_name = "Moisture flux"
-		controldata.units = "kg/m2/day"
-		controldata.long_name = "Advective moisture flux"
-
-	elif var == "d18OV":
-		testdata.d18OV(box)
-		controldata.d18OV(box)
-	elif var == "dDV":
-		testdata.dDV(box)
-		controldata.dDV(box)
-	elif var == "dxsV":
-		testdata.dxsV(box)
-		controldata.dxsV(box)
-	elif var == "psi":
-		testdata.psi(box)
-		controldata.psi(box)
-	elif var == "RH":
-		testdata.RH(box)
-		controldata.RH(box)
-	elif var == "VQ_d18O":
-		testdata.VQ_d18O(box)
-		controldata.VQ_d18O(box)
-	elif var == "VQ_dD":
-		testdata.VQ_dD(box)
-		controldata.VQ_dD(box)
-	elif var == "UQ_d18O":
-		testdata.UQ_d18O(box)
-		controldata.UQ_d18O(box)
-	elif var == "UQ_dD":
-		testdata.UQ_dD(box)
-		controldata.UQ_dD( box)
-	elif var == "QFLX_d18O":
-		testdata.QFLX_d18O(box)
-		controldata.QFLX_d18O(box)
-
-	# Regular variables inside the netcdf file
-	else:
-		try:
-			testdata.variable(var, box, verb = True)
-			controldata.variable(var, box)
-		except KeyError:
-			print "Not able to plot variable " + var + "...\nSkipping this variable."
-			print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
-			continue
-	if var_is_3d:
-		testdata.data = testdata.isobar(pressure)
-		controldata.data = controldata.isobar(pressure)
+	controldata.ExtractData(V, box)
+	testdata.ExtractDate(V, box)
 	
 	fig = plt.figure()
 	
