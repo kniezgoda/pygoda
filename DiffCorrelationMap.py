@@ -138,28 +138,66 @@ field_var_master = np.subtract(tfield_var_master, cfield_var_master)
 dim1 = field_var_master.shape[1]
 dim2 = field_var_master.shape[2]
 corr_array = np.zeros((dim1, dim2))
+tcorr_array = np.zeros((dim1, dim2))
+ccorr_array = np.zeros((dim1, dim2))
 for i in range(dim1):
 	for j in range(dim2):
+		cr, cpval = regress(cloc_var_master, cfield_var_master[:,i,j])
+		tr, tpval = regress(tloc_var_master, tfield_var_master[:,i,j])
 		r, pval = regress(loc_var_master, field_var_master[:,i,j])
 		if stiple:
 			if pval > alpha:
 				corr_array[i,j] = np.nan
 			else:
 				corr_array[i,j] = r
+			if cpval > alpha:
+				ccorr_array[i,j] = np.nan
+			else:
+				ccorr_array[i,j] = cr
+			if tpval > alpha:
+				tcorr_array[i,j] = np.nan
+			else:
+				tcorr_array[i,j] = tr
 		else:
 			corr_array[i,j] = r
+			ccorr_array[i,j] = cr
+			tcorr_array[i,j] = tr
+
 
 # Make the map of the corr array
+plt.subplot(3,1,1)
 bmlon, bmlat = np.meshgrid(lons, lats)
-m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=0,urcrnrlon=360,resolution='c')
+m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=lon-180,urcrnrlon=lon+180,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+clevs = np.linspace(-1, 1, 21)
+cs = m.contourf(bmlon, bmlat, ccorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+cbar.set_label("correlation-coefficient", fontsize = 8)
+x,y = m(lon,lat)
+m.plot(x, y, 'gx')
+
+plt.subplot(3,1,2)
+bmlon, bmlat = np.meshgrid(lons, lats)
+m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=lon-180,urcrnrlon=lon+180,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+clevs = np.linspace(-1, 1, 21)
+cs = m.contourf(bmlon, bmlat, tcorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+cbar.set_label("correlation-coefficient", fontsize = 8)
+x,y = m(lon,lat)
+m.plot(x, y, 'gx')
+
+plt.subplot(3,1,3)
+bmlon, bmlat = np.meshgrid(lons, lats)
+m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=lon-180,urcrnrlon=lon+180,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
 cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
-
-# Put a point on the map to show the location
 x,y = m(lon,lat)
 m.plot(x, y, 'gx')
 
