@@ -246,6 +246,7 @@ for V in variable:
 	# Extract variable info (sets var, vname, and pressure)
 	var_is_3d, var, pressure = controldata.ExtractData(V, box)
 	var_is_3d, var, pressure = testdata.ExtractData(V, box)
+	vname = var+str(pressure/100)
 	
 	fig = plt.figure()
 	
