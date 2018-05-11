@@ -755,7 +755,6 @@ d18OV and dDV : returns 2d numpy array data.
 	"""
 	def __init__(self, dataset):
 		from netCDF4 import Dataset as ds
-		from pygoda import ncdump
 		self.dataset = dataset
 		if type(dataset) is str:
 			self.dataset = ds(dataset, "r")
@@ -1222,7 +1221,6 @@ d18OV and dDV : returns 2d numpy array data.
 class popgoda:
 	def __init__(self, dataset):
 		from netCDF4 import Dataset as ds
-		from pygoda import ncdump
 		self.dataset = dataset
 		if type(dataset) is str:
 			self.dataset = ds(dataset, "r")
