@@ -1141,7 +1141,7 @@ d18OV and dDV : returns 2d numpy array data.
 		return self.Hadley
 
 
-	def ExtractData(self, V, box):
+	def ExtractData(self, V, box = None):
 		# The main function for extracting data, everything else is just behind the scenes stuff
 		var_is_3d = False
 		if V[:3] == '3d_':

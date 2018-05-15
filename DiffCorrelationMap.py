@@ -99,7 +99,7 @@ for n, d in enumerate(dates):
 		else:
 			V = fv
 			box = None
-
+		
 		tnc.ExtractData(V, box)
 		cnc.ExtractData(V, box)
 		
@@ -173,9 +173,10 @@ m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=lon-180,urcrnrl
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
-cs = m.contourf(bmlon, bmlat, ccorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, tcorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
+plt.title("test")
 x,y = m(lon,lat)
 m.plot(x, y, 'gx')
 
@@ -185,9 +186,10 @@ m = bm(projection = 'cea', llcrnrlat=-50,urcrnrlat=50, llcrnrlon=lon-180,urcrnrl
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
-cs = m.contourf(bmlon, bmlat, tcorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, ccorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
+plt.title("control")
 x,y = m(lon,lat)
 m.plot(x, y, 'gx')
 
@@ -200,6 +202,7 @@ clevs = np.linspace(-1, 1, 21)
 cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
+plt.title("test-control difference")
 x,y = m(lon,lat)
 m.plot(x, y, 'gx')
 
@@ -214,7 +217,8 @@ else:
 		title = "Correlation between\n" + lv + " at lats=" + str(bottom) + "-" + str(top) + ", lon=" + str(right) + "\nand global " + fv
 	else:
 		title = "Correlation between\n" + lv + " at lats=" + str(bottom) + "-" + str(top) + ", lons=" + str(left) + "-" + str(right) + "\nand global " + fv
-		
+
+fig.tight_layout()
 fig.suptitle(title)
 if savefig:
 	plt.savefig("correlationMap.pdf")
