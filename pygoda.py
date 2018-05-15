@@ -1180,9 +1180,13 @@ d18OV and dDV : returns 2d numpy array data.
 		    vname = V
 		    pressure = None
 		else:
-			var = V[3:-3]
-			vname = V[3:]
-			pressure = int(V[-3:]) * 100
+			split = V.split("_")
+			if len(split) != 3:
+				print "Something went wrong parsing the variable name.\nMake sure there are two underscores!"
+				return 
+			var = split[1]
+			vname = split[1]+split[2]
+			pressure = int(split[2]) * 100
 		# Extract the variable data
 		# Special variables
 		if var == "PRECT_d18O":
@@ -1243,7 +1247,11 @@ d18OV and dDV : returns 2d numpy array data.
 				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
 				return
 		if var_is_3d:
-			{"CAM":self.isobar(pressure), "CLM":self.depth(pressure*100)}.get(self.model, None)
+			if self.model == "CAM":
+				self.isobar(pressure)
+			elif self.model == "CLM":
+				pressure /= 100
+				self.depth(pressure)
 		return [var_is_3d, var, pressure]
 
 
