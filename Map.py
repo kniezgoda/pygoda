@@ -1,4 +1,4 @@
-#!/glade/u/apps/ch/opt/python/2.7.13/gnu/6.2.0/bin/python
+#! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
 '''
 Creates one map of a variable
 
