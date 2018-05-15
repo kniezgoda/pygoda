@@ -894,7 +894,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.pressure = pressure
 		if setData:
 			self.data = VAR
-			self.long_name += " @" + str(pressure/100) + "mb"
+			self.long_name += " @" + str(int(pressure/100)) + "mb"
 
 		return VAR
 
@@ -918,7 +918,7 @@ d18OV and dDV : returns 2d numpy array data.
 
 		if setData:
 			self.data = VAR
-			self.long_name += " @" + str(d) + "m"
+			self.long_name += " @" + str(int(d)) + "m"
 
 		return VAR
 
@@ -1186,7 +1186,7 @@ d18OV and dDV : returns 2d numpy array data.
 				return 
 			var = split[1]
 			vname = split[1]+split[2]
-			pressure = int(split[2]) * 100
+			pressure = float(split[2]) * 100
 		# Extract the variable data
 		# Special variables
 		if var == "PRECT_d18O":
