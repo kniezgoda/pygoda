@@ -764,6 +764,11 @@ d18OV and dDV : returns 2d numpy array data.
 		self.lat = self.dataset.variables['lat'][:]
 		self.lon = self.dataset.variables['lon'][:]
 		
+		self.model = "CAM"
+		if any(v == "levgrnd" for v in self.vars):
+			self.model = "CLM"
+			self.depths = self.dataset.variables['levgrnd'][:]
+
 		# Some variables that don't need to be caluclated more than once
 		self.PressureCalculated = False
 		self.PsiCalculated = False
@@ -890,6 +895,30 @@ d18OV and dDV : returns 2d numpy array data.
 		if setData:
 			self.data = VAR
 			self.long_name += " @" + str(pressure/100) + "mb"
+
+		return VAR
+
+	def depth(self, d, setData = True, verb = False):
+		if self.model is not "CLM":
+			print "Can not run camgoda.depth() on a CAM file! Read in a CLM file to run this method."
+			return
+		if self.var == '':
+			print "No variable read in yet.\nUse self.variable() to read a variable first."
+			return
+		if self.vartype == "2d":
+			print "Current .data attribute is 2-dimensional, no depth data.\nRead in a 3d variable first before running this method."
+			return
+		import numpy as np
+		data = self.data
+		depths = self.depths
+		VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
+		for i in range(len(self.boxlat)):
+			for j in range(len(self.boxlon)):
+				VAR[i,j] = np.interp(d, depths, data[:,i,j])
+
+		if setData:
+			self.data = VAR
+			self.long_name += " @" + str(d) + "m"
 
 		return VAR
 
