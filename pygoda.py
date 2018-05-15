@@ -941,9 +941,9 @@ d18OV and dDV : returns 2d numpy array data.
 		try:
 			from clevs import getClev, getCmap
 			import matplotlib.pyplot as plt
-			pressure = ""
-			if self.vartype == "3d":
-				pressure = self.pressure
+			# pressure = ""
+			# if self.vartype == "3d":
+			# 	pressure = self.pressure
 			#self.clevs = getClev(self.var+str(pressure), season+"_"+region, self.data)
 			self.cmap = getCmap(self.var, 'cmap')
 			self.diffcmap = getCmap(self.var, 'diffcmap')
