@@ -221,91 +221,11 @@ for filein in files:
 			nc_u = nc_u[:,colsby4]
 
 		# Extract variable info (sets var, vname, and pressure)
-		var_is_3d = False
-		if V[:3] == '3d_':
-			var_is_3d = True
-			
-		if not var_is_3d:
-			var = V
-			vname = V
-			pressure = None
-		else:
-			var = V[3:-3]
-			vname = V[3:]
-			pressure = int(V[-3:]) * 100
-
-		print("\nPlotting " + vname  +  " data...")
-
-		# Extract the variable data
-		# Special variables
-		if var == "PRECT_d18O":
-			ncdata.PRECT_d18O(box)
-		
-		elif var == "PRECT_dD":
-			ncdata.PRECT_dD(box)
-		
-		elif var == "PRECT_dxs":
-			ncdata.PRECT_dxs(box)
-		
-		elif var == "QFLX_d18O":
-			ncdata.QFLX_d18O(box)
-		
-		elif var == "QFLX_dD":
-			ncdata.QFLX_dD(box)
-		
-		elif var == "fluxDelta":
-			ncdata.fluxDelta(box)
-		
-		elif var == "Column_d18OV":
-			ncdata.variable('H2OV', box)
-			denom = ncdata.columnSum(box)
-			ncdata.variable('H218OV', box)
-			num = ncdata.columnSum(box)
-			ncdata.data = (num/denom - 1) * 1000
-		
-		elif var == "Column_dDV":
-			ncdata.variable('H2OV', box)
-			denom = ncdata.columnSum(box)
-			ncdata.variable('HDOV', box)
-			num = ncdata.columnSum(box)
-			ncdata.data = (num/denom - 1) * 1000
-
-		elif var == "P_E":
-			ncdata.data = (ncdata.variable('PRECT', box, math = False)*1000 - ncdata.variable('QFLX', box, math = False)) * 60 * 60 * 24
-			ncdata.units = "kg/m2/day"
-			ncdata.long_name = "Advective moisture flux"
-
-		elif var == "d18OV":
-			ncdata.d18OV(box)
-		elif var == "dDV":
-			ncdata.dDV(box)
-		elif var == "dxsV":
-			ncdata.dxsV(box)
-		elif var == "psi":
-			ncdata.psi(box)
-		elif var == "RH":
-			ncdata.RH(box)
-		elif var == "VQ_d18O":
-			ncdata.VQ_d18O(box)
-		elif var == "VQ_dD":
-			ncdata.VQ_dD(box)
-		elif var == "UQ_d18O":
-			ncdata.UQ_d18O(box)
-		elif var == "UQ_dD":
-			ncdata.UQ_dD( box)
-		elif var == "QFLX_d18O":
-			ncdata.QFLX_d18O(box)
-		
-		# Regular variables inside the netcdf file
-		else:
-			try:
-				ncdata.variable(var, box)
-			except KeyError:
-				print "Not able to plot variable " + var + "...\nSkipping this variable."
-				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
-				continue
-		if var_is_3d:
-			ncdata.data = ncdata.isobar(pressure)
+		var_is_3d, var, pressure = controldata.ExtractData(V, box)
+		var_is_3d, var, pressure = testdata.ExtractData(V, box)
+		vname = var
+		if pressure is not None:
+			vname += str(pressure)
 
 		#----------------#
 		# Create the map #
