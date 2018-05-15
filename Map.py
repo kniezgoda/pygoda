@@ -221,8 +221,7 @@ for filein in files:
 			nc_u = nc_u[:,colsby4]
 
 		# Extract variable info (sets var, vname, and pressure)
-		var_is_3d, var, pressure = controldata.ExtractData(V, box)
-		var_is_3d, var, pressure = testdata.ExtractData(V, box)
+		var_is_3d, var, pressure = ncdata.ExtractData(V, box)
 		vname = var
 		if pressure is not None:
 			vname += str(pressure)
