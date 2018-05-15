@@ -247,7 +247,7 @@ for filein in files:
 		cbar = m.colorbar(cs, location='right', pad="5%")
 		cbar.set_label(ncdata.units, fontsize = 8)
 		if user_control_plot_title is None:
-			control_title = vname + " from " + filein
+			control_title = ncdata.long_name + "\n" + filein
 		else:
 			control_title = user_control_plot_title 
 		plt.title(control_title, fontsize = 8)
