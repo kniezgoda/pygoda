@@ -1060,8 +1060,8 @@ d18OV and dDV : returns 2d numpy array data.
 		qflx_h218o = self.variable("QFLX_H218O", box, setData = False, math = False)
 		qflx_h2o = self.variable("QFLX_H2O", box, setData = False, math = False)
 		qmask = xr.DataArray(qflx_h2o)
-		qflx_h2o = np.array(qmask.where(abs(qmask) > .0000008))
-		qflx_h218o = np.array(xr.DataArray(qflx_h218o).where(abs(qmask) > .0000008))
+		qflx_h2o = np.array(qmask.where(abs(qmask) > .00000008))
+		qflx_h218o = np.array(xr.DataArray(qflx_h218o).where(abs(qmask) > .00000008))
 		# mask out large values of qflx_h218o
 		qmask = xr.DataArray(qflx_h218o)
 		qflx_h218o = np.array(qmask.where(abs(qmask) < 100))
@@ -1079,8 +1079,8 @@ d18OV and dDV : returns 2d numpy array data.
 		qflx_hdo = self.variable("QFLX_HDO", box, setData = False, math = False)
 		qflx_h2o = self.variable("QFLX_H2O", box, setData = False, math = False)
 		qmask = xr.DataArray(qflx_h2o)
-		qflx_h2o = np.array(qmask.where(abs(qmask) > .0000005))
-		qflx_hdo = np.array(xr.DataArray(qflx_hdo).where(abs(qmask) > .0000005))
+		qflx_h2o = np.array(qmask.where(abs(qmask) > .00000005))
+		qflx_hdo = np.array(xr.DataArray(qflx_hdo).where(abs(qmask) > .00000005))
 		self.var = "QFLX_dD"
 		self.long_name = "dD of QFLX"
 		self.units = "delta D"
