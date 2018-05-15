@@ -97,6 +97,13 @@ region_name = "Box"
 southern_lat, northern_lat = [int(l) for l in ARGS.lats]
 left_lon, right_lon = [int(l) for l in ARGS.lons]
 
+# Global
+if (region == "GT") | (region == "GlobalTropics"):
+	region_name = "GlobalTropics"
+	southern_lat = -50
+	northern_lat = 50
+	left_lon = 0
+	right_lon = 360
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
 	region_name = "IndianMonsoon"
