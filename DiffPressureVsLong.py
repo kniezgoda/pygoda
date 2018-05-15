@@ -40,6 +40,13 @@ region_name = "Box"
 southern_lat, northern_lat = [int(l) for l in ARGS.lats]
 left_lon, right_lon = [int(l) for l in ARGS.lons]
 
+# Global
+if (region == "GT") | (region == "GlobalTropics"):
+	region_name = "GlobalTropics"
+	southern_lat = -50
+	northern_lat = 50
+	left_lon = 0
+	right_lon = 360
 # Arabian Sea
 if (region == "AS") | (region == "ArabianSea"):
 	region_name = "ArabianSea"
@@ -93,19 +100,19 @@ pressures = range(100000, 0, -5000)
 
 if mkdir:
 	# Create maps directory is it doesn't exist
-	if not os.path.exists("PressureVsLat"):
-		os.mkdir("PressureVsLat")
-		print "Created directory " + "PressureVsLat"
+	if not os.path.exists("PressureVsLong"):
+		os.mkdir("PressureVsLong")
+		print "Created directory " + "PressureVsLong"
 
 	# Create the region directory if it doesn't already exist
-	if not os.path.exists("PressureVsLat/" + region_name):
-		os.mkdir("PressureVsLat/" + region_name)
-		print "Created directory " + "PressureVsLat/" + region_name
+	if not os.path.exists("PressureVsLong/" + region_name):
+		os.mkdir("PressureVsLong/" + region_name)
+		print "Created directory " + "PressureVsLong/" + region_name
 
 	# Create grep directory inside region directory
-	if not os.path.exists("PressureVsLat/" + region_name + "/" + grep):
-		os.mkdir("PressureVsLat/" + region_name + "/" + grep)
-		print "Created directory " + "PressureVsLat/" + region_name + "/" + grep
+	if not os.path.exists("PressureVsLong/" + region_name + "/" + grep):
+		os.mkdir("PressureVsLong/" + region_name + "/" + grep)
+		print "Created directory " + "PressureVsLong/" + region_name + "/" + grep
 
 # Look for the climo files in the root directory
 print "\nLooking for control " + grep + " files in " + controldir
