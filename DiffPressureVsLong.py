@@ -26,10 +26,11 @@ testdir = ARGS.testdir
 controldir = ARGS.controldir
 savefig = ARGS.savefig # default is True
 showfig = ARGS.showfig # default is false
+mkdir = True
 variables = ARGS.variables
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
-	savfig = False
+	savefig = False
 	showfig = True
 	mkdir = False
 
