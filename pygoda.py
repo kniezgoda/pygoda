@@ -1243,7 +1243,7 @@ d18OV and dDV : returns 2d numpy array data.
 				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
 				return
 		if var_is_3d:
-			self.isobar(pressure)
+			{"CAM":self.isobar(pressure), "CLM":self.depth(pressure*100)}.get(self.model, None)
 		return [var_is_3d, var, pressure]
 
 
