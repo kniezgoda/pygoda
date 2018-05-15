@@ -147,19 +147,19 @@ if (region == "4P") | (region == "FourProxies"):
 
 if mkdir:
 	# Create maps directory is it doesn't exist
-	if not os.path.exists("PressureVsLat"):
-		os.mkdir("PressureVsLat")
-		print "Created directory " + "PressureVsLat"
+	if not os.path.exists("DiffMap"):
+		os.mkdir("DiffMap")
+		print "Created directory " + "DiffMap"
 
 	# Create the region directory if it doesn't already exist
-	if not os.path.exists("PressureVsLat/" + region_name):
-		os.mkdir("PressureVsLat/" + region_name)
-		print "Created directory " + "PressureVsLat/" + region_name
+	if not os.path.exists("DiffMap/" + region_name):
+		os.mkdir("DiffMap/" + region_name)
+		print "Created directory " + "DiffMap/" + region_name
 
 	# Create grep directory inside region directory
-	if not os.path.exists("PressureVsLat/" + region_name + "/" + grep):
-		os.mkdir("PressureVsLat/" + region_name + "/" + grep)
-		print "Created directory " + "PressureVsLat/" + region_name + "/" + grep
+	if not os.path.exists("DiffMap/" + region_name + "/" + grep):
+		os.mkdir("DiffMap/" + region_name + "/" + grep)
+		print "Created directory " + "DiffMap/" + region_name + "/" + grep
 
 if findFile:
 	# Look for the climo files in the root directory
