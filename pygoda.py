@@ -918,7 +918,7 @@ d18OV and dDV : returns 2d numpy array data.
 
 		if setData:
 			self.data = VAR
-			self.long_name += " @" + str(round(d)) + "m"
+			self.long_name += " @" + str(d) + "m"
 
 		return VAR
 
