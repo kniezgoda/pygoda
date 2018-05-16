@@ -165,11 +165,14 @@ for n, d in enumerate(dates):
 
 print "All data extracted, computing correlations..."
 
+ntime, nlats, nlons = cv1_master.shape
+ccorrArray = np.zeros((nlats, nlons))
+tcorrArray = np.zeros((nlats, nlons))
+for i in nlats:
+	print i
+	for j in nlons:
+		print j
+		ccorrArray[i,j] = np.corrcoef(cv1_master[:i,j], cv2_master[:i,j])[0,1]
+		tcorrArray[i,j] = np.corrcoef(tv1_master[:i,j], tv2_master[:i,j])[0,1]
 
-print cv1_master
-print cv1_master.shape
-print cv2_master.shape
-print tv1_master.shape
-print tv2_master.shape
-
-                                                                                                                                                     168,0-1       Bot
+print ccorrArray
