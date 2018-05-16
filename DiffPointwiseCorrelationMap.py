@@ -185,12 +185,16 @@ for i in range(nlats):
 		corr_array[i,j] = np.corrcoef(diffv1_master[:,i,j], diffv2_master[:,i,j])[0,1]
 
 
+llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[1], lons[0], lons[1]]
+if 0 in lons[1:-2]: # if we cross the gml
+	llcrnlon = lons[0]-360
+
 # Make the map of the corr array
 fig = plt.figure()
 
 plt.subplot(3,1,1)
 bmlon, bmlat = np.meshgrid(lons, lats)
-m = bm(projection = 'cea', llcrnrlat=lats[0],urcrnrlat=lats[-1], llcrnrlon=lons[0],urcrnrlon=lons[-1],resolution='c')
+m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
@@ -200,7 +204,7 @@ cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("test")
 
 plt.subplot(3,1,2)
-m = bm(projection = 'cea', llcrnrlat=lats[0],urcrnrlat=lats[-1], llcrnrlon=lons[0],urcrnrlon=lons[-1],resolution='c')
+m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
@@ -210,7 +214,7 @@ cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("control")
 
 plt.subplot(3,1,3)
-m = bm(projection = 'cea', llcrnrlat=lats[0],urcrnrlat=lats[-1], llcrnrlon=lons[0],urcrnrlon=lons[-1],resolution='c')
+m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
