@@ -950,6 +950,56 @@ d18OV and dDV : returns 2d numpy array data.
 		except ImportError:
 			return "Could not find clevs.py, not able to set clevs!"
 
+	def mask(self, gt_lt, val, maskArray = self.data, targetArray = self.data):
+		'''
+		This function is intended to mask a target array for bad data.
+		It can also be used for taking out small values of, e.g., QFLX, when used in the 
+		denominator of ratios. 
+
+		Viable options for 'gt_lt' argument are 'gt' (greater than) or 'lt' (less than) as of now.
+
+		This method does not set ANY data, including self.data, self.long_name, self.units, or anything like that!
+
+		It requires xarray.
+
+		The basic idea is to take the 'array', and find all values
+		that are 'bool' (less than or greater than) when compared to 'val'.
+		
+		Example:
+		maskArray = [[1,5,3,2,6,8,2345,3456,2,5,8,4],
+				 [6,3,7,4,3,6,6,5,3,5,11234,6],
+				 [6,4,3452345,3,6,5,3,5,67,8,6,4]]
+		We want to remove the large values: 2345, 3456, 11234, 3452345, and 67
+		as they are clearly outliers. To do so, we would run the function with the following arguments:
+
+		self.data = self.mask('gt', 50, maskArray, maskArray)
+
+		If self.data = maskArray, then simply run
+
+		self.data = self.mask('gt', 50)
+
+		This method also provides functionality for removing values from target arrays based on
+		a mask generated from maskArray, but most of the time this is not necessary. 
+
+		To mask an array called targetArray with a mask generated from maskArray, run
+
+		masked_targetArray = self.mask('gt', 50, maskArray, targetArray)
+		'''
+		if (gt_lt is not "gt") or (gt_lt is not "lt"):
+			print "First argument (gt_lt) must be either 'gt' or 'lt'...Exiting method."
+			return 
+		import xarray as xr
+		import numpy as np
+		maskArray = xr.DataArray(maskArray)
+		if gt_lt == 'gt':
+			# This is supposed to be the less than sign even though we're in the gt if statement.
+			# This is because the masking function in xarray keeps values that 
+			# satisfy the boolean in the where argument, and makes everything else nan
+			ret = np.array(maskArray.where(maskArray < val))
+		else:
+			ret = np.array(maskArray.where(maskArray > val))
+		return ret
+	
 	def PRECT_d18O(self, box = None):
 		h2o = self.variable("PRECT_H2O", box, setData = False)
 		h218o = self.variable("PRECT_H218O", box, setData = False)
@@ -1216,7 +1266,13 @@ d18OV and dDV : returns 2d numpy array data.
 		elif var == "P_E":
 			self.variable('PRECT', box, math = False)*1000 - self.variable('QFLX', box, math = False) * 60 * 60 * 24
 			self.units = "kg/m2/day"
-			self.long_name = "Moisture flux"
+			self.long_name = "Moisture convergence (P-E)"
+		elif var == "PoverE":
+			prect = self.variable('PRECT', box, math = False)*1000
+			qflx = self.variable('QFLX', box, math = False) * 60 * 60 * 24
+			qmask = xr.DataArray(qflx)
+			self.units = "kg/m2/day"
+			self.long_name = "Moisture convergence (P-E)"
 		elif var == "d18OV":
 			self.d18OV(box)
 		elif var == "dDV":
