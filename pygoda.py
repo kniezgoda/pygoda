@@ -1275,11 +1275,11 @@ d18OV and dDV : returns 2d numpy array data.
 			self.units = "kg/m2/day"
 			self.long_name = "Moisture convergence (P-E)"
 		elif var == "PoverE":
-			prect = self.variable('PRECT', box, math = False)*1000 # units of kg/m2/day
-			qflx = self.variable('QFLX', box, math = False) * 60 * 60 * 24 # kg/m2/day
+			prect = self.variable('PRECT', box) # units of kg/m2/day
+			qflx = self.variable('QFLX', box) # kg/m2/day
 			qflx = self.mask(qflx, 'lt', .005) # remove qflx less than 5 g/m2/day ---> pretty much zero
 			self.data = prect/qflx
-			self.units = "kg/m2/day"
+			self.units = "unitless (ratio)"
 			self.long_name = "Ratio of precipitation to evaporation (P/E)"
 		elif var == "d18OV":
 			self.d18OV(box)
