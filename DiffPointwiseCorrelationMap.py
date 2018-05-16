@@ -139,11 +139,16 @@ for n, d in enumerate(dates):
 	cnc = camgoda(cpath)
 	tnc = camgoda(tpath)
 
-	cv1_hold = np.expand_dims(cnc.ExtractData(v1, box), 0)
-	cv2_hold = np.expand_dims(cnc.ExtractData(v2, box), 0)
+	cnc.ExtractData(v1, box)
+	cv1_hold = np.expand_dims(cnc.data, 0)
+	cnc.ExtractData(v2, box)
+	cv2_hold = np.expand_dims(cnc.data, 0)
 
-	tv1_hold = np.expand_dims(tnc.ExtractData(v1, box), 0)
-	tv2_hold = np.expand_dims(tnc.ExtractData(v2, box), 0)
+	tnc.ExtractData(v1, box)
+	tv1_hold = np.expand_dims(tnc.data, 0)
+	tnc.ExtractData(v2, box)
+	tv2_hold = np.expand_dims(tnc.data, 0)
+
 
 	if n == 0:
 		cv1_master = cv1_hold
@@ -158,5 +163,13 @@ for n, d in enumerate(dates):
 		tv1_master = np.concatenate((tv1_master, tv1_hold), axis = 0)
 		tv2_master = np.concatenate((tv2_master, tv2_hold), axis = 0)
 
+print "All data extracted, computing correlations..."
 
 
+print cv1_master
+print cv1_master.shape
+print cv2_master.shape
+print tv1_master.shape
+print tv2_master.shape
+
+                                                                                                                                                     168,0-1       Bot
