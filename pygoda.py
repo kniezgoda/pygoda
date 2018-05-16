@@ -949,10 +949,10 @@ d18OV and dDV : returns 2d numpy array data.
 			self.diffcmap = getCmap(self.var, 'diffcmap')
 		except ImportError:
 			return "Could not find clevs.py, not able to set clevs!"
-
-	def mask(self, gt_lt, val, maskArray = self.data, targetArray = self.data):
+			
+	def mask(self, array, gt_lt, val, targetArray = None):
 		'''
-		This function is intended to mask a target array for bad data.
+		This function is intended to mask an array for bad data.
 		It can also be used for taking out small values of, e.g., QFLX, when used in the 
 		denominator of ratios. 
 
@@ -966,38 +966,45 @@ d18OV and dDV : returns 2d numpy array data.
 		that are 'bool' (less than or greater than) when compared to 'val'.
 		
 		Example:
-		maskArray = [[1,5,3,2,6,8,2345,3456,2,5,8,4],
+		array = [[1,5,3,2,6,8,2345,3456,2,5,8,4],
 				 [6,3,7,4,3,6,6,5,3,5,11234,6],
 				 [6,4,3452345,3,6,5,3,5,67,8,6,4]]
 		We want to remove the large values: 2345, 3456, 11234, 3452345, and 67
 		as they are clearly outliers. To do so, we would run the function with the following arguments:
 
-		self.data = self.mask('gt', 50, maskArray, maskArray)
-
-		If self.data = maskArray, then simply run
-
-		self.data = self.mask('gt', 50)
+		masked_array = self.mask(array, 'gt', 50)
 
 		This method also provides functionality for removing values from target arrays based on
-		a mask generated from maskArray, but most of the time this is not necessary. 
+		a mask generated from array, but most of the time this is not necessary. 
 
-		To mask an array called targetArray with a mask generated from maskArray, run
+		To mask an array called targetArray with a mask generated from array, run
 
-		masked_targetArray = self.mask('gt', 50, maskArray, targetArray)
+		masked_targetArray = self.mask(array, 'gt', 50, targetArray)
 		'''
-		if (gt_lt is not "gt") or (gt_lt is not "lt"):
+		if (gt_lt is not "gt") and (gt_lt is not "lt"):
 			print "First argument (gt_lt) must be either 'gt' or 'lt'...Exiting method."
 			return 
 		import xarray as xr
 		import numpy as np
-		maskArray = xr.DataArray(maskArray)
+		
+		# This is the array to be tested against the boolean expression in where()
+		maskArray = xr.DataArray(array)
+
+		# This is the array the will be masked and returned by the method
+		if targetArray is not None:
+			if targetArray.shape != array.shape:
+				print "Target array and input array are not the same shape.\nCan not mask a target array of different shape than the input array!\nExiting..."
+				return
+			returnArray = xr.DataArray(targetArray)
+		else:
+			returnArray = xr.DataArray(array)
 		if gt_lt == 'gt':
 			# This is supposed to be the less than sign even though we're in the gt if statement.
 			# This is because the masking function in xarray keeps values that 
 			# satisfy the boolean in the where argument, and makes everything else nan
-			ret = np.array(maskArray.where(maskArray < val))
+			ret = np.array(returnArray.where(maskArray < val))
 		else:
-			ret = np.array(maskArray.where(maskArray > val))
+			ret = np.array(returnArray.where(maskArray > val))
 		return ret
 	
 	def PRECT_d18O(self, box = None):
