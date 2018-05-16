@@ -180,12 +180,28 @@ for i in range(nlats):
 	print i
 	for j in range(nlons):
 		print j
-		ccorr_array[i,j] = np.corrcoef(cv1_master[:,i,j], cv2_master[:,i,j])[0,1]
-		tcorr_array[i,j] = np.corrcoef(tv1_master[:,i,j], tv2_master[:,i,j])[0,1]
-		corr_array[i,j] = np.corrcoef(diffv1_master[:,i,j], diffv2_master[:,i,j])[0,1]
+		cr, cpval = regress(cv1_master[:,i,j], cv2_master[:,i,j])
+		tr, tpval = regress(tv1_master[:,i,j], tv2_master[:,i,j])
+		r, pval = regress(diffv1_master[:,i,j], diffv2_master[:,i,j])
+		if stiple:
+			if pval > alpha:
+				corr_array[i,j] = np.nan
+			else:
+				corr_array[i,j] = r
+			if cpval > alpha:
+				ccorr_array[i,j] = np.nan
+			else:
+				ccorr_array[i,j] = cr
+			if tpval > alpha:
+				tcorr_array[i,j] = np.nan
+			else:
+				tcorr_array[i,j] = tr
+		else:
+			corr_array[i,j] = r
+			ccorr_array[i,j] = cr
+			tcorr_array[i,j] = tr
 
-
-llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[1], lons[0], lons[1]]
+llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[-1], lons[0], lons[-1]]
 if 0 in lons[1:-2]: # if we cross the gml
 	llcrnlon = lons[0]-360
 
