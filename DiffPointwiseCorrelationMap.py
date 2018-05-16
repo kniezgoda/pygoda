@@ -139,11 +139,24 @@ for n, d in enumerate(dates):
 	cnc = camgoda(cpath)
 	tnc = camgoda(tpath)
 
+	cv1_hold = np.expand_dims(cnc.ExtractData(v1, box), 0)
+	cv2_hold = np.expand_dims(cnc.ExtractData(v2, box), 0)
+
+	tv1_hold = np.expand_dims(tnc.ExtractData(v1, box), 0)
+	tv2_hold = np.expand_dims(tnc.ExtractData(v2, box), 0)
+
 	if n == 0:
-		cv1_master = cnc.ExtractData(v1, box)
-		cv2_master = cnc.ExtractData(v2, box)
+		cv1_master = cv1_hold
+		cv2_master = cv2_hold
+		tv1_master = tv1_hold
+		tv2_master = tv2_hold
 
-		tv1_master = tnc.ExtractData(v1, box)
-		tv2_master = tnc.ExtractData(v2, box)
+	else:
+		cv1_master = np.concatenate((cv1_master, cv1_hold), axis = 0)
+		cv2_master = np.concatenate((cv2_master, cv2_hold), axis = 0)
 
-		
+		tv1_master = np.concatenate((tv1_master, tv1_hold), axis = 0)
+		tv2_master = np.concatenate((tv2_master, tv2_hold), axis = 0)
+
+
+
