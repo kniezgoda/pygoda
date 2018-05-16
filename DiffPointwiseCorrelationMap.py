@@ -156,6 +156,9 @@ for n, d in enumerate(dates):
 		tv1_master = tv1_hold
 		tv2_master = tv2_hold
 
+		lats = cnc.boxlat
+		lons = cnc.boxlon
+
 	else:
 		cv1_master = np.concatenate((cv1_master, cv1_hold), axis = 0)
 		cv2_master = np.concatenate((cv2_master, cv2_hold), axis = 0)
@@ -170,15 +173,47 @@ diffv2_master = tv2_master - cv2_master
 print "All data extracted, computing correlations..."
 
 ntime, nlats, nlons = cv1_master.shape
-ccorrArray = np.zeros((nlats, nlons))
-tcorrArray = np.zeros((nlats, nlons))
-dcorrArray = np.zeros((nlats, nlons))
+ccorr_array = np.zeros((nlats, nlons))
+tcorr_array = np.zeros((nlats, nlons))
+corr_array = np.zeros((nlats, nlons))
 for i in range(nlats):
 	print i
 	for j in range(nlons):
 		print j
-		ccorrArray[i,j] = np.corrcoef(cv1_master[:,i,j], cv2_master[:,i,j])[0,1]
-		tcorrArray[i,j] = np.corrcoef(tv1_master[:,i,j], tv2_master[:,i,j])[0,1]
-		dcorrArray[i,j] = np.corrcoef(dv1_master[:,i,j], dv2_master[:,i,j])[0,1]
+		ccorr_array[i,j] = np.corrcoef(cv1_master[:,i,j], cv2_master[:,i,j])[0,1]
+		tcorr_array[i,j] = np.corrcoef(tv1_master[:,i,j], tv2_master[:,i,j])[0,1]
+		corr_array[i,j] = np.corrcoef(diffv1_master[:,i,j], diffv2_master[:,i,j])[0,1]
 
-dcorrArray
+
+# Make the map of the corr array
+fig = plt.figure()
+
+plt.subplot(3,1,1)
+bmlon, bmlat = np.meshgrid(lons, lats)
+m = bm(projection = 'cea', llcrnrlat=lats[0],urcrnrlat=lats[1], llcrnrlon=lons[0],urcrnrlon=lons[1],resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+clevs = np.linspace(-1, 1, 21)
+cs = m.contourf(bmlon, bmlat, tcorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+cbar.set_label("correlation-coefficient", fontsize = 8)
+plt.title("test")
+
+plt.subplot(3,1,2)
+m = bm(projection = 'cea', llcrnrlat=lats[0],urcrnrlat=lats[1], llcrnrlon=lons[0],urcrnrlon=lons[1],resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+clevs = np.linspace(-1, 1, 21)
+cs = m.contourf(bmlon, bmlat, ccorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+cbar.set_label("correlation-coefficient", fontsize = 8)
+plt.title("control")
+
+plt.subplot(3,1,3)
+m = bm(projection = 'cea', llcrnrlat=lats[0],urcrnrlat=lats[1], llcrnrlon=lons[0],urcrnrlon=lons[1],resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+clevs = np.linspace(-1, 1, 21)
+cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+cbar.set_label("correlation-coefficient", fontsize = 8)
