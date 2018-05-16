@@ -138,3 +138,12 @@ for n, d in enumerate(dates):
 	# Open the file
 	cnc = camgoda(cpath)
 	tnc = camgoda(tpath)
+
+	if n == 0:
+		cv1_master = cnc.ExtractData(v1, box)
+		cv2_master = cnc.ExtractData(v2, box)
+
+		tv1_master = tnc.ExtractData(v1, box)
+		tv2_master = tnc.ExtractData(v2, box)
+
+		
