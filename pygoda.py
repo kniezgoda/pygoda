@@ -1275,9 +1275,9 @@ d18OV and dDV : returns 2d numpy array data.
 			self.units = "kg/m2/day"
 			self.long_name = "Moisture convergence (P-E)"
 		elif var == "PoverE":
-			prect = self.variable('PRECT', box, math = False)*1000
-			qflx = self.variable('QFLX', box, math = False) * 60 * 60 * 24
-			qmask = xr.DataArray(qflx)
+			prect = self.variable('PRECT', box, math = False)*1000 # units of kg/m2/day
+			qflx = self.variable('QFLX', box, math = False) * 60 * 60 * 24 # kg/m2/day
+			qflx = self.mask(qflx, 'lt', .005) # remove qflx less than 5 g/m2/day ---> pretty much zero
 			self.units = "kg/m2/day"
 			self.long_name = "Moisture convergence (P-E)"
 		elif var == "d18OV":
