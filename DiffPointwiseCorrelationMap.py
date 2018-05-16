@@ -163,16 +163,22 @@ for n, d in enumerate(dates):
 		tv1_master = np.concatenate((tv1_master, tv1_hold), axis = 0)
 		tv2_master = np.concatenate((tv2_master, tv2_hold), axis = 0)
 
+
+diffv1_master = tv1_master - cv1_master
+diffv2_master = tv2_master - cv2_master
+
 print "All data extracted, computing correlations..."
 
 ntime, nlats, nlons = cv1_master.shape
 ccorrArray = np.zeros((nlats, nlons))
 tcorrArray = np.zeros((nlats, nlons))
-for i in nlats:
+dcorrArray = np.zeros((nlats, nlons))
+for i in range(nlats):
 	print i
-	for j in nlons:
+	for j in range(nlons):
 		print j
-		ccorrArray[i,j] = np.corrcoef(cv1_master[:i,j], cv2_master[:i,j])[0,1]
-		tcorrArray[i,j] = np.corrcoef(tv1_master[:i,j], tv2_master[:i,j])[0,1]
+		ccorrArray[i,j] = np.corrcoef(cv1_master[:,i,j], cv2_master[:,i,j])[0,1]
+		tcorrArray[i,j] = np.corrcoef(tv1_master[:,i,j], tv2_master[:,i,j])[0,1]
+		dcorrArray[i,j] = np.corrcoef(dv1_master[:,i,j], dv2_master[:,i,j])[0,1]
 
-print ccorrArray
+dcorrArray
