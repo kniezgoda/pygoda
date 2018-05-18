@@ -22,7 +22,7 @@ parser.add_argument('-cdir', '--control_directory', dest = 'cdir', default = 'fc
 parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
 parser.add_argument('-r', '--region', dest = 'region', default = None)
 parser.add_argument('-grep', dest = 'grep', default = 'cam.h0')
-parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90,90])
+parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-50,50])
 parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= 2, default = ["PRECT", "PRECT_d18O"])
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [10,30])

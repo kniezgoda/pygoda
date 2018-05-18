@@ -23,7 +23,7 @@ Control flags
 -show : show the plots to the screen
 
 '''
-from pygoda import h1ts
+from pygoda import camdates, findClimoFile, camgoda
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -33,9 +33,13 @@ def running_mean(x, N):
     return (cumsum[N:] - cumsum[:-N]) / N 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-r', '--region', dest = 'region', nargs = 4, default = None)
+parser.add_argument('-years', '--years', dest = 'years', nargs = 2, default = None)
+parser.add_argument('-months', '--months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
+parser.add_argument('-days', dest = 'h1', action = 'store_true')
 parser.add_argument('-cen', '--center_latlon', dest = 'center_latlon', nargs = 2, default = None)
 parser.add_argument('-del', '--delta_latlon', dest = 'delta_latlon', nargs = 1, default = 5)
+parser.add_argument('-box', dest = 'box', nargs = 4, default = None)
+parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variables', nargs= "*")
@@ -46,19 +50,36 @@ parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1
 
 ARGS = parser.parse_args()
 run = int(ARGS.running_mean)
-wd = ARGS.directory
-region = ARGS.region
 center = ARGS.center_latlon
 delta = ARGS.delta_latlon
+grep = ARGS.grep
 if center is not None:
 	box = [int(center[0])-delta, int(center[0])+delta, int(center[1])-delta, int(center[1])+delta]
 elif region is not None:
-	box = [int(r) for r in region]
+	box = [int(b) for b in ARGS.box]
 else:
 	print "No region set! Defaulting to global"
 	box = [-90,90,0,360]
 
-print "\nRegion is " + str(box) 
+print "Box array:"
+print box
+
+# Find the date array
+dates = []
+h1 = ARGS.h1 # boolean
+months = [int(m) for m in ARGS.months]
+if ARGS.years is not None:
+	y1, y2 = [int(y) for y in ARGS.years]
+	dates = camdates(y1, y2, months, days = h1)
+else:
+	y1 = y2 = 0
+	# Remove the years and leave only months and days if needed
+	# Useful for *dailyClim* files
+	dates = [x[5:] for x in camdates(y1, y2, months, days = h1)]
+
+print "Date array:" 
+print dates
+
 savefig = ARGS.savefig
 showfig = ARGS.showfig
 variables = ARGS.variables
@@ -69,33 +90,35 @@ if ARGS.developer_mode:
 	showfig = True
 	mkdir = False
 
-fig = plt.figure()
-for n, v in enumerate(variables):
-	for w in wd:
-		varhold, long_name, units, dates = h1ts(v, box, w)
-		varhold = running_mean(varhold, run)
 
-		plt.subplot(len(variables),1,n+1)
-		if (w == '.') | (w == './'):
-			experiment = ""
-		else:
-			experiment = w
-		if len(wd) > 1:
-			plt.plot(varhold, label = experiment)
-			plt.legend()
-		else:
-			plt.plot(varhold)
-		plt.title(long_name)
-		plt.ylabel(units)
-		atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
-		labx = ['' for whatever in atx]
-		if v == variables[-1]:
-			labx = np.array(dates)[np.array(atx)]
-		plt.xticks(atx,labx,rotation=45)
+# Main algorithm
+for v in variables:
+	print "Variable is " + v
+	var_master = []
+	for d in dates:
+		# Find the file for this date
+		full_path, fname = findClimoFile(grep+d)
+		if fname != 0:
+			print fname
+		# Open the file
+		nc = camgoda(full_path)
+		# Read the data
+		data = nc.ExtractData(v, box)
+		# Average the data
+		data_avg = np.nanmean(data)
+		# Keep track of the mean
+		var_master.append(data_avg)
 
-fig.suptitle("Region: " + str(box))
+	plt.plot(dates, var_master)
+	plt.title(long_name)
+	plt.ylabel(nc.units)
+	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
+	labx = ['' for whatever in atx]
+	if v == variables[-1]:
+		labx = np.array(dates)[np.array(atx)]
+	plt.xticks(atx,labx,rotation=45)
 
-if showfig:
-	plt.show()
-if savefig:
-	None
+	if showfig:
+		plt.show()
+	if savefig:
+		None
