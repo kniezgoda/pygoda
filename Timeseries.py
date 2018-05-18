@@ -96,36 +96,40 @@ if ARGS.developer_mode:
 ##################
 # Main algorithm #
 ##################
-for n, v in enumerate(variables):
-	print "Variable is " + v
-	var_master = []
-	for d in dates:
-		# Find the file for this date
-		full_path, fname = findClimoFile("*"+grep+"*"+d+"*")
-		if fname != 0:
-			print fname
-		# Open the file
-		nc = camgoda(full_path)
+var_master = np.zeros(shape = (len(dates), len(variables)))
+long_name = []
+units = []
+for n, d in enumerate(dates):
+	# Find the file for this date
+	full_path, fname = findClimoFile("*"+grep+"*"+d+"*")
+	if fname != 0:
+		print fname
+	# Open the file
+	nc = camgoda(full_path)
+	for m, v in enumerate(variables):
 		# Read the data
 		var_is_3d, var, pressure = nc.ExtractData(v, box)
 		data = nc.data
 		# Average the data
 		data_avg = np.nanmean(data)
-		# Keep track of the mean
-		var_master.append(data_avg)
+		var_master[n,m] = data_avg
+		if n == 0:
+			long_name.append(nc.long_name)
+			units.append(nc.units)
 
-	plt.subplot(len(variables),1,n+1)
-	plt.plot(var_master)
-	plt.title(nc.long_name)
-	plt.ylabel(nc.units)
+ntime, nvar = var_master.shape
+for i in range(nvar):
+	plt.subplot(nvar,1,i+1)
+	plt.plot(var_master[:,i])
+	plt.title(long_name[i])
+	plt.ylabel(units[i])
 	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 	labx = ['' for whatever in atx]
-	if v == variables[-1]:
+	if i == nvar-1:
 		labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
 
+plt.tight_layout()
+
 if showfig:
 	plt.show()
-if savefig:
-	None
-
