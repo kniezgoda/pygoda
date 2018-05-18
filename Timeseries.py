@@ -47,7 +47,10 @@ parser.add_argument('-dir', '--directory', dest = 'directory', nargs= "*", defau
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1)
 
+##########################
 # Read command-line args #
+##########################
+
 ARGS = parser.parse_args()
 run = int(ARGS.running_mean)
 delta = int(ARGS.delta_latlon)
@@ -90,8 +93,9 @@ if ARGS.developer_mode:
 	showfig = True
 	mkdir = False
 
-
-# Main algorithm
+##################
+# Main algorithm #
+##################
 for v in variables:
 	print "Variable is " + v
 	var_master = []
@@ -110,8 +114,8 @@ for v in variables:
 		# Keep track of the mean
 		var_master.append(data_avg)
 
-	plt.plot(dates, var_master)
-	plt.title(long_name)
+	plt.plot(var_master)
+	# plt.title(long_name)
 	plt.ylabel(nc.units)
 	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 	labx = ['' for whatever in atx]
