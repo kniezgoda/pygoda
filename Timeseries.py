@@ -97,7 +97,7 @@ for v in variables:
 	var_master = []
 	for d in dates:
 		# Find the file for this date
-		full_path, fname = findClimoFile(grep+d)
+		full_path, fname = findClimoFile("*"+grep+"*"+d+"*")
 		if fname != 0:
 			print fname
 		# Open the file
