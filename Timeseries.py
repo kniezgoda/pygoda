@@ -50,11 +50,11 @@ parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1
 
 ARGS = parser.parse_args()
 run = int(ARGS.running_mean)
-center = ARGS.center_latlon
-delta = ARGS.delta_latlon
+lat, lon = [int(c) for c in ARGS.center_latlon]
+delta = [int(d) for d in ARGS.delta_latlon]
 grep = ARGS.grep
 if center is not None:
-	box = [int(center[0])-delta, int(center[0])+delta, int(center[1])-delta, int(center[1])+delta]
+	box = [lat-delta, lat+delta, lon-delta, lon+delta]
 elif region is not None:
 	box = [int(b) for b in ARGS.box]
 else:
