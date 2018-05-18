@@ -47,7 +47,7 @@ parser.add_argument('-dir', '--directory', dest = 'directory', nargs= "*", defau
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1)
 
-
+# Read command-line args #
 ARGS = parser.parse_args()
 run = int(ARGS.running_mean)
 delta = int(ARGS.delta_latlon)
@@ -103,7 +103,8 @@ for v in variables:
 		# Open the file
 		nc = camgoda(full_path)
 		# Read the data
-		data = nc.ExtractData(v, box)
+		var_is_3d, var, pressure = nc.ExtractData(v, box)
+		data = nc.data
 		# Average the data
 		data_avg = np.nanmean(data)
 		# Keep track of the mean
