@@ -37,7 +37,7 @@ parser.add_argument('-years', '--years', dest = 'years', nargs = 2, default = No
 parser.add_argument('-months', '--months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
 parser.add_argument('-days', dest = 'h1', action = 'store_true')
 parser.add_argument('-cen', '--center_latlon', dest = 'center_latlon', nargs = 2, default = None)
-parser.add_argument('-del', '--delta_latlon', dest = 'delta_latlon', nargs = 1, default = 5)
+parser.add_argument('-del', '--delta_latlon', dest = 'delta_latlon', default = 5)
 parser.add_argument('-box', dest = 'box', nargs = 4, default = None)
 parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
@@ -50,7 +50,7 @@ parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1
 
 ARGS = parser.parse_args()
 run = int(ARGS.running_mean)
-delta = [int(d) for d in ARGS.delta_latlon]
+delta = int(ARGS.delta_latlon)
 grep = ARGS.grep
 if ARGS.center_latlon is not None:
 	lat, lon = [int(c) for c in ARGS.center_latlon]
