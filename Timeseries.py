@@ -96,7 +96,7 @@ if ARGS.developer_mode:
 ##################
 # Main algorithm #
 ##################
-for v in variables:
+for n, v in enumerate(variables):
 	print "Variable is " + v
 	var_master = []
 	for d in dates:
@@ -114,6 +114,7 @@ for v in variables:
 		# Keep track of the mean
 		var_master.append(data_avg)
 
+	plt.subplot(len(variables),1,n+1)
 	plt.plot(var_master)
 	plt.title(nc.long_name)
 	plt.ylabel(nc.units)
@@ -123,8 +124,8 @@ for v in variables:
 		labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
 
-	if showfig:
-		plt.show()
-	if savefig:
-		None
+if showfig:
+	plt.show()
+if savefig:
+	None
 
