@@ -58,7 +58,7 @@ grep = ARGS.grep
 if ARGS.center_latlon is not None:
 	lat, lon = [int(c) for c in ARGS.center_latlon]
 	box = [lat-delta, lat+delta, lon-delta, lon+delta]
-elif region is not None:
+elif ARGS.box is not None:
 	box = [int(b) for b in ARGS.box]
 else:
 	print "No region set! Defaulting to global"
@@ -115,7 +115,7 @@ for v in variables:
 		var_master.append(data_avg)
 
 	plt.plot(var_master)
-	# plt.title(long_name)
+	plt.title(nc.long_name)
 	plt.ylabel(nc.units)
 	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 	labx = ['' for whatever in atx]
@@ -127,3 +127,4 @@ for v in variables:
 		plt.show()
 	if savefig:
 		None
+
