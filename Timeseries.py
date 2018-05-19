@@ -132,6 +132,7 @@ for i in range(nvar):
 		labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
 
+print "Correlating the first two variables..."
 varcorr = [corr(var_master[:,0], var_master[:,1], lag = x) for x in range(-100,101)]
 plt.subplot(nvar+1,1,nvar+1)
 plt.plot(range(-100,101), varcorr)
