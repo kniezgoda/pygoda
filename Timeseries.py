@@ -23,6 +23,39 @@ Control flags
 -show : show the plots to the screen
 
 '''
+def corr(a, b, lag=0):
+	# Compute the correlation between two 1-dimensional arrays (python lists)
+	# Index lags can be introduced with the lag argument (default of zero = no lag)
+	# Correlations are normalized by N_tau, the number of non-nan samples for that particular lag.
+	# Returns the correlation value, R_xy.
+	from scipy.stats import describe as desc
+	import numpy as np
+	if lag == 0:
+		a1 = a
+		a2 = b
+	else:
+		a1 = a[lag:]
+		a2 = b[:-lag]
+	a1_description = desc(a1, nan_policy = 'omit')
+	a1_mu = a1_description.mean
+	a1_var = a1_description.variance
+	a1_stddev = np.sqrt(a1_var)
+	a2_description = desc(a2, nan_policy = 'omit')
+	a2_mu = a2_description.mean
+	a2_var = a2_description.variance
+	a2_stddev = np.sqrt(a2_var)
+	# Find the nans 
+	mask = ~np.isnan(a1*a2)
+	N = sum(mask)
+	# Set dummy array
+	hold = []
+	# Correlate a1 with a2
+	for i in range(len(a1)):
+		if mask[i]:
+			hold.append((a1[i]-a1_mu)*(a2[i]-a2_mu))
+	return sum(hold)/N/(a2_stddev*a1_stddev)
+
+
 from pygoda import camdates, findClimoFile, camgoda
 import numpy as np
 import matplotlib.pyplot as plt
@@ -96,6 +129,8 @@ if ARGS.developer_mode:
 ##################
 # Main algorithm #
 ##################
+
+# Creates the master array of the correct shape
 var_master = np.zeros(shape = (len(dates), len(variables)))
 long_name = []
 units = []
@@ -119,7 +154,7 @@ for n, d in enumerate(dates):
 
 ntime, nvar = var_master.shape
 for i in range(nvar):
-	plt.subplot(nvar,1,i+1)
+	plt.subplot(nvar+1,1,i+1)
 	plt.plot(var_master[:,i])
 	plt.title(long_name[i])
 	plt.ylabel(units[i])
@@ -129,6 +164,10 @@ for i in range(nvar):
 		labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
 
+varcorr = [corr(var_master[:,0], var_master[:,1], lag = x) for x in range(-100,101)]
+plt.subplot(range(-100,101), nvar+1,1,nvar+1)
+
+plt.plot(varcorr)
 plt.tight_layout()
 
 if showfig:
