@@ -122,14 +122,14 @@ def corr(a, b, lag=0):
 	import numpy as np
 	if lag == 0:
 		# Have to do this because b[:-lag] doesn't work for lag == 0.
-		a1 = a
-		a2 = b
+		a1 = np.array(a)
+		a2 = np.array(b)
 	elif lag > 0:
-		a1 = a[lag:]
-		a2 = b[:-lag]
+		a1 = np.array(a[lag:])
+		a2 = np.array(b[:-lag])
 	else:
-		a1 = a[:lag]
-		a2 = b[-lag:]
+		a1 = np.array(a[:lag])
+		a2 = np.array(b[-lag:])
 	a1_mu = np.nanmean(a1)
 	a1_stddev = np.nanstd(a1)
 	a2_mu = np.nanmean(a2)
