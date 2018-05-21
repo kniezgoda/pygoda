@@ -19,7 +19,7 @@ parser.add_argument('-box', dest = 'box', nargs = 4, default = None)
 parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
-parser.add_argument('-v', '--variable', dest = 'variable')
+parser.add_argument('-v', '--variable', nargs = '*', dest = 'variable')
 parser.add_argument('-dir', '--directory', dest = 'directory', default = '.')
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1)
@@ -62,7 +62,7 @@ print dates
 
 savefig = ARGS.savefig
 showfig = ARGS.showfig
-variable = ARGS.variable
+variable = [v for v in ARGS.variable]
 mkdir = True
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
@@ -96,25 +96,25 @@ for n, d in enumerate(dates):
 			long_name.append(nc.long_name)
 			units.append(nc.units)
 
-# Plot the timeseries
-plt.subplot(2,1,1)
-plt.plot(var_master[:,i])
-plt.title(long_name[i])
-plt.ylabel(units[i])
-atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
-labx = ['' for whatever in atx]
-if i == nvar-1:
-  labx = np.array(dates)[np.array(atx)]
-plt.xticks(atx,labx,rotation=45)
+	# Plot the timeseries
+	plt.subplot(2,1,1)
+	plt.plot(var_master[:,i])
+	plt.title(long_name[i])
+	plt.ylabel(units[i])
+	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
+	labx = ['' for whatever in atx]
+	if i == nvar-1:
+	  labx = np.array(dates)[np.array(atx)]
+	plt.xticks(atx,labx,rotation=45)
 
-# Compute and plot the ACF
-plt.subplot(2,1,2)
-acf = corr(var_master[:,i], var_master[:,i], range(-100,101))
-plt.plot(range(-100,101), acf)
-plt.xlabel("lag")
-plt.ylabel("auto-correlation coefficient")
+	# Compute and plot the ACF
+	plt.subplot(2,1,2)
+	acf = corr(var_master[:,i], var_master[:,i], range(-100,101))
+	plt.plot(range(-100,101), acf)
+	plt.xlabel("lag")
+	plt.ylabel("auto-correlation coefficient")
 
-plt.tight_layout()
+	plt.tight_layout()
 
-if showfig:
-	plt.show()
+	if showfig:
+		plt.show()
