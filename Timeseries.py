@@ -126,7 +126,7 @@ if nvar > 1:
 	add = 1
 	
 for i in range(nvar):
-	plt.subplot(nvar+add,1,i+add)
+	plt.subplot(nvar+add,1,i+1)
 	plt.plot(var_master[:,i])
 	plt.title(long_name[i])
 	plt.ylabel(units[i])
