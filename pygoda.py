@@ -1050,6 +1050,9 @@ d18OV and dDV : returns 2d numpy array data.
 		self.units = "permil"
 		self.vartype = "2d"
 		self.data = (h218o / h2o - 1) * 1000
+		# Filter diriculous data
+		self.data = self.mask(self.data, 'gt', 50)
+		self.data = self.mask(self.data, 'lt', -50)
 		return self.data
 
 	def PRECT_dD(self, box = None):
