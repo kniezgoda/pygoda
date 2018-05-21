@@ -118,6 +118,8 @@ def corr(a, b, lag=0):
 	The R value returned (Rxx, in this case) is not equal to 1, which it should be.
 	Instead, it is equal to something close to 0.997, not too far off but not entirely correct either.
 	from scipy.stats import describe as desc
+	
+	---> Negative lag implies that a1 leads a2!
 	'''
 	import numpy as np
 	if lag == 0:
