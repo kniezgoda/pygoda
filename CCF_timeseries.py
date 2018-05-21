@@ -62,7 +62,7 @@ print dates
 
 savefig = ARGS.savefig
 showfig = ARGS.showfig
-variables = [v for v in ARGS.variable]
+variable = [v for v in ARGS.variable]
 mkdir = True
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
