@@ -106,7 +106,7 @@ plt.title(long_name[0])
 plt.ylabel(units[0])
 
 plt.subplot(312)
-pt.plot(var_master[:,1])
+plt.plot(var_master[:,1])
 plt.title(long_name[1])
 plt.ylabel(units[1])
 atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
