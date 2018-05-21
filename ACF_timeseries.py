@@ -75,12 +75,7 @@ if ARGS.developer_mode:
 ##################
 
 # Creates the master array of the correct shape
-# This is not needed but is copied from other code, so leaving it this way
-# The code is not equipped to handle more than one variable right now,
-# so this next line could read var_master = []
-var_master = np.zeros(shape = (len(dates), 1))
-long_name = []
-units = []
+var_master = []
 for n, d in enumerate(dates):
 	# Find the file for this date
 	full_path, fname = findClimoFile("*"+grep+"*"+d+"*", directory = ARGS.directory)
@@ -94,23 +89,23 @@ for n, d in enumerate(dates):
 	data = nc.data
 	# Average the data
 	data_avg = np.nanmean(data)
-	var_master[n,0] = data_avg
+	var_master.append(data_avg)
 	if n == 0:
-		long_name.append(nc.long_name)
-		units.append(nc.units)
+		long_name = nc.long_name
+		units = nc.units
 
 # Plot the timeseries
 plt.subplot(2,1,1)
-plt.plot(var_master[:,0])
-plt.title(long_name[0])
-plt.ylabel(units[0])
+plt.plot(var_master)
+plt.title(long_name)
+plt.ylabel(units)
 atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 labx = np.array(dates)[np.array(atx)]
 plt.xticks(atx,labx,rotation=45)
 
 # Compute and plot the ACF
 plt.subplot(2,1,2)
-acf = corr(var_master[:,0], var_master[:,0], range(-100,101))
+acf = corr(var_master, var_master, range(-100,101))
 plt.plot(range(-100,101), acf)
 plt.xlabel("lag")
 plt.ylabel("auto-correlation coefficient")
