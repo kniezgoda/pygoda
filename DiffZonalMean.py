@@ -97,6 +97,10 @@ for v in variables:
 	plt.plot(lat, dvar_zonalMean, color = 'k')
 	plt.ylabel("Difference in " + units)
 
-	fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + "-" + str(right_lon))
+	fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + " - " + str(right_lon))
 
-	plt.show()
+	if savefig:
+		plt.savefig(v + "." + str(left_lon) + "_" + str(right_lon) ".ps")
+	if showfig:
+		plt.show()
+	
