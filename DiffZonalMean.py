@@ -12,11 +12,11 @@ parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2
 parser.add_argument('-grep', dest = 'grep', default = "ANN")
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
-parser.add_argument('-v', '--variable', dest = 'variable', nargs= 1, default = None)
+parser.add_argument('-v', '--variable', dest = 'variable', nargs= '*', default = None)
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
-parser.add_argument('-lats', dest = 'lats', default = [-90, 90])
-parser.add_argument('-lons', dest = 'lons', default = [0, 360])
+parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90, 90])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0, 360])
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 
 ARGS = parser.parse_args()
@@ -28,7 +28,7 @@ tfile = ARGS.testdatafname
 bottom_lat, top_lat = [int(l) for l in ARGS.lats]
 left_lon, right_lon = [int(l) for l in ARGS.lons]
 box = [bottom_lat, top_lat, left_lon, right_lon]
-variable = ARGS.variable
+variables = [str(V) for V in ARGS.variable]
 savefig = ARGS.savefig
 showfig = ARGS.showfig
 
@@ -64,38 +64,39 @@ else:
 # Open the file
 cnc = camgoda(controldatafname)
 tnc = camgoda(testdatafname)
-	
-# Extract the variable
-cnc.ExtractData(v, box)
-tnc.ExtractData(v, box)
 
-# Save the data
-cvar = cnc.data
-tvar = tnc.data
-long_name = cnc.long_name
-units = cnc.units
-lat = cnc.boxlat
+for v in variables:
+	# Extract the variable
+	cnc.ExtractData(v, box)
+	tnc.ExtractData(v, box)
 
-# Zonally average the data
-cvar_zonalMean = np.mean(cvar, axis = 1)
-tvar_zonalMean = np.mean(tvar, axis = 1)
+	# Save the data
+	cvar = cnc.data
+	tvar = tnc.data
+	long_name = cnc.long_name
+	units = cnc.units
+	lat = cnc.boxlat
 
-# Compute the difference
-dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
+	# Zonally average the data
+	cvar_zonalMean = np.mean(cvar, axis = 1)
+	tvar_zonalMean = np.mean(tvar, axis = 1)
 
-# Plot the data
-fig = plt.figure()
+	# Compute the difference
+	dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
 
-plt.subplot(211)
-plt.plot(lat, tvar_zonalMean, label = "test")
-plt.plot(lat, cvar_zonalMean, label = "control")
-plt.ylabel(units)
-plt.legend()
+	# Plot the data
+	fig = plt.figure()
 
-plt.subplot(212)
-plt.plot(lat, dvar_zonalMean)
-plt.ylabel("Difference in " + units)
+	plt.subplot(211)
+	plt.plot(lat, tvar_zonalMean, label = "test")
+	plt.plot(lat, cvar_zonalMean, label = "control")
+	plt.ylabel(units)
+	plt.legend()
 
-fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + "-" + str(right_lon))
+	plt.subplot(212)
+	plt.plot(lat, dvar_zonalMean)
+	plt.ylabel("Difference in " + units)
 
-plt.show()
+	fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + "-" + str(right_lon))
+
+	plt.show()
