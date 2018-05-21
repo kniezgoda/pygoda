@@ -93,8 +93,8 @@ for n, d in enumerate(dates):
 		data_avg = np.nanmean(data)
 		var_master[n,m] = data_avg
 		if n == 0:
-		long_name.append(nc.long_name)
-		units.append(nc.units)
+			long_name.append(nc.long_name)
+			units.append(nc.units)
 
 for D in range(2):
 	var_master[:,D] = runningMean(var_master[:,D], run)
