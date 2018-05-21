@@ -64,15 +64,17 @@ else:
 # Open the file
 cnc = camgoda(controldatafname)
 tnc = camgoda(testdatafname)
-
-# Extract latitudes
-lat = cnc.boxlat
 	
 # Extract the variable
 cnc.ExtractData(v, box)
 tnc.ExtractData(v, box)
+
+# Save the data
 cvar = cnc.data
 tvar = tnc.data
+long_name = cnc.long_name
+units = cnc.units
+lat = cnc.boxlat
 
 # Zonally average the data
 cvar_zonalMean = np.mean(cvar, axis = 1)
@@ -85,10 +87,15 @@ dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
 fig = plt.figure()
 
 plt.subplot(211)
-plt.plot(lats, tvar_zonalMean, label = "test")
-plt.plot(lats, cvar_zonalMean, label = "control")
+plt.plot(lat, tvar_zonalMean, label = "test")
+plt.plot(lat, cvar_zonalMean, label = "control")
+plt.ylabel(units)
+plt.legend()
 
 plt.subplot(212)
-plt.plot(lats, dvar_zonalMean)
+plt.plot(lat, dvar_zonalMean)
+plt.ylabel("Difference in " + units)
+
+fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + "-" + str(right_lon))
 
 plt.show()
