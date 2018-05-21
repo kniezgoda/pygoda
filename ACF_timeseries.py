@@ -102,9 +102,7 @@ for n, d in enumerate(dates):
 	plt.title(long_name[0])
 	plt.ylabel(units[0])
 	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
-	labx = ['' for whatever in atx]
-	if i == nvar-1:
-	  labx = np.array(dates)[np.array(atx)]
+	labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
 
 	# Compute and plot the ACF
