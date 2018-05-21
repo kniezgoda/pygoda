@@ -44,7 +44,7 @@ parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variables', nargs= "*")
-parser.add_argument('-dir', '--directory', dest = 'directory', nargs= "*", default = ['.'])
+parser.add_argument('-dir', '--directory', dest = 'directory', default = '.')
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1)
 
@@ -104,7 +104,7 @@ long_name = []
 units = []
 for n, d in enumerate(dates):
 	# Find the file for this date
-	full_path, fname = findClimoFile("*"+grep+"*"+d+"*")
+	full_path, fname = findClimoFile("*"+grep+"*"+d+"*", dir = ARGS.directory)
 	if fname != 0:
 		print fname
 	# Open the file
