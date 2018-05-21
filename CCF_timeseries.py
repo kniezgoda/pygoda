@@ -120,8 +120,8 @@ for lag in range(-100,101):
 	acf.append(corr(var_master[:,0], var_master[:,1], lag))
 plt.plot(range(-100,101), acf)
 plt.xlabel("lag")
-max = np.argmax(acf)
-min = np.argmin(acf)
+max = range(-100,101)[np.argmax(acf)]
+min = range(-100,101)[np.argmin(acf)]
 print "Lag of max correlation: " + str(max) + "\nLag of minimum correlation: " + str(min)
 
 plt.tight_layout()
