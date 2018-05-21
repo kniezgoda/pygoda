@@ -1,6 +1,6 @@
 #!/home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
 
-from pygoda_2 import ExtractData, findClimoFile
+from pygoda import camgoda, findClimoFile
 import os, sys, glob, argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -61,8 +61,34 @@ else:
 	controlfn = os.path.splitext(os.path.split(cfile)[1])[0]
 	testfn = os.path.splitext(os.path.split(tfile)[1])[0]
 
+# Open the file
+cnc = camgoda(controldatafname)
+tnc = camgoda(testdatafname)
 
+# Extract latitudes
+lat = cnc.boxlat
+	
 # Extract the variable
-cnc = ExtractData(controldatafname, variable, box)
-tnc = ExtractData(testdatafname, variable, box)
+cnc.ExtractData(v, box)
+tnc.ExtractData(v, box)
+cvar = cnc.data
+tvar = tnc.data
 
+# Zonally average the data
+cvar_zonalMean = np.mean(cvar, axis = 1)
+tvar_zonalMean = np.mean(tvar, axis = 1)
+
+# Compute the difference
+dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
+
+# Plot the data
+fig = plt.figure()
+
+plt.subplot(211)
+plt.plot(lats, tvar_zonalMean, label = "test")
+plt.plot(lats, cvar_zonalMean, label = "control")
+
+plt.subplot(212)
+plt.plot(lats, dvar_zonalMean)
+
+plt.show()
