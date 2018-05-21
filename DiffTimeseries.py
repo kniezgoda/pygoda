@@ -24,7 +24,7 @@ Control flags
 
 '''
 
-from pygoda import camdates, findClimoFile, camgoda, corr
+from pygoda import camdates, findClimoFile, camgoda, corr, runningMean
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -135,8 +135,8 @@ for n, d in enumerate(dates):
 ntime, nvar = cvar_master.shape
 for i in range(nvar):
 	plt.subplot(nvar,1,i+1)
-	plt.plot(tvar_master[:,i], label = "test")
-	plt.plot(cvar_master[:,i], label = "control")
+	plt.plot(runningMean(tvar_master[:,i], run), label = "test")
+	plt.plot(runningMean(cvar_master[:,i], run), label = "control")
 	plt.title(long_name[i])
 	plt.legend()
 	plt.ylabel(units[i])
