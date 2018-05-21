@@ -100,7 +100,7 @@ for v in variables:
 	fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + " - " + str(right_lon))
 
 	if savefig:
-		plt.savefig(v + "." + str(left_lon) + "_" + str(right_lon) ".ps")
+		plt.savefig(v + "." + str(left_lon) + "_" + str(right_lon) + ".ps")
 	if showfig:
 		plt.show()
 	
