@@ -94,7 +94,7 @@ for v in variables:
 	plt.legend()
 
 	plt.subplot(212)
-	plt.plot(lat, dvar_zonalMean)
+	plt.plot(lat, dvar_zonalMean, color = 'k')
 	plt.ylabel("Difference in " + units)
 
 	fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + "-" + str(right_lon))
