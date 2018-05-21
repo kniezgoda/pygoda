@@ -121,8 +121,12 @@ for n, d in enumerate(dates):
 			units.append(nc.units)
 
 ntime, nvar = var_master.shape
+add = 0
+if nvar > 1:
+	add = 1
+	
 for i in range(nvar):
-	plt.subplot(nvar+1,1,i+1)
+	plt.subplot(nvar+add,1,i+add)
 	plt.plot(var_master[:,i])
 	plt.title(long_name[i])
 	plt.ylabel(units[i])
@@ -132,7 +136,7 @@ for i in range(nvar):
 		labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
 
-if nvar > 1:
+if add:
 	print "Correlating the first two variables..."
 	varcorr = [corr(var_master[:,0], var_master[:,1], lag = x) for x in range(-100,101)]
 	plt.subplot(nvar+1,1,nvar+1)
