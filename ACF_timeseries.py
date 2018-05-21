@@ -75,7 +75,7 @@ if ARGS.developer_mode:
 ##################
 
 # Creates the master array of the correct shape
-var_master = np.zeros(shape = (len(dates), len(variables)))
+var_master = np.zeros(shape = (len(dates), len(variable)))
 long_name = []
 units = []
 for n, d in enumerate(dates):
@@ -85,7 +85,7 @@ for n, d in enumerate(dates):
 		print fname
 	# Open the file
 	nc = camgoda(full_path)
-	for m, v in enumerate(variables):
+	for m, v in enumerate(variable):
 		# Read the data
 		var_is_3d, var, pressure = nc.ExtractData(v, box)
 		data = nc.data
