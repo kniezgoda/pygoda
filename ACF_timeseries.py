@@ -105,7 +105,9 @@ plt.xticks(atx,labx,rotation=45)
 
 # Compute and plot the ACF
 plt.subplot(2,1,2)
-acf = corr(var_master, var_master, range(-100,101))
+acf = []
+for lag in range(-100,101):
+	acf.append(corr(var_master, var_master, lag))
 plt.plot(range(-100,101), acf)
 plt.xlabel("lag")
 plt.ylabel("auto-correlation coefficient")
