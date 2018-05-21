@@ -85,7 +85,7 @@ for n, d in enumerate(dates):
 		print fname
 	# Open the file
 	nc = camgoda(full_path)
-	for m, v in variable:
+	for m, v in enumerate(variable):
 		# Read the data
 		var_is_3d, var, pressure = nc.ExtractData(v, box)
 		data = nc.data
