@@ -19,7 +19,7 @@ parser.add_argument('-box', dest = 'box', nargs = 4, default = None)
 parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
-parser.add_argument('-v', '--variable', nargs = '*', dest = 'variable')
+parser.add_argument('-v', '--variable', dest = 'variable')
 parser.add_argument('-dir', '--directory', dest = 'directory', default = '.')
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1)
@@ -62,7 +62,7 @@ print dates
 
 savefig = ARGS.savefig
 showfig = ARGS.showfig
-variable = [v for v in ARGS.variable]
+variable = ARGS.variable
 mkdir = True
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
@@ -75,7 +75,10 @@ if ARGS.developer_mode:
 ##################
 
 # Creates the master array of the correct shape
-var_master = np.zeros(shape = (len(dates), len(variable)))
+# This is not needed but is copied from other code, so leaving it this way
+# The code is not equipped to handle more than one variable right now,
+# so this next line could read var_master = []
+var_master = np.zeros(shape = (len(dates), 1))
 long_name = []
 units = []
 for n, d in enumerate(dates):
@@ -85,34 +88,34 @@ for n, d in enumerate(dates):
 		print fname
 	# Open the file
 	nc = camgoda(full_path)
-	for m, v in enumerate(variable):
-		# Read the data
-		var_is_3d, var, pressure = nc.ExtractData(v, box)
-		data = nc.data
-		# Average the data
-		data_avg = np.nanmean(data)
-		var_master[n,m] = data_avg
-		if n == 0:
-			long_name.append(nc.long_name)
-			units.append(nc.units)
+	v = variable
+	# Read the data
+	var_is_3d, var, pressure = nc.ExtractData(v, box)
+	data = nc.data
+	# Average the data
+	data_avg = np.nanmean(data)
+	var_master[n,0] = data_avg
+	if n == 0:
+		long_name.append(nc.long_name)
+		units.append(nc.units)
 
-	# Plot the timeseries
-	plt.subplot(2,1,1)
-	plt.plot(var_master[:,0])
-	plt.title(long_name[0])
-	plt.ylabel(units[0])
-	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
-	labx = np.array(dates)[np.array(atx)]
-	plt.xticks(atx,labx,rotation=45)
+# Plot the timeseries
+plt.subplot(2,1,1)
+plt.plot(var_master[:,0])
+plt.title(long_name[0])
+plt.ylabel(units[0])
+atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
+labx = np.array(dates)[np.array(atx)]
+plt.xticks(atx,labx,rotation=45)
 
-	# Compute and plot the ACF
-	plt.subplot(2,1,2)
-	acf = corr(var_master[:,i], var_master[:,i], range(-100,101))
-	plt.plot(range(-100,101), acf)
-	plt.xlabel("lag")
-	plt.ylabel("auto-correlation coefficient")
+# Compute and plot the ACF
+plt.subplot(2,1,2)
+acf = corr(var_master[:,0], var_master[:,0], range(-100,101))
+plt.plot(range(-100,101), acf)
+plt.xlabel("lag")
+plt.ylabel("auto-correlation coefficient")
 
-	plt.tight_layout()
+plt.tight_layout()
 
-	if showfig:
-		plt.show()
+if showfig:
+	plt.show()
