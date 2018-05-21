@@ -110,8 +110,10 @@ for n, d in enumerate(dates):
 	# Find the file for this date
 	cfull_path, cfname = findClimoFile("*"+grep+"*"+d+"*", directory = cdir)
 	tfull_path, tfname = findClimoFile("*"+grep+"*"+d+"*", directory = tdir)
-	if fname != 0:
-		print fname
+	if cfname != 0:
+		print cfname
+	if tfname != 0:
+		print tfname
 	# Open the file
 	cnc = camgoda(cfull_path)
 	tnc = camgoda(tfull_path)
