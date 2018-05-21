@@ -98,9 +98,9 @@ for n, d in enumerate(dates):
 
 	# Plot the timeseries
 	plt.subplot(2,1,1)
-	plt.plot(var_master[:,i])
-	plt.title(long_name[i])
-	plt.ylabel(units[i])
+	plt.plot(var_master[:,0])
+	plt.title(long_name[0])
+	plt.ylabel(units[0])
 	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 	labx = ['' for whatever in atx]
 	if i == nvar-1:
