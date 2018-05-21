@@ -104,7 +104,7 @@ long_name = []
 units = []
 for n, d in enumerate(dates):
 	# Find the file for this date
-	full_path, fname = findClimoFile("*"+grep+"*"+d+"*", dir = ARGS.directory)
+	full_path, fname = findClimoFile("*"+grep+"*"+d+"*", directory = ARGS.directory)
 	if fname != 0:
 		print fname
 	# Open the file
