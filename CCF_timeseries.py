@@ -85,16 +85,19 @@ for n, d in enumerate(dates):
 		print fname
 	# Open the file
 	nc = camgoda(full_path)
-  for m, v in variable:
-    # Read the data
-    var_is_3d, var, pressure = nc.ExtractData(v, box)
-    data = nc.data
-    # Average the data
-    data_avg = np.nanmean(data)
-    var_master[n,m] = data_avg
-    if n == 0:
-      long_name.append(nc.long_name)
-      units.append(nc.units)
+	for m, v in variable:
+		# Read the data
+		var_is_3d, var, pressure = nc.ExtractData(v, box)
+		data = nc.data
+		# Average the data
+		data_avg = np.nanmean(data)
+		var_master[n,m] = data_avg
+		if n == 0:
+		long_name.append(nc.long_name)
+		units.append(nc.units)
+
+for D in range(2):
+	var_master[:,D] = runningMean(var_master[:,D], run)
 
 # Plot the timeseries
 plt.subplot(311)
