@@ -1,7 +1,7 @@
 # A collection of functions useful for manipulating and working with netcdf files in python
 
 
-def runningMean(x, N, mode = 'valid'):
+def runningMean(x, N, mode = 'same'):
 	import numpy as np
 	return np.convolve(x, np.ones((N,))/N, mode=mode)
 
