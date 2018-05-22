@@ -1278,10 +1278,11 @@ d18OV and dDV : returns 2d numpy array data.
 				return 
 			pressure = float(split[-1]) * 100
 			var = split[1]
-			vname = split[1]+split[2]
+			vname = split[1]
 			if len(split) == 4: # Handle variables like VQ_H2O
-				var += split[2]
-				vname += split[3]
+				var += "_" + split[2]
+				vname += "_" + split[2]
+			vname += split[-1]
 		# Extract the variable data
 		# Special variables
 		if var == "PRECT_d18O":
