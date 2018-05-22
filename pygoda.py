@@ -1247,7 +1247,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.CalculatePressure(box = box)
 		E = self.variable("Q", box = box, setData = False) / 1000 * self.P_m / 0.622
 		Es = 610.78 * np.exp(self.variable("T", box = box, setData = False) / (self.variable("T", box = box, setData = False) + 238.3) * 17.2694)
-		RH = E/Es 
+		RH = E/Es * 100
+		RH = self.mask(RH, 'gt', 1.3)
 		self.data = RH
 		self.long_name = "Relative Humidity"
 		self.units = "%"
