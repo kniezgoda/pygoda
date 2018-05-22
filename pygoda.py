@@ -1318,6 +1318,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = prect/qflx
 			self.units = "unitless (ratio)"
 			self.long_name = "Ratio of precipitation to evaporation P/E"
+		elif var == "convergenceDelta":
+			self.convergenceDelta(box)
 		elif var == "d18OV":
 			self.d18OV(box)
 		elif var == "dDV":
