@@ -1268,17 +1268,20 @@ d18OV and dDV : returns 2d numpy array data.
 		if V[:3] == '3d_':
 			var_is_3d = True
 		if not var_is_3d:
-		    var = V
-		    vname = V
-		    pressure = None
+			var = V
+			vname = V
+			pressure = None
 		else:
 			split = V.split("_")
-			if len(split) != 3:
-				print "Something went wrong parsing the variable name.\nMake sure there are two underscores!"
+			if 3 > len(split) > 4:
+				print "Something went wrong parsing the variable name.\nMake sure there are two or three underscores!"
 				return 
+			pressure = float(split[-1]) * 100
 			var = split[1]
 			vname = split[1]+split[2]
-			pressure = float(split[2]) * 100
+			if len(split) == 4: # Handle variables like VQ_H2O
+				var += split[2]
+				vname += split[3]
 		# Extract the variable data
 		# Special variables
 		if var == "PRECT_d18O":
