@@ -96,18 +96,19 @@ for n, d in enumerate(dates):
 			long_name.append(nc.long_name)
 			units.append(nc.units)
 
+var_resid = np.zeros(shape = var_master.shape)
 for D in range(2):
-	var_master[:,D] = runningMean(var_master[:,D], run)
+	var_resid[:,D] = var_master[:,D] - runningMean(var_master[:,D], run)
 
 # Plot the timeseries
 plt.subplot(311)
-plt.plot(var_master[:,0])
-plt.title(long_name[0])
+plt.plot(var_resid[:,0])
+plt.title(long_name[0] + " residuals")
 plt.ylabel(units[0])
 
 plt.subplot(312)
-plt.plot(var_master[:,1])
-plt.title(long_name[1])
+plt.plot(var_resid[:,1])
+plt.title(long_name[1] + " residuals")
 plt.ylabel(units[1])
 atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 labx = np.array(dates)[np.array(atx)]
@@ -117,7 +118,7 @@ plt.xticks(atx,labx,rotation=45)
 plt.subplot(313)
 acf = []
 for lag in range(-100,101):
-	acf.append(corr(var_master[:,0], var_master[:,1], lag))
+	acf.append(corr(var_resid[:,0], var_resid[:,1], lag))
 plt.plot(range(-100,101), acf)
 plt.xlabel("lag")
 max = range(-100,101)[np.argmax(acf)]
