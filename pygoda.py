@@ -1201,7 +1201,7 @@ d18OV and dDV : returns 2d numpy array data.
 		P_E = P-E
 
 		# Mask for near-zero values of P-E
-		RE, RP, P_E = [self.mask(np.abs(P_E), 'lt', 0.01, x) for x in [RE, RP, P_E]]
+		RE, RP, P_E = [self.mask(np.abs(P_E), 'lt', 0.1, x) for x in [RE, RP, P_E]]
 
 		data = ((RP-RE)/(P_E) - 1) * 1000
 		self.var = "convergenceDelta"
