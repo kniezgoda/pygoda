@@ -1189,32 +1189,23 @@ d18OV and dDV : returns 2d numpy array data.
 		self.data = (qflx_hdo / qflx_h2o - 1) * 1000
 		return self.data
 
-	def fluxDelta(self, box = None):
-		import xarray as xr
+	def convergenceDelta(self, box = None):
 		import numpy as np
-		P = self.variable("PRECT_H2O", box = box, setData = False, math = False)*1000
-		E  = self.variable("QFLX_H2O", box = box, setData = False, math = False)
-		RP = self.variable("PRECT_H218O", box = box, setData = False, math = False)*1000
-		RE = self.variable("QFLX_H218O", box = box, setData = False, math = False)
+		P = self.variable("PRECT_H2O", box = box)
+		E  = self.variable("QFLX_H2O", box = box)
+		RP = self.variable("PRECT_H218O", box = box)
+		RE = self.variable("QFLX_H218O", box = box)
 
 		# Mask everything by the weird values of RE near ice
-		REmask = xr.DataArray(RE)
-		RE = np.array(REmask.where(abs(REmask) < 1))
-		RP = np.array(xr.DataArray(RP).where(abs(REmask) < 1))
-		P = np.array(xr.DataArray(P).where(abs(REmask) < 1))
-		E = np.array(xr.DataArray(E).where(abs(REmask) < 1))
+		RE, RP, P, E = [self.mask(RE, 'lt', 1, x) for x in [RE, RP, P, E]]
+		P_E = P-E
 
 		# Mask for near-zero values of P-E
-		P_E = P-E
-		P_Emask = xr.DataArray(P_E)
-		RE = np.array(xr.DataArray(RE).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
-		RP = np.array(xr.DataArray(RP).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
-		P = np.array(xr.DataArray(P).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
-		E = np.array(xr.DataArray(E).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
+		RE, RP, P_E = [self.mask(np.abs(P_E), 'lt', 0.01, x) for x in [RE, RP, P_E]]
 
-		data = ((RP-RE)/(P-E) - 1) * 1000
-		self.var = "fluxDelta"
-		self.long_name = "d18O of advected moisture"
+		data = ((RP-RE)/(P_E) - 1) * 1000
+		self.var = "convergenceDelta"
+		self.long_name = "d18O of moisture convergence"
 		self.units = "delta 18O"
 		self.vartype = "2d"
 		self.data = data
@@ -1315,7 +1306,8 @@ d18OV and dDV : returns 2d numpy array data.
 			num  = self.columnSum(box)
 			self.data = (num/denom - 1) * 1000
 		elif var == "P_E":
-			self.variable('PRECT', box, math = False)*1000 - self.variable('QFLX', box, math = False) * 60 * 60 * 24
+			data = self.variable('PRECT', box) - self.variable('QFLX', box)
+			self.data = data
 			self.units = "kg/m2/day"
 			self.long_name = "Moisture convergence (P-E)"
 		elif var == "PoverE":
