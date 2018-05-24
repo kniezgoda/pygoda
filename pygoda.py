@@ -78,13 +78,13 @@ def find_indices(box, lats, lons):
 
 
 def sigmaFilter(a, sigma = 3, n_passes=1):
-	import scipy.stats as stats
 	import numpy as np
-	d = stats.describe(a)
-	avg = d.mean
-	stddev = np.sqrt(d.variance)
+	avg = np.nanmean(a)
+	stddev = np.nanstd(a)
 	for i in range(n_passes):
 		a = [np.nan if (x < avg - sigma*stddev) | (x > avg + sigma*stddev) else x for x in a]
+		avg = np.nanmean(a)
+		stddev = np.nanstd(a)
 	return np.array(a)
 
 def medianFilter(a, n = 3, n_passes=1):
@@ -179,158 +179,6 @@ def PressureCalc(A, B, PS):
 	for n in range(len(B)):
 		pressure.append(np.array(A[n] * 100000 + B[n] * PS))
 	return np.array(pressure)
-
-
-# =========================================================================================== #
-
-
-#############
-### dR_dt ###
-#############
-
-def dR_dt(f, isotope, lev = -1, time = 0):
-	'''
-	Author : Kyle Niezgoda
-	Date : June 9, 2017
-
-	This function calculates dR/dt due to horizontal advection 
-	where R is the ratio of isotope to normal water in vapor form.
-
-	Arguments
-	---------
-	file : string, the file name to calculate dR/dt from
-	isotope : string, which isotope to calculate, either HDO or H218O
-	lev : int, the level to caulate dR/dt at
-		default : -1 (surface)
-	time : int, if the file has more than one time file, which one to use?
-		default : 0
-
-	Returns
-	-------
-	array : 2-d array of dR/dt values in units of R per second
-	'''
-	from netCDF4 import Dataset
-	import numpy as np
-
-	Rad = 6371000 # meters, radius of Earth
-
-	# Read the file
-	nc = Dataset(f, mode = 'r')
-
-	# Import and calculate some spatial variables
-	lat = nc.variables['lat'][:]
-	# Only works if longitudes and latitudes are equally spaced on a finite volume grid!
-	dy = 2 * np.pi * Rad * np.diff(lat)[0] / 360
-	lon = nc.variables['lon'][:]
-	# Only works if longitudes and latitudes are equally spaced on a finite volume grid!
-	delta_lon = np.diff(lon)[0]
-	dx = 2 * np.pi / 360 * Rad * delta_lon * np.cos(np.radians(lat))
-
-	# Figure out what the user meant with the isotope argument
-	if (isotope == "hdo") | (isotope == "HDO"):
-		which = "HDO"
-		#print "Extracting data for " + which
-	elif (isotope == "h218o") | (isotope == "H218O") | (isotope == "H218o") | (isotope == "h2180") | (isotope == "H2180"):
-		which = "H218O"
-		#print "Extracting data for " + which
-	else:
-		print "Error from dR_dt.py..."
-		print "Do not understand the isotope argument or no isotope argument entered!"
-		print "Fix the isotope argument, make sure it is a string, a try again."
-		print "Exiting program..."
-		return
-
-	# Read in the important stuff
-	UQ = nc.variables['UQ'][time,lev,:,:].squeeze()
-	UQ_HDO = nc.variables['UQ_'+which][time,lev,:,:].squeeze()
-	HDOV = nc.variables[which+'V'][time,lev,:,:].squeeze()
-	Q = nc.variables['Q'][time,lev,:,:].squeeze()
-	R = HDOV/Q
-
-	# Initialize the spatial gradient master arrays
-	dUQ_dx = np.zeros(UQ.shape)
-	dUQ_dy = np.zeros(UQ.shape)
-	dUQHDO_dx = np.zeros(UQ_HDO.shape)
-	dUQHDO_dy = np.zeros(UQ_HDO.shape)
-
-	######################
-	### Plan of attack ###
-	######################
-	'''
-	We need to calculate d/dt(UQ) and d/dt(UQ_HDO)
-	To do so we'll need to find spatial gradients for
-	UQ_HDO and UQ in both x and y. We will ignore 
-	gradients in the z. 
-
-	We will set d/dy = 0 for the top and bottom lat
-	as a boundary condition for both variables.
-
-	Algorithm:
-	# 1) loop through rows and columns
-	# 2) calculate the dx one by one inside each column loop
-	# 3) calculate all the dy at once inside the first column loop (j==0)
-	# 4) dR/dx = -d/dx(UQ_HDO) + R*d/dx(UQ), same for dy
-	# 5) dR/dt = (dR/dx + dR/dy) / q
-	'''
-
-	# Loop through rows
-	for i in range(UQ.shape[0]):
-		# Extract data for this iteration
-		uqrow = UQ[i,:]
-		uqhdorow = UQ_HDO[i,:]
-		
-		# Initialize dx carriers
-		duq_dx = []
-		duqhdo_dx = []
-
-		# Loop through columns
-		for j in range(UQ.shape[1]):
-			# Solve dx stuff one at a time
-			duq_dx.append((uqrow[(j+1)%UQ.shape[1]] - uqrow[(j-1)])/dx[i])
-			duqhdo_dx.append((uqhdorow[(j+1)%UQ.shape[1]] - uqhdorow[(j-1)])/dx[i])
-			
-			################
-			### dy start ###
-			################
-			# Solve all the dy stuff here
-			# Only have to do it once inside the i loop
-			if i == 0:
-				# Initialize dy carriers as 0 for the top lat
-				duq_dy = [0]
-				duqhdo_dy = [0]
-
-				# Extract the column data for this iteration
-				uqcol = UQ[:,j]
-				uqhdocol = UQ_HDO[:,j]
-
-				# Loop through the extraacted column and compute the d/dy
-				for n in range(len(uqcol)):
-					# This is for top and bottom lat, we hard code in 0's already
-					if (n == 0) | (n == len(uqcol)-1):
-						continue
-					else:
-						duq_dy.append((uqcol[n+1] - uqcol[n-1])/dy)
-						duqhdo_dy.append((uqhdocol[n+1] - uqhdocol[n-1])/dy)
-
-				# Add another zero for the -90 lat
-				duq_dy.append(0)
-				duqhdo_dy.append(0)
-
-				# Keep track with master array
-				dUQ_dy[:,j] = duq_dy
-				dUQHDO_dy[:,j] = duqhdo_dy
-			###############
-			### end dy ####
-			###############
-
-		# Keep track with master array
-		dUQ_dx[i,:] = duq_dx
-		dUQHDO_dx[i,:] = duqhdo_dx
-
-	dR_dy = -dUQHDO_dy + np.multiply(R, dUQ_dy)
-	dR_dx = -dUQHDO_dx + np.multiply(R, dUQ_dx)
-	dR_dt = np.divide(dR_dx + dR_dy, Q)
-	return dR_dt
 
 
 # =========================================================================================== #
@@ -1111,19 +959,18 @@ d18OV and dDV : returns 2d numpy array data.
 		self.data = ddv_p - 8 * d18ov_p
 		return self.data
 
-	# def VQ_d18O(self, box = None):
-	# 	import xarray as xr
-	# 	vq_h218o = self.variable("VQ_H218O", box, setData = False)
-	# 	vq_h2o = self.variable("VQ_H2O", box, setData = False)
-	# 	self.var = "VQ_d18O"
-	# 	self.long_name = "VQ_d18O"
-	# 	self.units = "m/s * delta"
-	# 	self.vartype = "3d"
-	# 	data = (vq_h218o / vq_h2o - 1) * 1000
-	# 	data = xr.DataArray(data)
-	# 	data = data.where(abs(data) < 100)
-	# 	self.data = data
-	# 	return self.data
+	def VQ_d18O(self, box = None):
+		import numpy as np
+		vq_h218o = self.variable("VQ_H218O", box, setData = False)
+		vq_h2o = self.variable("VQ_H2O", box, setData = False)
+		vq_h2o, vq_h218o = [self.mask(np.abs(vq_h2o), 'lt', 0.00001, x) for x in [vq_h2o, vq_h218o]
+		self.var = "VQ_d18O"
+		self.long_name = "VQ_d18O"
+		self.units = "m/s * delta"
+		self.vartype = "3d"
+		data = (vq_h218o / vq_h2o - 1) * 1000
+		self.data = data
+		return self.data
 
 	# def VQ_dD(self, box = None):
 	# 	vq_hdo = self.variable("VQ_HDO", box, setData = False)
@@ -1345,6 +1192,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.UQ_dD(box)
 		elif var == "QFLX_d18O":
 			self.QFLX_d18O(box)
+		elif var == "VQ_d18O":
+			self.VQ_d18O(box)
 
 		# Regular variables inside the netcdf file
 		else:
