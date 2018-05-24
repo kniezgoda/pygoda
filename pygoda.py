@@ -963,7 +963,7 @@ d18OV and dDV : returns 2d numpy array data.
 		import numpy as np
 		vq_h218o = self.variable("VQ_H218O", box, setData = False)
 		vq_h2o = self.variable("VQ_H2O", box, setData = False)
-		vq_h2o, vq_h218o = [self.mask(np.abs(vq_h2o), 'lt', 0.00001, x) for x in [vq_h2o, vq_h218o]
+		vq_h2o, vq_h218o = [self.mask(np.abs(vq_h2o), 'lt', 0.001, x) for x in [vq_h2o, vq_h218o]]
 		self.var = "VQ_d18O"
 		self.long_name = "VQ_d18O"
 		self.units = "m/s * delta"
