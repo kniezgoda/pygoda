@@ -184,7 +184,7 @@ def PressureCalc(A, B, PS):
 # =========================================================================================== #
 
 
-def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days = False):
+def camdates(start_year = None, end_year = None, months = [1,2,3,4,5,6,7,8,9,10,11,12], days = False):
 	import datetime
 
 	# Compute the end day corresponding to the end month
@@ -196,7 +196,15 @@ def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days =
 	else:
 		end_day = 28
 
-	# Crete the starting and ending date
+	# Handle for no years 
+	# In this case, only months or month-days will be output
+	strip_years = False
+	if start_year is None or end_year is None:
+		start_year = 0
+		end_year = 0
+		strip_years = True
+		
+	# Create the starting and ending date
 	dates = []
 	start_date = datetime.date(year = 1950 + start_year, month = months[0], day = 1)
 	end_date = datetime.date(year = 1950 + end_year, month = end_month, day = end_day)
@@ -209,7 +217,7 @@ def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days =
 		# Datetime doesn't do dates before 1950 or something like that...
 		# This is how I fix that
 		YEAR = str(d.year - 1950)
-		# Add leading zeros to the fromnt of the string to match to cam history file naming structure
+		# Add leading zeros to the front of the string to match to cam history file naming structure
 		# Years have 4 digits (YYYY), months and days have 2 digits (MM, DD)
 		for i in range(4-len(YEAR)):
 			YEAR = '0' + YEAR
@@ -240,7 +248,9 @@ def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days =
 			else:
 				dates.append(YEAR + '-' + MONTH)
 				d += delta
-	
+	if strip_years:
+		dates = [d[5:]for d in dates]
+		
 	return dates
 
 
