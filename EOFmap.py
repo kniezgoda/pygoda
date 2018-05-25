@@ -1,5 +1,3 @@
-#! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-
 from pygoda import camgoda, camdates, findClimoFile, eof
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,9 +5,9 @@ from mpl_toolkits.basemap import Basemap as bm
 import os, sys, glob, argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-cdir', '--control_directory', dest = 'cdir', default = 'fc5.2deg.wiso.piControl_kn028/atm/hist')
-parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
+parser.add_argument('-dir', '--directory', dest = 'dir', default = './')
 parser.add_argument('-v', '--variable', dest = 'variable', default = None)
+parser.add_argument('-del', dest = 'delta', default = 0)
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [None, None])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
 parser.add_argument('-box', dest = 'box', nargs = 4, default = [-50, 50, 0, 360])
@@ -22,8 +20,7 @@ parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action 
 
 # Read the ARGS
 ARGS = parser.parse_args()
-cdir = ARGS.cdir
-tdir = ARGS.tdir
+directory = ARGS.dir
 variable = ARGS.variable
 box = [int(b) for b in ARGS.box]
 num_eofs = int(ARGS.num_eofs)
@@ -46,8 +43,8 @@ dates = camdates(start, end)
 
 for n, date in enumerate(dates):
 	# Find the file for this date
-	cfull_path, cfname = findClimoFile("*"+grep_pre+"*"+date+"*"+grep_post+"*", cdir)
-	tfull_path, tfname = findClimoFile("*"+grep_pre+"*"+date+"*"+grep_post+"*", tdir)
+	cfull_path, cfname = findClimoFile("*grep_pre*"+date+"*grep_post*", cdir)
+	tfull_path, tfname = findClimoFile("*grep_pre*"+date+"*grep_post*", tdir)
 	if cfname != 0:
 		print cfname
 	if tfname != 0:
@@ -55,7 +52,7 @@ for n, date in enumerate(dates):
 	# Open the file
 	cnc = camgoda(cfull_path)
 	tnc = camgoda(tfull_path)
-	is3d, var, vname = cnc.ExtractData(variable, box)
+	is3d, var, vname = tnc.ExtractData(variable, box)
 	is3d, var, vname = tnc.ExtractData(variable, box)
 	if n == 0:
 		nlats, nlons = cnc.data.shape
