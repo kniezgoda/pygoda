@@ -65,6 +65,7 @@ for n, date in enumerate(dates):
 	d[n,:] = np.ndarray.flatten(tnc.data - cnc.data)
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
+print "Computing the EOF..."
 a, F = eof(d)
 
 # Reshape F into a spatial grid
@@ -79,7 +80,7 @@ if 0 in boxlon[1:-2]: # if we cross the gml
 num_subplots = 2*num_eofs
 for subplot in range(num_subplots):
 	if subplot % 2 == 0: #even, the F maps
-		plt.subplot(2,num_eofs,subplot)
+		plt.subplot(2,num_eofs,subplot+1)
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
@@ -88,7 +89,7 @@ for subplot in range(num_subplots):
 	else: # odd, the amplitude time series
 		atx = np.arange(0, len(dates), 3)
 		labx = np.array(dates)[atx]
-		plt.subplot(2,num_eofs,subplot)
+		plt.subplot(2,num_eofs,subplot+1)
 		plt.plot(a[:,(subplot-1)/2])
 		plt.xticks(atx, labx, rotation=45)
 
