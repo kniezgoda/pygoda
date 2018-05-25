@@ -73,8 +73,11 @@ print "Finished!"
 F_grid = np.reshape(F, (F.shape[0], nlats, nlons))
 
 # Make the maps 
-southern_lat, northern_lat, left_lon, right_lon = box
 bmlon, bmlat = np.meshgrid(boxlon, boxlat)
+southern_lat = boxlat[0]
+northern_lat = boxlat[-1]
+left_lon = boxlon[0]
+right_lon = boxlon[-1]
 if 0 in boxlon[1:-2]: # if we cross the gml
 	left_lon = boxlon[0]-360
 
