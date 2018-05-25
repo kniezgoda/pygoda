@@ -136,6 +136,43 @@ def corr(a, b, lag=0):
 		return np.nan
 	return np.nansum((a1 - a1_mu)  * (a2- a2_mu)) / N / (a1_stddev * a2_stddev)
 
+def Nstar_auto(a):
+	N = np.sum(~np.isnan(a))
+	hold = []
+	for k in range(-(N-1), N-1):
+		if not abs(k) < 0.8 * N:
+			continue
+		else:
+			r = corr(a, a, lag=k)
+			hold.append(((float(N)-float(abs(k)))/float(N)) * r**2)
+	return N / np.nansum(hold)
+
+
+def eof(d, removeMeans = True):
+	import numpy as np
+	N, M = d.shape
+	if removeMeans:
+		d -= np.mean(d)
+
+	# Calculate the mean square matrix (or the covariance matrix, if removeMeans)
+	D = np.zeros(shape = (M,M))
+	for ir in range(0,M):
+		D[ir,ir] = np.nanmean(d[:,ir] * d[:,ir])
+		# Doing it this way cuts the number of operations in half
+		for ic in range(ir+1,M):
+			D[ir, ic] = np.nanmean(d[:,ir] * d[:,ic])
+			D[ic, ir] = D[ir,ic]
+
+	# Compute the singular values of D
+	W, l, F = np.linalg.svd(D)
+
+	# Get the variance for each mode
+	l = diag(l)
+
+	# Calculate the amplitude functions
+	a = np.matmul(d, F)
+
+
 # =========================================================================================== #
 
 
