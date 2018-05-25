@@ -155,30 +155,30 @@ def Nstar_auto(a):
 
 
 def eof(d, removeMeans = True):
-import numpy as np
-N, M = d.shape
-if removeMeans:
-	d -= np.mean(d)
+	import numpy as np
+	N, M = d.shape
+	if removeMeans:
+		d -= np.mean(d)
 
-# Calculate the mean square matrix (or the covariance matrix, if removeMeans)
-D = np.zeros(shape = (M,M))
-for ir in range(0,M):
-	D[ir,ir] = np.nanmean(d[:,ir] * d[:,ir])
-	# Doing it this way cuts the number of operations in half
-	for ic in range(ir+1,M):
-		D[ir, ic] = np.nanmean(d[:,ir] * d[:,ic])
-		D[ic, ir] = D[ir,ic]
+	# Calculate the mean square matrix (or the covariance matrix, if removeMeans)
+	D = np.zeros(shape = (M,M))
+	for ir in range(0,M):
+		D[ir,ir] = np.nanmean(d[:,ir] * d[:,ir])
+		# Doing it this way cuts the number of operations in half
+		for ic in range(ir+1,M):
+			D[ir, ic] = np.nanmean(d[:,ir] * d[:,ic])
+			D[ic, ir] = D[ir,ic]
 
-# Compute the singular values of D
-W, l, F = np.linalg.svd(D)
+	# Compute the singular values of D
+	W, l, F = np.linalg.svd(D)
 
-# Get the variance for each mode
-l = np.diag(l)
+	# Get the variance for each mode
+	l = np.diag(l)
 
-# Calculate the amplitude functions
-a = np.matmul(d, F)
+	# Calculate the amplitude functions
+	a = np.matmul(d, F)
 
-return(a, F)
+	return(a, F)
 
 
 # =========================================================================================== #
