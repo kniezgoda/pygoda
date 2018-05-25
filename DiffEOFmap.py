@@ -67,6 +67,7 @@ for n, date in enumerate(dates):
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
 print "Computing the EOF..."
 a, F = eof(d)
+print "Finished!"
 
 # Reshape F into a spatial grid
 F_grid = np.reshape(F, (F.shape[0], nlats, nlons))
@@ -84,7 +85,7 @@ for subplot in range(num_subplots):
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
-		cs = m.contourf(bmlon, bmlat, F_grid[subplots/2,:,:], shading = 'flat', latlon = True)
+		cs = m.contourf(bmlon, bmlat, F_grid[subplot/2,:,:], shading = 'flat', latlon = True)
 		cbar = m.colorbar(cs, location='right', pad="5%")
 	else: # odd, the amplitude time series
 		atx = np.arange(0, len(dates), 3)
