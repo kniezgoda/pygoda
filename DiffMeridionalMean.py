@@ -75,11 +75,13 @@ for v in variables:
 	tvar = tnc.data
 	long_name = cnc.long_name
 	units = cnc.units
-	lat = cnc.boxlat
+	lon = cnc.boxlon
 
 	# Zonally average the data
-	cvar_zonalMean = np.mean(cvar, axis = 1)
-	tvar_zonalMean = np.mean(tvar, axis = 1)
+  # These are the wrong names, but the correct axis is averaged over
+  # I just didn't feel like changing the variable names since this code is just copied from DiffZonalMean.py
+	cvar_zonalMean = np.mean(cvar, axis = 0)
+	tvar_zonalMean = np.mean(tvar, axis = 0)
 
 	# Compute the difference
 	dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
@@ -88,19 +90,19 @@ for v in variables:
 	fig = plt.figure()
 
 	plt.subplot(211)
-	plt.plot(lat, tvar_zonalMean, label = "test")
-	plt.plot(lat, cvar_zonalMean, label = "control")
+	plt.plot(lon, tvar_zonalMean, label = "test")
+	plt.plot(lon, cvar_zonalMean, label = "control")
 	plt.ylabel(units)
 	plt.legend()
 
 	plt.subplot(212)
-	plt.plot(lat, dvar_zonalMean, color = 'k')
+	plt.plot(lon, dvar_zonalMean, color = 'k')
 	plt.ylabel("Difference in " + units)
 
-	fig.suptitle(long_name + "\nAveraged over longitudes " + str(left_lon) + " - " + str(right_lon))
+	fig.suptitle(long_name + "\nAveraged over longitudes " + str(bottom_lat) + " - " + str(top_lat))
 
 	if savefig:
-		plt.savefig(v + "." + str(left_lon) + "_" + str(right_lon) + ".ps")
+		plt.savefig(v + "." + str(bottom_lat) + "_" + str(top_lat) + ".ps")
 	if showfig:
 		plt.show()
 	

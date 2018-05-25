@@ -1,6 +1,10 @@
 # A collection of functions useful for manipulating and working with netcdf files in python
 
 
+def runningMean(x, N, mode = 'same'):
+	import numpy as np
+	return np.convolve(x, np.ones((N,))/N, mode=mode)
+
 # =========================================================================================== #
 
 
@@ -74,13 +78,13 @@ def find_indices(box, lats, lons):
 
 
 def sigmaFilter(a, sigma = 3, n_passes=1):
-	import scipy.stats as stats
 	import numpy as np
-	d = stats.describe(a)
-	avg = d.mean
-	stddev = np.sqrt(d.variance)
+	avg = np.nanmean(a)
+	stddev = np.nanstd(a)
 	for i in range(n_passes):
 		a = [np.nan if (x < avg - sigma*stddev) | (x > avg + sigma*stddev) else x for x in a]
+		avg = np.nanmean(a)
+		stddev = np.nanstd(a)
 	return np.array(a)
 
 def medianFilter(a, n = 3, n_passes=1):
@@ -114,18 +118,20 @@ def corr(a, b, lag=0):
 	The R value returned (Rxx, in this case) is not equal to 1, which it should be.
 	Instead, it is equal to something close to 0.997, not too far off but not entirely correct either.
 	from scipy.stats import describe as desc
+	
+	---> Negative lag implies that a1 leads a2!
 	'''
 	import numpy as np
 	if lag == 0:
 		# Have to do this because b[:-lag] doesn't work for lag == 0.
-		a1 = a
-		a2 = b
+		a1 = np.array(a)
+		a2 = np.array(b)
 	elif lag > 0:
-		a1 = a[lag:]
-		a2 = b[:-lag]
+		a1 = np.array(a[lag:])
+		a2 = np.array(b[:-lag])
 	else:
-		a1 = a[:lag]
-		a2 = b[-lag:]
+		a1 = np.array(a[:lag])
+		a2 = np.array(b[-lag:])
 	a1_mu = np.nanmean(a1)
 	a1_stddev = np.nanstd(a1)
 	a2_mu = np.nanmean(a2)
@@ -215,159 +221,7 @@ def PressureCalc(A, B, PS):
 # =========================================================================================== #
 
 
-#############
-### dR_dt ###
-#############
-
-def dR_dt(f, isotope, lev = -1, time = 0):
-	'''
-	Author : Kyle Niezgoda
-	Date : June 9, 2017
-
-	This function calculates dR/dt due to horizontal advection 
-	where R is the ratio of isotope to normal water in vapor form.
-
-	Arguments
-	---------
-	file : string, the file name to calculate dR/dt from
-	isotope : string, which isotope to calculate, either HDO or H218O
-	lev : int, the level to caulate dR/dt at
-		default : -1 (surface)
-	time : int, if the file has more than one time file, which one to use?
-		default : 0
-
-	Returns
-	-------
-	array : 2-d array of dR/dt values in units of R per second
-	'''
-	from netCDF4 import Dataset
-	import numpy as np
-
-	Rad = 6371000 # meters, radius of Earth
-
-	# Read the file
-	nc = Dataset(f, mode = 'r')
-
-	# Import and calculate some spatial variables
-	lat = nc.variables['lat'][:]
-	# Only works if longitudes and latitudes are equally spaced on a finite volume grid!
-	dy = 2 * np.pi * Rad * np.diff(lat)[0] / 360
-	lon = nc.variables['lon'][:]
-	# Only works if longitudes and latitudes are equally spaced on a finite volume grid!
-	delta_lon = np.diff(lon)[0]
-	dx = 2 * np.pi / 360 * Rad * delta_lon * np.cos(np.radians(lat))
-
-	# Figure out what the user meant with the isotope argument
-	if (isotope == "hdo") | (isotope == "HDO"):
-		which = "HDO"
-		#print "Extracting data for " + which
-	elif (isotope == "h218o") | (isotope == "H218O") | (isotope == "H218o") | (isotope == "h2180") | (isotope == "H2180"):
-		which = "H218O"
-		#print "Extracting data for " + which
-	else:
-		print "Error from dR_dt.py..."
-		print "Do not understand the isotope argument or no isotope argument entered!"
-		print "Fix the isotope argument, make sure it is a string, a try again."
-		print "Exiting program..."
-		return
-
-	# Read in the important stuff
-	UQ = nc.variables['UQ'][time,lev,:,:].squeeze()
-	UQ_HDO = nc.variables['UQ_'+which][time,lev,:,:].squeeze()
-	HDOV = nc.variables[which+'V'][time,lev,:,:].squeeze()
-	Q = nc.variables['Q'][time,lev,:,:].squeeze()
-	R = HDOV/Q
-
-	# Initialize the spatial gradient master arrays
-	dUQ_dx = np.zeros(UQ.shape)
-	dUQ_dy = np.zeros(UQ.shape)
-	dUQHDO_dx = np.zeros(UQ_HDO.shape)
-	dUQHDO_dy = np.zeros(UQ_HDO.shape)
-
-	######################
-	### Plan of attack ###
-	######################
-	'''
-	We need to calculate d/dt(UQ) and d/dt(UQ_HDO)
-	To do so we'll need to find spatial gradients for
-	UQ_HDO and UQ in both x and y. We will ignore 
-	gradients in the z. 
-
-	We will set d/dy = 0 for the top and bottom lat
-	as a boundary condition for both variables.
-
-	Algorithm:
-	# 1) loop through rows and columns
-	# 2) calculate the dx one by one inside each column loop
-	# 3) calculate all the dy at once inside the first column loop (j==0)
-	# 4) dR/dx = -d/dx(UQ_HDO) + R*d/dx(UQ), same for dy
-	# 5) dR/dt = (dR/dx + dR/dy) / q
-	'''
-
-	# Loop through rows
-	for i in range(UQ.shape[0]):
-		# Extract data for this iteration
-		uqrow = UQ[i,:]
-		uqhdorow = UQ_HDO[i,:]
-		
-		# Initialize dx carriers
-		duq_dx = []
-		duqhdo_dx = []
-
-		# Loop through columns
-		for j in range(UQ.shape[1]):
-			# Solve dx stuff one at a time
-			duq_dx.append((uqrow[(j+1)%UQ.shape[1]] - uqrow[(j-1)])/dx[i])
-			duqhdo_dx.append((uqhdorow[(j+1)%UQ.shape[1]] - uqhdorow[(j-1)])/dx[i])
-			
-			################
-			### dy start ###
-			################
-			# Solve all the dy stuff here
-			# Only have to do it once inside the i loop
-			if i == 0:
-				# Initialize dy carriers as 0 for the top lat
-				duq_dy = [0]
-				duqhdo_dy = [0]
-
-				# Extract the column data for this iteration
-				uqcol = UQ[:,j]
-				uqhdocol = UQ_HDO[:,j]
-
-				# Loop through the extraacted column and compute the d/dy
-				for n in range(len(uqcol)):
-					# This is for top and bottom lat, we hard code in 0's already
-					if (n == 0) | (n == len(uqcol)-1):
-						continue
-					else:
-						duq_dy.append((uqcol[n+1] - uqcol[n-1])/dy)
-						duqhdo_dy.append((uqhdocol[n+1] - uqhdocol[n-1])/dy)
-
-				# Add another zero for the -90 lat
-				duq_dy.append(0)
-				duqhdo_dy.append(0)
-
-				# Keep track with master array
-				dUQ_dy[:,j] = duq_dy
-				dUQHDO_dy[:,j] = duqhdo_dy
-			###############
-			### end dy ####
-			###############
-
-		# Keep track with master array
-		dUQ_dx[i,:] = duq_dx
-		dUQHDO_dx[i,:] = duqhdo_dx
-
-	dR_dy = -dUQHDO_dy + np.multiply(R, dUQ_dy)
-	dR_dx = -dUQHDO_dx + np.multiply(R, dUQ_dx)
-	dR_dt = np.divide(dR_dx + dR_dy, Q)
-	return dR_dt
-
-
-# =========================================================================================== #
-
-
-def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days = False):
+def camdates(start_year = None, end_year = None, months = [1,2,3,4,5,6,7,8,9,10,11,12], days = False):
 	import datetime
 
 	# Compute the end day corresponding to the end month
@@ -379,7 +233,15 @@ def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days =
 	else:
 		end_day = 28
 
-	# Crete the starting and ending date
+	# Handle for no years 
+	# In this case, only months or month-days will be output
+	strip_years = False
+	if start_year is None or end_year is None:
+		start_year = 0
+		end_year = 0
+		strip_years = True
+		
+	# Create the starting and ending date
 	dates = []
 	start_date = datetime.date(year = 1950 + start_year, month = months[0], day = 1)
 	end_date = datetime.date(year = 1950 + end_year, month = end_month, day = end_day)
@@ -392,7 +254,7 @@ def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days =
 		# Datetime doesn't do dates before 1950 or something like that...
 		# This is how I fix that
 		YEAR = str(d.year - 1950)
-		# Add leading zeros to the fromnt of the string to match to cam history file naming structure
+		# Add leading zeros to the front of the string to match to cam history file naming structure
 		# Years have 4 digits (YYYY), months and days have 2 digits (MM, DD)
 		for i in range(4-len(YEAR)):
 			YEAR = '0' + YEAR
@@ -423,7 +285,9 @@ def camdates(start_year, end_year, months = [1,2,3,4,5,6,7,8,9,10,11,12], days =
 			else:
 				dates.append(YEAR + '-' + MONTH)
 				d += delta
-	
+	if strip_years:
+		dates = [d[5:]for d in dates]
+		
 	return dates
 
 
@@ -1087,6 +951,9 @@ d18OV and dDV : returns 2d numpy array data.
 		self.units = "permil"
 		self.vartype = "2d"
 		self.data = (h218o / h2o - 1) * 1000
+		# Filter diriculous data
+		self.data = self.mask(self.data, 'gt', 50)
+		self.data = self.mask(self.data, 'lt', -50)
 		return self.data
 
 	def PRECT_dD(self, box = None):
@@ -1139,19 +1006,18 @@ d18OV and dDV : returns 2d numpy array data.
 		self.data = ddv_p - 8 * d18ov_p
 		return self.data
 
-	# def VQ_d18O(self, box = None):
-	# 	import xarray as xr
-	# 	vq_h218o = self.variable("VQ_H218O", box, setData = False)
-	# 	vq_h2o = self.variable("VQ_H2O", box, setData = False)
-	# 	self.var = "VQ_d18O"
-	# 	self.long_name = "VQ_d18O"
-	# 	self.units = "m/s * delta"
-	# 	self.vartype = "3d"
-	# 	data = (vq_h218o / vq_h2o - 1) * 1000
-	# 	data = xr.DataArray(data)
-	# 	data = data.where(abs(data) < 100)
-	# 	self.data = data
-	# 	return self.data
+	def VQ_d18O(self, box = None):
+		import numpy as np
+		vq_h218o = self.variable("VQ_H218O", box, setData = False)
+		vq_h2o = self.variable("VQ_H2O", box, setData = False)
+		vq_h2o, vq_h218o = [self.mask(np.abs(vq_h2o), 'lt', 0.001, x) for x in [vq_h2o, vq_h218o]]
+		self.var = "VQ_d18O"
+		self.long_name = "VQ_d18O"
+		self.units = "m/s * delta"
+		self.vartype = "3d"
+		data = (vq_h218o / vq_h2o - 1) * 1000
+		self.data = data
+		return self.data
 
 	# def VQ_dD(self, box = None):
 	# 	vq_hdo = self.variable("VQ_HDO", box, setData = False)
@@ -1217,32 +1083,23 @@ d18OV and dDV : returns 2d numpy array data.
 		self.data = (qflx_hdo / qflx_h2o - 1) * 1000
 		return self.data
 
-	def fluxDelta(self, box = None):
-		import xarray as xr
+	def convergenceDelta(self, box = None):
 		import numpy as np
-		P = self.variable("PRECT_H2O", box = box, setData = False, math = False)*1000
-		E  = self.variable("QFLX_H2O", box = box, setData = False, math = False)
-		RP = self.variable("PRECT_H218O", box = box, setData = False, math = False)*1000
-		RE = self.variable("QFLX_H218O", box = box, setData = False, math = False)
+		P = self.variable("PRECT_H2O", box = box)
+		E  = self.variable("QFLX_H2O", box = box)
+		RP = self.variable("PRECT_H218O", box = box)
+		RE = self.variable("QFLX_H218O", box = box)
 
 		# Mask everything by the weird values of RE near ice
-		REmask = xr.DataArray(RE)
-		RE = np.array(REmask.where(abs(REmask) < 1))
-		RP = np.array(xr.DataArray(RP).where(abs(REmask) < 1))
-		P = np.array(xr.DataArray(P).where(abs(REmask) < 1))
-		E = np.array(xr.DataArray(E).where(abs(REmask) < 1))
+		RE, RP, P, E = [self.mask(RE, 'lt', 1, x) for x in [RE, RP, P, E]]
+		P_E = P-E
 
 		# Mask for near-zero values of P-E
-		P_E = P-E
-		P_Emask = xr.DataArray(P_E)
-		RE = np.array(xr.DataArray(RE).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
-		RP = np.array(xr.DataArray(RP).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
-		P = np.array(xr.DataArray(P).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
-		E = np.array(xr.DataArray(E).where(abs(P_Emask) > (0.1 / 24 / 60 / 60)))
+		RE, RP, P_E = [self.mask(np.abs(P_E), 'lt', 0.1, x) for x in [RE, RP, P_E]]
 
-		data = ((RP-RE)/(P-E) - 1) * 1000
-		self.var = "fluxDelta"
-		self.long_name = "d18O of advected moisture"
+		data = ((RP-RE)/(P_E) - 1) * 1000
+		self.var = "convergenceDelta"
+		self.long_name = "d18O of moisture convergence"
 		self.units = "delta 18O"
 		self.vartype = "2d"
 		self.data = data
@@ -1284,7 +1141,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.CalculatePressure(box = box)
 		E = self.variable("Q", box = box, setData = False) / 1000 * self.P_m / 0.622
 		Es = 610.78 * np.exp(self.variable("T", box = box, setData = False) / (self.variable("T", box = box, setData = False) + 238.3) * 17.2694)
-		RH = E/Es 
+		RH = E/Es * 100
+		RH = self.mask(RH, 'gt', 120)
 		self.data = RH
 		self.long_name = "Relative Humidity"
 		self.units = "%"
@@ -1305,17 +1163,21 @@ d18OV and dDV : returns 2d numpy array data.
 		if V[:3] == '3d_':
 			var_is_3d = True
 		if not var_is_3d:
-		    var = V
-		    vname = V
-		    pressure = None
+			var = V
+			vname = V
+			pressure = None
 		else:
 			split = V.split("_")
-			if len(split) != 3:
-				print "Something went wrong parsing the variable name.\nMake sure there are two underscores!"
+			if 3 > len(split) > 4:
+				print "Something went wrong parsing the variable name.\nMake sure there are two or three underscores!"
 				return 
+			pressure = float(split[-1]) * 100
 			var = split[1]
-			vname = split[1]+split[2]
-			pressure = float(split[2]) * 100
+			vname = split[1]
+			if len(split) == 4: # Handle variables like VQ_H2O
+				var += "_" + split[2]
+				vname += "_" + split[2]
+			vname += split[-1]
 		# Extract the variable data
 		# Special variables
 		if var == "PRECT_d18O":
@@ -1343,7 +1205,8 @@ d18OV and dDV : returns 2d numpy array data.
 			num  = self.columnSum(box)
 			self.data = (num/denom - 1) * 1000
 		elif var == "P_E":
-			self.variable('PRECT', box, math = False)*1000 - self.variable('QFLX', box, math = False) * 60 * 60 * 24
+			data = self.variable('PRECT', box) - self.variable('QFLX', box)
+			self.data = data
 			self.units = "kg/m2/day"
 			self.long_name = "Moisture convergence (P-E)"
 		elif var == "PoverE":
@@ -1354,6 +1217,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = prect/qflx
 			self.units = "unitless (ratio)"
 			self.long_name = "Ratio of precipitation to evaporation P/E"
+		elif var == "convergenceDelta":
+			self.convergenceDelta(box)
 		elif var == "d18OV":
 			self.d18OV(box)
 		elif var == "dDV":
@@ -1374,6 +1239,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.UQ_dD(box)
 		elif var == "QFLX_d18O":
 			self.QFLX_d18O(box)
+		elif var == "VQ_d18O":
+			self.VQ_d18O(box)
 
 		# Regular variables inside the netcdf file
 		else:

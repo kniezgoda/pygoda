@@ -24,7 +24,7 @@ Control flags
 
 '''
 
-from pygoda import camdates, findClimoFile, camgoda, corr
+from pygoda import camdates, findClimoFile, camgoda, corr, runningMean
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -44,7 +44,8 @@ parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variables', nargs= "*")
-parser.add_argument('-dir', '--directory', dest = 'directory', default = '.')
+parser.add_argument('-cdir', dest = 'control_directory', default = '.')
+parser.add_argument('-tdir', dest = 'test_directory', default = '.')
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-run', '--running_mean', dest = 'running_mean', default = 1)
 
@@ -56,6 +57,8 @@ ARGS = parser.parse_args()
 run = int(ARGS.running_mean)
 delta = int(ARGS.delta_latlon)
 grep = ARGS.grep
+tdir = ARGS.test_directory 
+cdir = ARGS.control_directory
 if ARGS.center_latlon is not None:
 	lat, lon = [int(c) for c in ARGS.center_latlon]
 	box = [lat-delta, lat+delta, lon-delta, lon+delta]
@@ -99,48 +102,49 @@ if ARGS.developer_mode:
 ##################
 
 # Creates the master array of the correct shape
-var_master = np.zeros(shape = (len(dates), len(variables)))
+cvar_master = np.zeros(shape = (len(dates), len(variables)))
+tvar_master = np.zeros(shape = (len(dates), len(variables)))
 long_name = []
 units = []
 for n, d in enumerate(dates):
 	# Find the file for this date
-	full_path, fname = findClimoFile("*"+grep+"*"+d+"*", directory = ARGS.directory)
-	if fname != 0:
-		print fname
+	cfull_path, cfname = findClimoFile("*"+grep+"*"+d+"*", directory = cdir)
+	tfull_path, tfname = findClimoFile("*"+grep+"*"+d+"*", directory = tdir)
+	if cfname != 0:
+		print cfname
+	if tfname != 0:
+		print tfname
 	# Open the file
-	nc = camgoda(full_path)
+	cnc = camgoda(cfull_path)
+	tnc = camgoda(tfull_path)
 	for m, v in enumerate(variables):
 		# Read the data
-		var_is_3d, var, pressure = nc.ExtractData(v, box)
-		data = nc.data
+		var_is_3d, var, pressure = cnc.ExtractData(v, box)
+		var_is_3d, var, pressure = tnc.ExtractData(v, box)
+		cdata = cnc.data
+		tdata = tnc.data
 		# Average the data
-		data_avg = np.nanmean(data)
-		var_master[n,m] = data_avg
+		cdata_avg = np.nanmean(cdata)
+		tdata_avg = np.nanmean(tdata)
+		cvar_master[n,m] = cdata_avg
+		tvar_master[n,m] = tdata_avg
 		if n == 0:
-			long_name.append(nc.long_name)
-			units.append(nc.units)
+			long_name.append(cnc.long_name)
+			units.append(cnc.units)
 
-ntime, nvar = var_master.shape
-add = 0
-if nvar > 1:
-	add = 1
-	
+ntime, nvar = cvar_master.shape
 for i in range(nvar):
-	plt.subplot(nvar+add,1,i+1)
-	plt.plot(var_master[:,i])
+	plt.subplot(nvar,1,i+1)
+	plt.plot(runningMean(tvar_master[:,i], run), label = "test")
+	plt.plot(runningMean(cvar_master[:,i], run), label = "control")
 	plt.title(long_name[i])
+	plt.legend()
 	plt.ylabel(units[i])
 	atx = [int(round(DATE)) for DATE in np.linspace(0, len(dates)-1, num = 10)]
 	labx = ['' for whatever in atx]
 	if i == nvar-1:
 		labx = np.array(dates)[np.array(atx)]
 	plt.xticks(atx,labx,rotation=45)
-
-if add:
-	print "Correlating the first two variables..."
-	varcorr = [corr(var_master[:,0], var_master[:,1], lag = x) for x in range(-100,101)]
-	plt.subplot(nvar+1,1,nvar+1)
-	plt.plot(range(-100,101), varcorr)
 
 plt.tight_layout()
 
