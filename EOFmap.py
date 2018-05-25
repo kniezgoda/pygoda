@@ -72,7 +72,7 @@ if 0 in boxlon[1:-2]: # if we cross the gml
 
 num_subplots = 2*num_eofs
 for subplot in range(num_subplots):
-	if subplot < num_eofs-1: # the F maps
+	if subplot <= num_eofs-1: # the F maps
 		plt.subplot(2,num_eofs,subplot+1)
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
