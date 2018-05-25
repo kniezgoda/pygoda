@@ -72,14 +72,14 @@ if 0 in boxlon[1:-2]: # if we cross the gml
 
 num_subplots = 2*num_eofs
 for subplot in range(num_subplots):
-	if subplot % 2 == 0: #even, the F maps
+	if subplot < num_eofs-1: # the F maps
 		plt.subplot(2,num_eofs,subplot+1)
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
 		cs = m.contourf(bmlon, bmlat, F_grid[subplot/2,:,:], shading = 'flat', latlon = True)
 		cbar = m.colorbar(cs, location='right', pad="5%")
-	else: # odd, the amplitude time series
+	else: # the amplitude time series
 		atx = np.arange(0, len(dates), 3)
 		labx = np.array(dates)[atx]
 		plt.subplot(2,num_eofs,subplot+1)
