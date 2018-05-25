@@ -57,7 +57,9 @@ for n, date in enumerate(dates):
 	d[n,:] = np.ndarray.flatten(nc.data)
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
+print "Computing the EOF..."
 a, F = eof(d)
+print "Finished!"
 
 # Reshape F into a spatial grid
 F_grid = np.reshape(F, (F.shape[0], nlats, nlons))
