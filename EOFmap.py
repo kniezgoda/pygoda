@@ -1,3 +1,4 @@
+#! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
 from pygoda import camgoda, camdates, findClimoFile, eof
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +8,6 @@ import os, sys, glob, argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', '--directory', dest = 'dir', default = './')
 parser.add_argument('-v', '--variable', dest = 'variable', default = None)
-parser.add_argument('-del', dest = 'delta', default = 0)
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [None, None])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
 parser.add_argument('-box', dest = 'box', nargs = 4, default = [-50, 50, 0, 360])
@@ -43,23 +43,18 @@ dates = camdates(start, end)
 
 for n, date in enumerate(dates):
 	# Find the file for this date
-	cfull_path, cfname = findClimoFile("*grep_pre*"+date+"*grep_post*", cdir)
-	tfull_path, tfname = findClimoFile("*grep_pre*"+date+"*grep_post*", tdir)
-	if cfname != 0:
-		print cfname
-	if tfname != 0:
-		print tfname
+	full_path, fname = findClimoFile("*grep_pre*"+date+"*grep_post*", directory)
+	if fname != 0:
+		print fname
 	# Open the file
-	cnc = camgoda(cfull_path)
-	tnc = camgoda(tfull_path)
-	is3d, var, vname = tnc.ExtractData(variable, box)
-	is3d, var, vname = tnc.ExtractData(variable, box)
+	nc = camgoda(full_path)
+	is3d, var, vname = nc.ExtractData(variable, box)
 	if n == 0:
-		nlats, nlons = cnc.data.shape
-		boxlat = cnc.boxlat
-		boxlon = cnc.boxlon
+		nlats, nlons = nc.data.shape
+		boxlat = nc.boxlat
+		boxlon = nc.boxlon
 		d = np.zeros(shape = (len(dates), nlats*nlons))
-	d[n,:] = np.ndarray.flatten(tnc.data - cnc.data)
+	d[n,:] = np.ndarray.flatten(nc.data)
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
 a, F = eof(d)
