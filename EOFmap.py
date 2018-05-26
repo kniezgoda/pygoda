@@ -14,6 +14,7 @@ parser.add_argument('-box', dest = 'box', nargs = 4, default = [-50, 50, 0, 360]
 parser.add_argument('-n', dest = 'num_eofs', default = 1)
 parser.add_argument('-grep_pre', dest = 'grep_pre', default = '')
 parser.add_argument('-grep_post', dest = 'grep_post', default = '')
+parser.add_argument('-raw', dest = 'raw', action = 'store_false')
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
@@ -37,6 +38,10 @@ if ARGS.developer_mode:
     print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
     savfig = False
     showfig = True
+raw = ARGS.raw
+removeMeans = True
+if raw:
+	removeMeans = False
 
 # Extract the dates
 dates = camdates(start, end)
@@ -58,7 +63,7 @@ for n, date in enumerate(dates):
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
 print "Computing the EOF..."
-a, F = eof(d, verbose = True)
+a, F = eof(d, removeMeans, verbose = True)
 print "Finished!"
 
 # Reshape F into a spatial grid
