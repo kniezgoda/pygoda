@@ -58,7 +58,7 @@ for n, date in enumerate(dates):
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
 print "Computing the EOF..."
-a, F = eof(d)
+a, F = eof(d, verbose = True)
 print "Finished!"
 
 # Reshape F into a spatial grid
