@@ -154,7 +154,7 @@ def Nstar_auto(a):
 	return N / np.nansum(hold)
 
 
-def eof(d, removeMeans = True):
+def eof(d, removeMeans = True, verbose = False):
 	import numpy as np
 	N, M = d.shape
 	if removeMeans:
@@ -163,6 +163,10 @@ def eof(d, removeMeans = True):
 	# Calculate the mean square matrix (or the covariance matrix, if removeMeans)
 	D = np.zeros(shape = (M,M))
 	for ir in range(0,M):
+		if verbose:
+			percent = round(float(ir)/M)
+			if percent % 10 == 0:
+				print str(percent) + "% done..."
 		D[ir,ir] = np.nanmean(d[:,ir] * d[:,ir])
 		# Doing it this way cuts the number of operations in half
 		for ic in range(ir+1,M):
