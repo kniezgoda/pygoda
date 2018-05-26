@@ -43,7 +43,7 @@ dates = camdates(start, end)
 
 for n, date in enumerate(dates):
 	# Find the file for this date
-	full_path, fname = findClimoFile("*grep_pre*"+date+"*grep_post*", directory)
+	full_path, fname = findClimoFile("*"+grep_pre+"*"+date+"*"+grep_post+"*", directory)
 	if fname != 0:
 		print fname
 	# Open the file
