@@ -12,6 +12,7 @@ parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2
 parser.add_argument('-v', '--variable', dest = 'variable', default = None)
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [None, None])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
+parser.add_argument('-days', '--days', dest = 'days', action = 'store_true')
 parser.add_argument('-box', dest = 'box', nargs = 4, default = [-50, 50, 0, 360])
 parser.add_argument('-n', dest = 'num_eofs', default = 1)
 parser.add_argument('-grep_pre', dest = 'grep_pre', default = '')
@@ -32,6 +33,7 @@ if start is not None and end is not None:
 	start = int(start)
 	end = int(end)
 months = [int(m) for m in ARGS.months]
+days = ARGS.days
 grep_pre = ARGS.grep_pre
 grep_post = ARGS.grep_post
 savefig = ARGS.savefig
@@ -42,7 +44,7 @@ if ARGS.developer_mode:
     showfig = True
 
 # Extract the dates
-dates = camdates(start, end)
+dates = camdates(start, end, months, days)
 
 for n, date in enumerate(dates):
 	# Find the file for this date
