@@ -164,6 +164,8 @@ def eof(d, removeMeans = True, verbose = False):
 	D = np.zeros(shape = (M,M))
 	for ir in range(0,M):
 		if verbose:
+			print float(ir)/M
+			print round(float(ir)/M)
 			percent = round(float(ir)/M) * 100
 			if percent % 10 == 0:
 				print str(percent) + "% done..."
