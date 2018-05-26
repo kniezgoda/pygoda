@@ -155,10 +155,14 @@ def Nstar_auto(a):
 
 
 def eof(d, removeMeans = True, verbose = False):
+	'''
+	Largely copied and modified from Jim Lerzcak
+	d in the input data array, 2-d, where rows are times and 
+	'''
 	import numpy as np
 	N, M = d.shape
 	if removeMeans:
-		d -= np.mean(d)
+		d = d - np.mean(d, axis = 0)
 
 	# Calculate the mean square matrix (or the covariance matrix, if removeMeans)
 	D = np.zeros(shape = (M,M))
@@ -174,10 +178,9 @@ def eof(d, removeMeans = True, verbose = False):
 			D[ic, ir] = D[ir,ic]
 
 	# Compute the singular values of D
+	# l is the variance (diagonals already removed)
+	# F is the eigen function array
 	W, l, F = np.linalg.svd(D)
-
-	# Get the variance for each mode
-	l = np.diag(l)
 
 	# Calculate the amplitude functions
 	a = np.matmul(d, F)
