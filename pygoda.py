@@ -1393,3 +1393,4 @@ class popgoda:
 				VAR[i,j] = np.interp(depth, self.z[:], self.data[:,i,j])
 
 		return VAR
+		
