@@ -196,7 +196,7 @@ for filein in files:
 		print("\nPlotting " + vname  +  " data...")
 
 		try:
-			ncdata.variable(var, box)
+			ncdata.ExtractData(var, box)
 		except KeyError:
 			print "Not able to plot variable " + var + "...\nSkipping this variable."
 			continue
