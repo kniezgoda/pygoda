@@ -191,18 +191,6 @@ testdata = popgoda(testdatafname)
 box = (southern_lat, northern_lat, left_lon, right_lon)
 # controldata.surface(controldata.vars[0], box, setData = False) # this sets self.boxlon and self.boxlat
 
-# Create bm coords from region bounds
-# bm lonitude coords need to be 0 < coord < 360 
-bmlon, bmlat = np.meshgrid(controldata.boxlon, controldata.boxlat)
-
-# Reset the lat and lon bounds so that maps don't show grey areas 
-southern_lat, northern_lat = np.array(controldata.boxlat)[[0,-1]]
-# Change lons to be negative is 180 < lon < 360 because that's how bm works for 'cea' projection
-left_lon, right_lon = np.array(controldata.boxlon)[[0,-1]]
-if 0 in controldata.boxlon[1:-2]: # if we cross the gml
-	left_lon = controldata.boxlon[0]-360
-
-
 g = -9.8 # gravitational constant
 
 # Change into figure directory (root/region/season/) for image creation
@@ -218,9 +206,14 @@ for V in variable:
 
 	# Extract the box lats and lons
 	bmlon, bmlat = np.meshgrid(controldata.boxlon, controldata.boxlat)
-	
-	fig = plt.figure()
-	
+	# Reset the lat and lon bounds so that maps don't show grey areas 
+	southern_lat, northern_lat = np.array(controldata.boxlat)[[0,-1]]
+	# Change lons to be negative is 180 < lon < 360 because that's how bm works for 'cea' projection
+	left_lon, right_lon = np.array(controldata.boxlon)[[0,-1]]
+	if 0 in controldata.boxlon[1:-2]: # if we cross the gml
+		left_lon = controldata.boxlon[0]-360
+		fig = plt.figure()
+		
 	# test data
 	plt.subplot(3,1,1)
 	m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
