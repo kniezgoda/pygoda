@@ -160,6 +160,7 @@ def eof(d, removeMeans = True, verbose = False):
 	d in the input data array, 2-d, where rows are times and 
 	'''
 	import numpy as np
+	import os
 	N, M = d.shape
 	if removeMeans:
 		d = d - np.mean(d, axis = 0)
@@ -177,6 +178,8 @@ def eof(d, removeMeans = True, verbose = False):
 			D[ir, ic] = np.nanmean(d[:,ir] * d[:,ic])
 			D[ic, ir] = D[ir,ic]
 
+	home = os.path.expanduser("~") + "/"
+	np.savetxt(home+".tempD.csv", D, delimiter = ',')
 	# Compute the singular values of D
 	# l is the variance (diagonals already removed)
 	# F is the eigen function array
@@ -185,7 +188,7 @@ def eof(d, removeMeans = True, verbose = False):
 	# Calculate the amplitude functions
 	a = np.matmul(d, F)
 
-	return(a, F)
+	return(a, F, l)
 
 
 # =========================================================================================== #
@@ -810,6 +813,7 @@ d18OV and dDV : returns 2d numpy array data.
 			for j in range(pdel.shape[2]):
 				pdel[:,i,j] = np.diff(self.P_i[:,i,j])
 		self.Pdel = pdel
+		self.PS = PS
 		self.PressureCalculated = True
 
 	def isobar(self, pressure, setData = True, verb = False):
@@ -867,12 +871,14 @@ d18OV and dDV : returns 2d numpy array data.
 
 		return VAR
 
-	def columnSum(self, box = None, setData = False):
+	def columnSum(self, box = None, setData = True):
 		import numpy as np
-		g = -9.8
+		g = 9.8
 		if not self.PressureCalculated:
 			self.CalculatePressure(box, setData = False)
-		csum = -self.Pdel * self.data / g
+		# Weight the data by the absolute amount of mass in each layer
+		# Good for temperature
+		csum = self.Pdel * self.data / g
 		csum_vertsum = np.sum(csum, axis = 0)
 		if setData:
 			self.var += "_columnSum"
@@ -881,6 +887,20 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = csum_vertsum
 		return csum_vertsum
 
+	def columnMean(self, box = None, setData = True):
+		import numpy as np
+		if not self.PressureCalculated:
+			self.CalculatePressure(box, setData = False)
+		# Weight the data by the relative amount of mass in each layer
+		# Should be used for ratios (Q, RH)
+		cavg = self.Pdel / self.PS * self.data
+		cavg_vertsum = np.sum(cavg, axis = 0)
+		if setData:
+			self.var += "columnMean"
+			self.long_name += ", column mean"
+			self.vartype = "2d"
+			self.data = cavg_vertsum
+		return cavg_vertsum
 
 	def prep_map(self, season, region):
 		try:
@@ -1203,16 +1223,25 @@ d18OV and dDV : returns 2d numpy array data.
 			self.fluxDelta(box)
 		elif var == "Column_d18OV":
 			self.variable('H2OV', box)
-			denom = self.columnSum(box)
+			denom = self.columnSum(box, setData = False)
 			self.variable('H218OV', box)
-			num  = self.columnSum(box)
+			num  = self.columnSum(box, setData = False)
 			self.data = (num/denom - 1) * 1000
+			self.long_name = "Column d18OV"
+			self.units = "delta 18O"
 		elif var == "Column_dDV":
-			self.variable('H2OV', box)
-			denom = self.columnSum(box)
+			self.variable('Q', box)
+			denom = self.columnSum(box, setData = False)
 			self.variable('HDOV', box)
-			num  = self.columnSum(box)
+			num  = self.columnSum(box, setData = False)
 			self.data = (num/denom - 1) * 1000
+			self.long_name = "Column dDV"
+			self.units = "delta D"
+		elif var == "Column_Q":
+			self.variable("Q", box)
+			self.columnSum(box)
+			self.long_name = "Vertically integrated water"
+			self.units = "g-H2O"
 		elif var == "P_E":
 			data = self.variable('PRECT', box) - self.variable('QFLX', box)
 			self.data = data
@@ -1250,7 +1279,16 @@ d18OV and dDV : returns 2d numpy array data.
 			self.QFLX_d18O(box)
 		elif var == "VQ_d18O":
 			self.VQ_d18O(box)
-
+		elif var == "PRECTsquared":
+			self.variable("PRECT", box)
+			self.data = self.data**2
+			self.long_name = "PRECT squared"
+			self.units = "(mm/day)^2"
+		elif var == "PRECTsqrt":
+			self.variable("PRECT", box)
+			self.data = self.data**(.5)
+			self.long_name = "Square root of PRECT"
+			self.units = "sqrt(mm/day)"
 		# Regular variables inside the netcdf file
 		else:
 			try:
@@ -1292,7 +1330,7 @@ class popgoda:
 			if self.ntime == 1:
 				self.isTime = False
 
-	def variable(self, var, box = None, setData = True):
+	def surface(self, var, box = None, setData = True):
 		from pygoda import find_indices
 		import xarray as xr
 		import numpy as np
@@ -1393,4 +1431,17 @@ class popgoda:
 				VAR[i,j] = np.interp(depth, self.z[:], self.data[:,i,j])
 
 		return VAR
-		
+
+	def ExtractData(self, var, box):
+		if var == "d18O":
+			self.data = (self.surface("R18O", box) - 1) * 1000
+			self.long_name = "d18O"
+			self.units = "delta-18O"
+		else:
+			try:
+				self.surface(var, box)
+			except KeyError:
+				print "Not able to plot variable " + var + "...\nSkipping this variable."
+				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
+				return
+
