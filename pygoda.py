@@ -1292,7 +1292,7 @@ class popgoda:
 			if self.ntime == 1:
 				self.isTime = False
 
-	def variable(self, var, box = None, setData = True):
+	def surface(self, var, box = None, setData = True):
 		from pygoda import find_indices
 		import xarray as xr
 		import numpy as np
@@ -1393,3 +1393,16 @@ class popgoda:
 				VAR[i,j] = np.interp(depth, self.z[:], self.data[:,i,j])
 
 		return VAR
+<<<<<<< HEAD
+
+	def ExtractData(self, box):
+		if var == "d18O":
+			self.data = (self.surface("R18O", box) - 1) * 1000
+			self.long_name = "d18O of surface"
+			self.units = "delta 18O"
+		else:
+			try:
+				self.surface(var, box)
+=======
+		
+>>>>>>> d6add82f3220e4c9eaaac308749baa0db8c62720

@@ -9,7 +9,7 @@ import os, sys, glob, argparse
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.basemap import Basemap as bm 
-from pygoda import camgoda, findClimoFile, niceClev, RegularClev
+from pygoda import findClimoFile, niceClev, RegularClev
 root = os.getcwd()
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,6 +63,7 @@ parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = N
 parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-verb', '--verbose', dest = 'verbose', action = 'store_true')
+parser.add_argument('-model', '--model', dest = 'model', default = 'cam')
 
 ARGS = parser.parse_args()
 clev = ARGS.clev
@@ -90,7 +91,12 @@ if ARGS.developer_mode:
 	showfig = True
 	mkdir = False
 
-
+model = ARGS.model
+if model is 'cam' or model is 'clm':
+	from pygoda import camgoda
+if model == 'pop':
+	from pygoda import popgoda as camgoda
+	
 # Set the lat bounds
 # Default global tropics
 region_name = "GlobalTropics"
