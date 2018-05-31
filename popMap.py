@@ -55,7 +55,8 @@ user_control_plot_title = None
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--files', dest = 'files', nargs = "*")
-parser.add_argument('-r', '--region', dest = 'region', default = 'GlobalTropics')
+parser.add_argument('-r', '--region', dest = 'region', default = '')
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-85 85 0 360])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
@@ -89,11 +90,8 @@ if ARGS.developer_mode:
 
 # Set the lat bounds
 # Default global tropics
-region_name = "GlobalTropics"
-southern_lat = -85
-northern_lat = 85
-left_lon = 0
-right_lon = 355
+region_name = "User"
+southern_lat, northern_lat, left_lon, right_lon = [int(b) for b in ARGS.box]
 
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
