@@ -240,13 +240,13 @@ for V in variable:
 	
 	# difference data 
 	diff = testdata.data - controldata.data
-	diffmax = np.max(np.abs(diff))
+	diffmax = np.nanmax(np.abs(diff))
 	clvs = np.linspace(-diffmax, diffmax, 17)
 	plt.subplot(3,1,3)
 	m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 	m.drawcoastlines()
 	m.drawmapboundary(fill_color='0.3')
-	cs = m.contourf(bmlon, bmlat, diff, clvs shading = 'flat', latlon = True,cmap=plt.cm.RdBu_r)
+	cs = m.contourf(bmlon, bmlat, diff, clvs, shading = 'flat', latlon = True,cmap=plt.cm.RdBu_r)
 	cbar = m.colorbar(cs, location='right', pad="5%")
 	cbar.set_label("difference in " + testdata.units, fontsize = 8)
 	plt.title("test - control difference", fontsize = 8)		

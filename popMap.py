@@ -56,7 +56,7 @@ user_control_plot_title = None
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--files', dest = 'files', nargs = "*")
 parser.add_argument('-r', '--region', dest = 'region', default = '')
-parser.add_argument('-box', dest = 'box', nargs = 4, default = [-85 85 0 360])
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-85, 85, 0, 360])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
@@ -170,15 +170,6 @@ for filein in files:
 	# Set the boxlat and boxlon
 	box = (southern_lat, northern_lat, left_lon, right_lon)
 
-
-	# Reset the lat and lon bounds so that Map don't show grey areas 
-	# southern_lat, northern_lat = np.array(ncdata.boxlat)[[0,-1]]
-	# Change lons to be negative is 180 < lon < 360 because that's how bm works for 'cea' projection
-	# left_lon, right_lon = np.array(ncdata.boxlon)[[0,-1]]
-	# if 0 in ncdata.boxlon[1:-2]: # if we cross the gml
-	# 	left_lon = ncdata.boxlon[0]-360
-
-
 	g = -9.8 # gravitational constant
 
 	# Change into figure directory (root/region/season/) for image creation
@@ -204,6 +195,13 @@ for filein in files:
 		#----------------#
 		
 		bmlon, bmlat = np.meshgrid(ncdata.boxlon, ncdata.boxlat)
+
+		# Reset the lat and lon bounds so that Map don't show grey areas 
+		southern_lat, northern_lat = np.array(ncdata.boxlat)[[0,-1]]
+		# Change lons to be negative is 180 < lon < 360 because that's how bm works for 'cea' projection
+		left_lon, right_lon = np.array(ncdata.boxlon)[[0,-1]]
+		if 0 in ncdata.boxlon[1:-2]: # if we cross the gml
+			left_lon = ncdata.boxlon[0]-360
 
 		fig = plt.figure()
 
