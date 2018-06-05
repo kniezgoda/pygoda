@@ -1,4 +1,4 @@
-#!/Users/kyleniezgoda/anaconda/bin/python
+#! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
 '''
 This code creates test, control, and difference maps for a collection of netcdf variables from iCAM5.
 The three maps are plotted to a figure and saved to a user-entered directory.
@@ -31,24 +31,12 @@ or some file structure and then have the user supply the file in a
 command line flag or argument.
 '''
 
-#------------- Custom subplot title names 
-# these are the names of the subplots, not the main figure --- the main figure always has the same name (the variable long name from the netcdf file)
-# Set to None (no quotes) for default subplot names, the name of the file used
-# Default 
-user_test_plot_title = None 
-user_control_plot_title = None
-# Regular 
-#user_test_plot_title = "Test: Mid-Holocene (6kya)"
-#user_control_plot_title = "Control: Pre-industrial (1850)"
-#user_test_plot_title = "Test: Estimated MH"
-#user_control_plot_title = "Control: Simulated MH"
-
 
 ##############################################
 ###### Don't change anything below here ######
 ##############################################
 
-
+# test
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,48 +44,45 @@ user_control_plot_title = None
 ####### Parse arguments from command line #######
 #################################################
 
-'''
-6 optional args:
--r (--region) REGION : sets the region, default to '' (global tropics)
--s (--season) SEASON : sets season, defaults to 'ANN'
--tdir (test_directory) TDIR : sets the directory to look for test files in, defaults to *_kn003 directory
--cdir (control_directory) CDIR : see above, for control, defaults to *_kn002 directory
--show : sets showfig to True, will print all plots to screen. Default is not to show figs
--nosave : sets savefig to False, will not save figures to current directory. Default is to save images to current directory
-'''
-
 parser = argparse.ArgumentParser()
-parser.add_argument('-r', '--region', dest = 'region', default = '')
-parser.add_argument('-s', '--season', dest = 'season', default = 'ANN')
-parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = '.')
-parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = '.')
+parser.add_argument('-r', '--region', dest = 'region', default = None)
+parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = "F.C5.2deg.wiso.defaultSSTICE_kn002")
+parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = "F.C5.2deg.wiso.obs6kSST_kn003")
+parser.add_argument('-grep', dest = 'grep', default = '*cam.h0')
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-85,85,0,360])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
-parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
+parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
+parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
 parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = None)
 parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = 3, default = None)
-parser.add_argument('-ft', '--file_type', dest = 'file_type', default = 'ps')
-parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
+parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
+
 
 ARGS = parser.parse_args()
 region = ARGS.region
-print "Region is " + region
+season = '' # This needs to be set to comply with legacy coding schemes
 testdatafname = ARGS.testdatafname
 controldatafname = ARGS.controldatafname
 findFile = True
 if (testdatafname is not None) & (controldatafname is not None):
 	findFile = False
-season = ARGS.season
 testdir = ARGS.testdir
 controldir = ARGS.controldir
+grep = ARGS.grep
 clev = ARGS.clev
-diffclev = ARGS.diffclev= False
+diffclev = ARGS.diffclev
+barbs = ARGS.wind_barb_pressure
+show_barbs = False
+if barbs is not None:
+	barb_pressure = ARGS.wind_barb_pressure[0] * 100
+	show_barbs = True
 savefig = ARGS.savefig
 showfig = ARGS.showfig
-variable = ARGS.variable
-ftype = ARGS.file_type
+variable = ARGS.variables
+ftype = 'ps'
 mkdir = True
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
@@ -107,12 +92,15 @@ if ARGS.developer_mode:
 
 # Set the lat bounds
 # Default global tropics
-region_name = "GlobalTropics"
-southern_lat = -85
-northern_lat = 85
-left_lon = 0
-right_lon = 355
-
+region_name = "Box"
+southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
+# Global
+if (region == "GT") | (region == "GlobalTropics"):
+	region_name = "GlobalTropics"
+	southern_lat = -50
+	northern_lat = 50
+	left_lon = 0
+	right_lon = 360
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
 	region_name = "IndianMonsoon"
@@ -163,35 +151,32 @@ if (region == "4P") | (region == "FourProxies"):
 
 if mkdir:
 	# Create maps directory is it doesn't exist
-	if not os.path.exists("popDiffMap"):
-		os.mkdir("popDiffMap")
-		print "Created directory " + "popDiffMap"
+	if not os.path.exists("DiffPopMap"):
+		os.mkdir("DiffPopMap")
+		print "Created directory " + "DiffPopMap"
 
 	# Create the region directory if it doesn't already exist
-	if not os.path.exists("popDiffMap/" + region_name):
-		os.mkdir("popDiffMap/" + region_name)
-		print "Created directory " + "popDiffMap/" + region_name
+	if not os.path.exists("DiffPopMap/" + region_name):
+		os.mkdir("DiffPopMap/" + region_name)
+		print "Created directory " + "DiffPopMap/" + region_name
 
-	# Create season directory inside region directory
-	if not os.path.exists("popDiffMap/" + region_name + "/" + season):
-		os.mkdir("popDiffMap/" + region_name + "/" + season)
-		print "Created directory " + "popDiffMap/" + region_name + "/" + season
+	# Create grep directory inside region directory
+	if not os.path.exists("DiffPopMap/" + region_name + "/" + grep):
+		os.mkdir("DiffPopMap/" + region_name + "/" + grep)
+		print "Created directory " + "DiffPopMap/" + region_name + "/" + grep
 
 if findFile:
 	# Look for the climo files in the root directory
-	print "\nLooking for control " + season + " files in " + controldir + "..."
-	controldatafname, controlfn = findClimoFile("*" + season + "*", controldir)
+	print "\nLooking for control " + grep + " files in " + controldir
+	controldatafname, controlfn = findClimoFile("*" + grep + "*", controldir)
 	if not controldatafname:
 		sys.exit()
-	else:
-		print "Found file " + controlfn
-	print "\nLooking for test " + season + " files in " + testdir + "..."
-	testdatafname, testfn = findClimoFile("*" + season + "*", testdir)
+	print "Found control file: " + controlfn
+	print "\nLooking for test " + grep + " files in " + testdir
+	testdatafname, testfn = findClimoFile("*" + grep + "*", testdir)
 	if not testdatafname:
 		sys.exit()
-	else:
-		print "Found file " + testfn
-
+	print "Found test file: " + testfn
 else:
 	print "\nControl file is " + controldatafname
 	print "\nTest file is " + testdatafname
@@ -204,88 +189,66 @@ testdata = popgoda(testdatafname)
 
 # Set the boxlat and boxlon
 box = (southern_lat, northern_lat, left_lon, right_lon)
+# controldata.surface(controldata.vars[0], box, setData = False) # this sets self.boxlon and self.boxlat
 
 g = -9.8 # gravitational constant
 
 # Change into figure directory (root/region/season/) for image creation
 if mkdir:
-	os.chdir("popDiffMap/" + region_name + "/" + season)
+	os.chdir("DiffPopMap/" + region_name + "/" + grep)
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------- Map creation ---------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 for V in variable:
-	var = V
-	vname = V
-	pressure = None
+	vname = var = V
+	controldata.ExtractData(V, box)
+	testdata.ExtractData(V, box)
 
-	print("\nPlotting " + season + " " + vname  +  " data...")
-
-	try:
-		testdata.variable(var, box)
-		controldata.variable(var, box)
-	except KeyError:
-		print "Not able to plot variable " + var + "...\nSkipping this variable."
-		continue
-	
-	controldata.variable("QFLUX", box, setData = False) # this sets self.boxlon and self.boxlat
-
-	# Create bm coords from region bounds
-	# bm lonitude coords need to be 0 < coord < 360 
+	# Extract the box lats and lons
 	bmlon, bmlat = np.meshgrid(controldata.boxlon, controldata.boxlat)
-
 	# Reset the lat and lon bounds so that maps don't show grey areas 
 	southern_lat, northern_lat = np.array(controldata.boxlat)[[0,-1]]
 	# Change lons to be negative is 180 < lon < 360 because that's how bm works for 'cea' projection
 	left_lon, right_lon = np.array(controldata.boxlon)[[0,-1]]
 	if 0 in controldata.boxlon[1:-2]: # if we cross the gml
 		left_lon = controldata.boxlon[0]-360
-		fig = plt.figure()
-
-	#----------------#
-	# Create the map #
-	#----------------#
+	
 	fig = plt.figure()
-
+		
 	# test data
-	testdatadata = testdata.data
 	plt.subplot(3,1,1)
 	m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 	m.drawcoastlines()
 	m.drawmapboundary(fill_color='0.3')
-	# cs = m.contourf(bmlon, bmlat, testdata.data, testdata.clevs, shading = 'flat', latlon = True, cmap=testdata.cmap)
-	cs = m.contourf(bmlon, bmlat, testdatadata, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+	cs = m.contourf(bmlon, bmlat, testdata.data, shading = 'flat', latlon = True)
 	cbar = m.colorbar(cs, location='right', pad="5%")
-	cbar.set_label("", fontsize = 8)
-	if user_test_plot_title is None:
-		test_title = "test: " + testfn
-	else:
-		test_title = user_test_plot_title
+	cbar.set_label(testdata.units, fontsize = 8)
+	test_title = "test: " + testfn
 	plt.title(test_title, fontsize = 8)
 	
 	# control data
-	controldatadata = controldata.data
 	plt.subplot(3,1,2)
 	m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 	m.drawcoastlines()
 	m.drawmapboundary(fill_color='0.3')
-	# cs = m.contourf(bmlon, bmlat, controldata.data, controldata.clevs, shading = 'flat', latlon = True, cmap=controldata.cmap)
-	cs = m.contourf(bmlon, bmlat, controldatadata, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+	cs = m.contourf(bmlon, bmlat, controldata.data, shading = 'flat', latlon = True)
 	cbar = m.colorbar(cs, location='right', pad="5%")
-	cbar.set_label("", fontsize = 8)
-	control_title = user_control_plot_title 
-	if user_control_plot_title is None:
-		control_title = "control: " + controlfn
+	cbar.set_label(controldata.units, fontsize = 8)
+	control_title = "control: " + controlfn
 	plt.title(control_title, fontsize = 8)
 	
 	# difference data 
+	diff = testdata.data - controldata.data
+	diffmax = np.nanmax(np.abs(diff))
+	clvs = np.linspace(-diffmax, diffmax, 17)
 	plt.subplot(3,1,3)
 	m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 	m.drawcoastlines()
 	m.drawmapboundary(fill_color='0.3')
-	cs = m.contourf(bmlon, bmlat, testdatadata - controldatadata, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+	cs = m.contourf(bmlon, bmlat, diff, clvs, shading = 'flat', latlon = True,cmap=plt.cm.RdBu_r)
 	cbar = m.colorbar(cs, location='right', pad="5%")
-	cbar.set_label("", fontsize = 8)
+	cbar.set_label("difference in " + testdata.units, fontsize = 8)
 	plt.title("test - control difference", fontsize = 8)		
 	
 	# Make things pretty

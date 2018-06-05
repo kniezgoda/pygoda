@@ -1330,7 +1330,7 @@ class popgoda:
 			if self.ntime == 1:
 				self.isTime = False
 
-	def variable(self, var, box = None, setData = True):
+	def surface(self, var, box = None, setData = True):
 		from pygoda import find_indices
 		import xarray as xr
 		import numpy as np
@@ -1431,3 +1431,17 @@ class popgoda:
 				VAR[i,j] = np.interp(depth, self.z[:], self.data[:,i,j])
 
 		return VAR
+
+	def ExtractData(self, var, box):
+		if var == "d18O":
+			self.data = (self.surface("R18O", box) - 1) * 1000
+			self.long_name = "d18O"
+			self.units = "delta-18O"
+		else:
+			try:
+				self.surface(var, box)
+			except KeyError:
+				print "Not able to plot variable " + var + "...\nSkipping this variable."
+				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
+				return
+
