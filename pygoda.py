@@ -1185,11 +1185,11 @@ d18OV and dDV : returns 2d numpy array data.
 		return self.data
 
 	def divergence(self, box = None):
-u = self.variable("U", box)
-u_colMean = self.columnMean(box)
-v = self.variable("V", box)
-v_colMean = self.columnMean(box)
-
+		u = self.variable("U", box)
+		u_colMean = self.columnMean(box)
+		v = self.variable("V", box)
+		v_colMean = self.columnMean(box)
+		return # not finished yet
 
 
 
