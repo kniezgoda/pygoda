@@ -103,7 +103,7 @@ for subplot in range(num_subplots):
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
-		cs = m.contourf(bmlon, bmlat, eof_grid[subplot,:,:], np.linspace(-.5,.5,11), shading = 'flat', latlon = True)
+		cs = m.contourf(bmlon, bmlat, eof_grid[subplot,:,:], clev, shading = 'flat', latlon = True)
 		cbar = m.colorbar(cs, location='right', pad="5%")
 	else: # the amplitude time series
 		atx = np.arange(0, len(dates), 3)
