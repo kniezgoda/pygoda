@@ -85,11 +85,15 @@ if 0 in boxlon[1:-2]: # if we cross the gml
 num_subplots = 2*num_eofs
 for subplot in range(num_subplots):
 	if subplot <= num_eofs-1: #the F maps
+		# Generate the clevs
+		x = round(np.max(np.abs(eof_grid[subplot,:,:])), 2)
+		clev = np.linspace(-x,x,21)
 		plt.subplot(2,num_eofs,subplot+1)
+		plt.title(round(varfrac[subplot], 3))
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
-		cs = m.contourf(bmlon, bmlat, eof_grid[subplot,:,:], shading = 'flat', latlon = True)
+		cs = m.contourf(bmlon, bmlat, eof_grid[subplot,:,:], clev, shading = 'flat', latlon = True)
 		cbar = m.colorbar(cs, location='right', pad="5%")
 	else: # the amplitude time series
 		atx = np.arange(0, len(dates), 3)
