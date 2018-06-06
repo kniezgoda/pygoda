@@ -165,6 +165,8 @@ def eof(d, removeMeans = True, verbose = False):
 	a: the amplitude time series
 	F: the EOFs
 	l: the eigenvalues
+
+	ANNOYINGLY, THIS DOES NOT WORK. USE THE EOF PACKAGE IN PYTHON INSTEAD
 	'''
 	import numpy as np
 	import os
