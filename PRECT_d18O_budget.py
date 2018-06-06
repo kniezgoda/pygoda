@@ -8,7 +8,11 @@ tfile = 'fc5.2deg.wiso.mh6ka_kn032/AMWG.climoFiles/fc5.2deg.wiso.mh6ka_kn032_JAS
 cnc = camgoda(cfile)
 tnc = camgoda(tfile)
 
+<<<<<<< HEAD
 box = [5, 30, 345, 45]
+=======
+box = (0, 35, 330, 35)
+>>>>>>> d1e1c0fad5a708324398f76a9df51534676bf01a
 
 
 # Done with "delta values" 
@@ -86,6 +90,7 @@ del_Rp = SUM / P_bar
 
 
 
+<<<<<<< HEAD
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.basemap import Basemap as bm 
@@ -148,6 +153,8 @@ cs = m.contourf(bmlon, bmlat, five, clev, shading = 'flat', latlon = True, cmap 
 cbar = m.colorbar(cs, location='right', pad="5%")
 
 plt.show()
+=======
+>>>>>>> d1e1c0fad5a708324398f76a9df51534676bf01a
 #-------#
 
 

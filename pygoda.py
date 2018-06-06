@@ -157,7 +157,14 @@ def Nstar_auto(a):
 def eof(d, removeMeans = True, verbose = False):
 	'''
 	Largely copied and modified from Jim Lerzcak
-	d in the input data array, 2-d, where rows are times and 
+	d in the input data array, 2-d, where rows are times and columns are locations
+	
+	d.shape should be [N,M] with N times and M locations
+
+	returns [a, F, l]
+	a: the amplitude time series
+	F: the EOFs
+	l: the eigenvalues
 	'''
 	import numpy as np
 	import os
@@ -169,7 +176,7 @@ def eof(d, removeMeans = True, verbose = False):
 	D = np.zeros(shape = (M,M))
 	for ir in range(0,M):
 		if verbose:
-			percent = round(float(ir)/M * 100)
+			percent = round(float(ir)/D.size/2 * 100)
 			if percent % 10 == 0:
 				print str(percent) + "% done..."
 		D[ir,ir] = np.nanmean(d[:,ir] * d[:,ir])
@@ -733,7 +740,7 @@ d18OV and dDV : returns 2d numpy array data.
 			if self.ntime == 1:
 				self.isTime = False
 
-	def variable(self, var, box = None, verb = False, setData = True, math = True):
+	def variable(self, var, box = None, verb = False, setData = True, math = True, idx_add = 0):
 		'''
 		Main function for extracting data from netcdf file
 		Performs conversions on data if there is documentation for it in algebra.py
@@ -759,6 +766,15 @@ d18OV and dDV : returns 2d numpy array data.
 		
 		# Strip the numbers down to the region from the box arg
 		idxbox = find_indices(box, self.lat, self.lon)
+
+		# Add and subtract extra values from the indices according to idx_add
+		# This is used for calculating fluxes and divergences, where boundarie become a problem
+		# If we are not at the edge of the world, it is best to add an extra lat and lon on the left and right 
+		# in order to calculate fluxes and divergence at boundaries
+		if (0 not in idxbox[0]) and ((len(self.lat)-1) not in idxbox[0]):
+			idxbox[0] = np.append(idxbox[0][0]-idx_add, idxbox[0], idxbox[0][-1]+idx_add)
+		if (0 not in idxbox[1]) and ((len(self.lon)-1) not in idxbox[1]):
+			idxbox[1] = np.append(idxbox[1][0]-idx_add, idxbox[1], idxbox[1][-1]+idx_add)
 
 		# No lev, no time
 		if ndims == 2:
@@ -797,14 +813,14 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = data
 		return data
 
-	def CalculatePressure(self, box = None, setData = False):
+	def CalculatePressure(self, box = None, setData = False, idx_add = 0):
 		from pygoda import PressureCalc
 		import numpy as np
-		A_m = self.variable("hyam", box = box, setData = setData)
-		A_i = self.variable("hyai", box = box, setData = setData)
-		B_m = self.variable("hybm", box = box, setData = setData)
-		B_i = self.variable("hybi", box = box, setData = setData)
-		PS = self.variable("PS", box = box, setData = setData)
+		A_m = self.variable("hyam", box = box, setData = setData, idx_add = idx_add)
+		A_i = self.variable("hyai", box = box, setData = setData, idx_add = idx_add)
+		B_m = self.variable("hybm", box = box, setData = setData, idx_add = idx_add)
+		B_i = self.variable("hybi", box = box, setData = setData, idx_add = idx_add)
+		PS = self.variable("PS", box = box, setData = setData, idx_add = idx_add)
 		# Create 3d pressure field
 		self.P_m = PressureCalc(A_m,B_m,PS)
 		self.P_i = PressureCalc(A_i,B_i,PS)
@@ -872,12 +888,14 @@ d18OV and dDV : returns 2d numpy array data.
 		return VAR
 
 	def columnSum(self, box = None, setData = True):
+		if self.vartype is not "3d":
+			print "Var type is not 3d, cannot compute column sum! Exiting..."
+			return
 		import numpy as np
 		g = 9.8
 		if not self.PressureCalculated:
 			self.CalculatePressure(box, setData = False)
 		# Weight the data by the absolute amount of mass in each layer
-		# Good for temperature
 		csum = self.Pdel * self.data / g
 		csum_vertsum = np.sum(csum, axis = 0)
 		if setData:
@@ -887,12 +905,14 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = csum_vertsum
 		return csum_vertsum
 
-	def columnMean(self, box = None, setData = True):
+	def columnMean(self, box = None, setData = True, idx_add = 0):
+		if self.vartype is not "3d":
+			print "Var type is not 3d, cannot compute column sum! Exiting..."
+			return
 		import numpy as np
 		if not self.PressureCalculated:
-			self.CalculatePressure(box, setData = False)
+			self.CalculatePressure(box, setData = False, idx_add = idx_add)
 		# Weight the data by the relative amount of mass in each layer
-		# Should be used for ratios (Q, RH)
 		cavg = self.Pdel / self.PS * self.data
 		cavg_vertsum = np.sum(cavg, axis = 0)
 		if setData:
@@ -1163,6 +1183,15 @@ d18OV and dDV : returns 2d numpy array data.
 		self.vartype = "3d"
 		self.data = psi
 		return self.data
+
+	def divergence(self, box = None):
+		u = self.variable("U", box)
+		u_colMean = self.columnMean(box)
+		v = self.variable("V", box)
+		v_colMean = self.columnMean(box)
+		return # not finished yet
+
+
 
 	def RH(self, box = None):
 		import numpy as np
