@@ -1,5 +1,6 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-from pygoda import camgoda, camdates, findClimoFile, eof
+from pygoda import camgoda, camdates, findClimoFile
+from eofs.standard import Eof
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap as bm 
@@ -44,7 +45,7 @@ if raw:
 	removeMeans = False
 
 # Extract the dates
-dates = camdates(start, end)
+dates = camdates(start, end, months)
 
 for n, date in enumerate(dates):
 	# Find the file for this date
@@ -63,11 +64,14 @@ for n, date in enumerate(dates):
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
 print "Computing the EOF..."
-a, F = eof(d, removeMeans, verbose = True)
+EOF = Eof(d)
+eof = EOF.eofs(neofs = num_eofs)
+pca = EOF.pcs(npcs = num_eofs, pcscaling = 1)
+varfrac = EOF.varianceFraction()
 print "Finished!"
 
 # Reshape F into a spatial grid
-F_grid = np.reshape(F, (F.shape[0], nlats, nlons))
+eof_grid = np.reshape(eof, (eof.shape[0], nlats, nlons))
 
 # Make the maps 
 bmlon, bmlat = np.meshgrid(boxlon, boxlat)
@@ -85,13 +89,13 @@ for subplot in range(num_subplots):
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
-		cs = m.contourf(bmlon, bmlat, F_grid[subplot,:,:], shading = 'flat', latlon = True)
+		cs = m.contourf(bmlon, bmlat, eof_grid[subplot,:,:], shading = 'flat', latlon = True)
 		cbar = m.colorbar(cs, location='right', pad="5%")
 	else: # the amplitude time series
 		atx = np.arange(0, len(dates), 3)
 		labx = np.array(dates)[atx]
 		plt.subplot(2,num_eofs,subplot+1)
-		plt.plot(a[:,subplot-num_eofs])
+		plt.plot(pca[:,subplot-num_eofs])
 		plt.xticks(atx, labx, rotation=45)
 
 plt.show()
