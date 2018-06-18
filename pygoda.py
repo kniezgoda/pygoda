@@ -1325,7 +1325,7 @@ d18OV and dDV : returns 2d numpy array data.
 			try:
 				self.variable(var, box)
 			except KeyError:
-				print "Not able to plot variable " + var + "...\nSkipping this variable."
+				print "From camgoda.ExtractData:\nNot able to extract variable " + var + "...\nSkipping this variable."
 				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
 				return
 		if var_is_3d:
