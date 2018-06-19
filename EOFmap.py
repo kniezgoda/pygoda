@@ -41,9 +41,11 @@ if ARGS.developer_mode:
     showfig = True
 raw = ARGS.raw
 removeMeans = True
+print raw
 if raw:
 	removeMeans = False
 
+print removeMeans
 # Extract the dates
 dates = camdates(start, end, months)
 
