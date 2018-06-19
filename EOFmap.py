@@ -64,7 +64,7 @@ for n, date in enumerate(dates):
 
 # Compute the amplitude timeseries and EOF spatial distributions of the data array
 print "Computing the EOF..."
-EOF = Eof(d)
+EOF = Eof(d, center = removeMeans)
 eof = EOF.eofs(neofs = num_eofs)
 pca = EOF.pcs(npcs = num_eofs, pcscaling = 1)
 varfrac = EOF.varianceFraction()
