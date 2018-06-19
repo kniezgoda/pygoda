@@ -8,11 +8,7 @@ tfile = 'fc5.2deg.wiso.mh6ka_kn032/AMWG.climoFiles/fc5.2deg.wiso.mh6ka_kn032_JAS
 cnc = camgoda(cfile)
 tnc = camgoda(tfile)
 
-
-box = [5, 30, 345, 45]
-
-box = (0, 35, 330, 35)
-
+box = (5, 30, 330, 30)
 
 # Done with "delta values" 
 tPRECT_H218O = tnc.variable("PRECT_H218O", box)
@@ -77,15 +73,20 @@ Rp_bar = (tRp + cRp) / 2
 
 one = Re_bar
 two = del_E
+prod1 = Re_bar*del_E
 three = E_bar
 four = del_Re 
+prod2 = E_bar*del_Re
 five = Rc_bar
 six = del_C
+prod3 = Rc_bar*del_C
 seven = C_bar
 eight = del_Rc 
+prod4 = C_bar*del_Rc
 nine = Rp_bar
 ten = del_P
-SUM = one*two + three*four + five*six + seven*eight - nine*ten
+prod5 = Rp_bar*del_P
+SUM = prod1 + prod2 + prod3 + prod4 - prod5
 
 print([x/SUM for x in [one,two,three,four,five,six,seven,eight,nine,ten]])
 
@@ -104,15 +105,100 @@ if 0 in cnc.boxlon[1:-2]: # if we cross the gml
 	left_lon = cnc.boxlon[0]-360
 
 fig = plt.figure()
-clev = np.linspace(-10,10,11)
+clev = np.linspace(-40,40,11)
 
-plt.subplot(311)
-plt.title('del_Rp')
+
+plt.subplot(131)
+plt.title('P_bar*del_Rp + Rp_bar*del_P')
 m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, del_Rp, np.linspace(-4,4,17), shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, P_bar*del_Rp + Rp_bar*del_P, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(132)
+plt.title('Re_bar*del_E + E_bar*del_Re')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, Re_bar*del_E + E_bar*del_Re, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(133)
+plt.title('C_bar*del_Rc + C_bar*del_Rc')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, C_bar*del_Rc + C_bar*del_Rc, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.show()
+
+############
+# PRODUCTS #
+############
+plt.subplot(211)
+plt.title('del_Rp*P_bar')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, del_Rp*P_bar, shading = 'flat', latlon = True)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(256)
+plt.title('Re_bar*del_E')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, prod1, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(257)
+plt.title('E_bar*del_Re')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, prod2, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(258)
+plt.title('Rc_bar*del_C')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, prod3, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(259)
+plt.title('C_bar*del_Rc')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, prod4, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.subplot(2,5,10)
+plt.title('-Rp_bar*del_P')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+m.drawcoastlines()
+m.drawmapboundary(fill_color='0.3')
+cs = m.contourf(bmlon, bmlat, -prod5, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+cbar = m.colorbar(cs, location='right', pad="5%")
+
+plt.show()
+
+
+
+#####################
+# INDIVIDUAL VALUES #
+#####################
+# plt.subplot(321)
+# plt.title('del_Rp')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, del_Rp, shading = 'flat', latlon = True)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
 # plt.subplot(322)
 # plt.title('P_bar')
@@ -122,87 +208,91 @@ cbar = m.colorbar(cs, location='right', pad="5%")
 # cs = m.contourf(bmlon, bmlat, P_bar, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
 # cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(356)
-plt.title('Re_bar')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, one/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(356)
+# plt.title('Re_bar')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, one, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(3,5,11)
-plt.title('del_E')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, two/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(3,5,11)
+# plt.title('del_E')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, two, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(357)
-plt.title('E_bar')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, three/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(357)
+# plt.title('E_bar')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, three, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(3,5,12)
-plt.title('del_Re ')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, four/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(3,5,12)
+# plt.title('del_Re')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, four, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(358)
-plt.title('Rc_bar')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, five/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(358)
+# plt.title('Rc_bar')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, five, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(3,5,13)
-plt.title('del_C')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, six/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(3,5,13)
+# plt.title('del_C')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, six, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(359)
-plt.title('C_bar')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, seven/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(359)
+# plt.title('C_bar')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, seven, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(3,5,14)
-plt.title('del_Rc ')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, eight/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(3,5,14)
+# plt.title('del_Rc')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, eight, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(3,5,10)
-plt.title('Rp_bar')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, nine/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(3,5,10)
+# plt.title('Rp_bar')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, nine, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
 
-plt.subplot(3,5,15)
-plt.title('del_P')
-m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
-m.drawcoastlines()
-m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, ten/P_bar, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
-cbar = m.colorbar(cs, location='right', pad="5%")
+# plt.subplot(3,5,15)
+# plt.title('del_P')
+# m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
+# m.drawcoastlines()
+# m.drawmapboundary(fill_color='0.3')
+# cs = m.contourf(bmlon, bmlat, ten, clev, shading = 'flat', latlon = True, cmap = plt.cm.RdBu_r)
+# cbar = m.colorbar(cs, location='right', pad="5%")
+
+
 
 plt.show()
+
+
 #-------#
 
 

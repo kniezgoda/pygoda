@@ -195,7 +195,10 @@ def eof(d, removeMeans = True, verbose = False):
 	W, l, F = np.linalg.svd(D)
 
 	# Calculate the amplitude functions
-	a = np.matmul(d, F)
+	try:
+		a = np.matmul(d, F)
+	except(AttributeError):
+		a = np.dot(d,F)
 
 	return(a, F, l)
 
