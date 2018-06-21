@@ -1220,7 +1220,7 @@ d18OV and dDV : returns 2d numpy array data.
 		return self.Hadley
 
 
-	def ExtractData(self, V, box = None):
+	def ExtractData(self, V, box = None, returnData = False):
 		# The main function for extracting data, everything else is just behind the scenes stuff
 		var_is_3d = False
 		if V[:3] == '3d_':
@@ -1337,7 +1337,10 @@ d18OV and dDV : returns 2d numpy array data.
 			elif self.model == "CLM":
 				pressure /= 100
 				self.depth(pressure)
-		return [var_is_3d, var, pressure]
+		if returnData:
+			return self.data
+		else:
+			return [var_is_3d, var, pressure]
 
 
 class popgoda:
