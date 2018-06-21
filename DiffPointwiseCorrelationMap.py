@@ -175,19 +175,19 @@ print "All data extracted, computing correlations..."
 ntime, nlats, nlons = cv1_master.shape
 ccorr_array = np.zeros((nlats, nlons))
 tcorr_array = np.zeros((nlats, nlons))
-corr_array = np.zeros((nlats, nlons))
+#corr_array = np.zeros((nlats, nlons))
 for i in range(nlats):
 	print i
 	for j in range(nlons):
 		print j
 		cr, cpval = regress(cv1_master[:,i,j], cv2_master[:,i,j])
 		tr, tpval = regress(tv1_master[:,i,j], tv2_master[:,i,j])
-		r, pval = regress(diffv1_master[:,i,j], diffv2_master[:,i,j])
+		#r, pval = regress(diffv1_master[:,i,j], diffv2_master[:,i,j])
 		if stiple:
-			if pval > alpha:
-				corr_array[i,j] = np.nan
-			else:
-				corr_array[i,j] = r
+			#if pval > alpha:
+			#	corr_array[i,j] = np.nan
+			#else:
+			#	corr_array[i,j] = r
 			if cpval > alpha:
 				ccorr_array[i,j] = np.nan
 			else:
@@ -197,9 +197,11 @@ for i in range(nlats):
 			else:
 				tcorr_array[i,j] = tr
 		else:
-			corr_array[i,j] = r
+			#corr_array[i,j] = r
 			ccorr_array[i,j] = cr
 			tcorr_array[i,j] = tr
+
+corr_array = tcorr_array - ccorr_array
 
 llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[-1], lons[0], lons[-1]]
 if 0 in lons[1:-2]: # if we cross the gml
@@ -233,7 +235,7 @@ plt.subplot(3,1,3)
 m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
-clevs = np.linspace(-1, 1, 11)
+clevs = np.linspace(-2, 2, 17)
 cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
