@@ -776,11 +776,16 @@ d18OV and dDV : returns 2d numpy array data.
 		# This is used for calculating fluxes and divergences, where boundarie become a problem
 		# If we are not at the edge of the world, it is best to add an extra lat and lon on the left and right 
 		# in order to calculate fluxes and divergence at boundaries
+		
+		# This is causing problems when the differences between lats and lons is small (e.g., if box = (15,15,100,100)
+		# Need to fix this still, until then, this will remain commented out.
+		'''
 		if (0 not in idxbox[0]) and ((len(self.lat)-1) not in idxbox[0]):
 			idxbox[0] = np.append(idxbox[0][0]-idx_add, idxbox[0], idxbox[0][-1]+idx_add)
 		if (0 not in idxbox[1]) and ((len(self.lon)-1) not in idxbox[1]):
 			idxbox[1] = np.append(idxbox[1][0]-idx_add, idxbox[1], idxbox[1][-1]+idx_add)
-
+		'''
+		
 		# No lev, no time
 		if ndims == 2:
 			data = np.array(xr.DataArray(data)[idxbox[0], idxbox[1]])
