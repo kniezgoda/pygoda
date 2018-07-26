@@ -656,7 +656,7 @@ def HadleyCellInfo(psi500, lats):
 
 
 # =========================================================================================== #
-def ensoDates(sy, ey, directory):
+def ensoDates(sy, ey, directory, returnSSTs = False):
 	'''
 	sy and ey are start year and end year. 
 
@@ -732,8 +732,12 @@ def ensoDates(sy, ey, directory):
 	nino_dates = [item for sublist in nino_dates for item in sublist]
 	nina_dates = [item for sublist in nina_dates for item in sublist]
 
-	print "If all went well, the returned list is of nino then nina dates"
-	return [nino_dates, nina_dates]
+	if returnSSTs:
+		print "If all went well, the returned list is of nino then nina dates, then the raw SST timeseries"
+		return [nino_dates, nina_dates, nino34]
+	else:
+		print "If all went well, the returned list is of nino then nina dates"
+		return [nino_dates, nina_dates]
 
 
 
