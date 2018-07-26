@@ -678,7 +678,7 @@ def ensoDates(sy, ey, directory):
 		f, fn = findClimoFile("*pop.h."+d+".nc", directory = directory)
 		print fn
 		pop = popgoda(f)
-		nino34.append(np.nanmean(pop.surface("TEMP", box = (-5,5,190,240))))
+		nino34.append(pop.boxMean("TEMP", box = (-5,5,190,240)))
 
 
 	anom_nino34 = nino34 - np.mean(nino34)
@@ -1466,7 +1466,7 @@ class popgoda:
 			space_bool = (self.ulat > b) * (self.ulat < u) * ~((self.ulon < l) * (self.ulon > r))
 		
 		idx0, idx1 = np.where(space_bool)	
-		return np.mean(data[lev, idx0, idx1])
+		return np.nanmean(data[lev, idx0, idx1])
 		
 		
 	def surface(self, var, box = None, setData = True):
