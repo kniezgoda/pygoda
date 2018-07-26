@@ -377,7 +377,8 @@ def findClimoFile(regexp, directory = '.'):
 		return [path, name]
 	except IndexError:
 		print "No file found! Looked for files like " + directory+"/"+regexp
-		return [0,0]
+		#return [0,0]
+		raise
 
 
 # =========================================================================================== #
@@ -655,7 +656,7 @@ def HadleyCellInfo(psi500, lats):
 
 
 # =========================================================================================== #
-def ensoDates(sy, ey):
+def ensoDates(sy, ey, directory):
 	'''
 	sy and ey are start year and end year. 
 
@@ -674,7 +675,7 @@ def ensoDates(sy, ey):
 
 	nino34 = []
 	for d in dates:
-		f, fn = findClimoFile("*pop.h."+d+".nc", directory = '/nas2/data/kniezgod/bc5cn.1deg.wiso.midHolocene_kn042/ocn/hist')
+		f, fn = findClimoFile("*pop.h."+d+".nc", directory = directory)
 		print fn
 		pop = popgoda(f)
 		nino34.append(np.nanmean(pop.surface("TEMP", box = (-5,5,190,240))))
@@ -1450,7 +1451,24 @@ class popgoda:
 			self.ntime = self.dimlen[self.dims.index("time")]
 			if self.ntime == 1:
 				self.isTime = False
-
+	def boxMean(self, var, box = None, lev = 0, setData = True):
+		from pygoda import find_indices
+		import xarray as xr
+		import numpy as np
+		from scipy.interpolate import griddata
+		# Extract the data
+		DATA = self.dataset.variables[var]
+		data = DATA[:].squeeze()
+		b,u,l,r = box
+		if l < r:
+			space_bool = (self.ulat > b) * (self.ulat < u) * (self.ulon < r) * (self.ulon > l)
+		else:
+			space_bool = (self.ulat > b) * (self.ulat < u) * ~((self.ulon < l) * (self.ulon > r))
+		
+		idx0, idx1 = np.where(space_bool)	
+		return np.mean(data[lev, idx0, idx1])
+		
+		
 	def surface(self, var, box = None, setData = True):
 		from pygoda import find_indices
 		import xarray as xr
