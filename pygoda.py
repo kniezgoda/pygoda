@@ -655,6 +655,85 @@ def HadleyCellInfo(psi500, lats):
 
 
 # =========================================================================================== #
+def ensoDates(sy, ey):
+	'''
+	sy and ey are start year and end year. 
+
+	returns: a list of two lists. index 0 is the nino dates, index 1 is the nina dates.
+
+	the method for determining nino/nina dates is from:
+	Trenberth, K. E. (1997) The Definition of El Niño. Bulletin of the American Meteorological Society, 78, 2771-2777.
+
+	basically, compute nino3.4 sst monthly anomalies, compute the 5-month running mean of these anomalies, then look for
+	instances when the 5-month running mean is > .3 deg c (nino) or < -.3 deg c (nina) for 6 months in a row at least.
+	'''
+	from pygoda import popgoda, camdates, findClimoFile, runningMean
+	import numpy as np
+
+	dates = camdates(sy, ey)
+
+	nino34 = []
+	for d in dates:
+		f, fn = findClimoFile("*pop.h."+d+".nc", directory = '/nas2/data/kniezgod/bc5cn.1deg.wiso.midHolocene_kn042/ocn/hist')
+		print fn
+		pop = popgoda(f)
+		nino34.append(np.nanmean(pop.surface("TEMP", box = (-5,5,190,240))))
+
+
+	anom_nino34 = nino34 - np.mean(nino34)
+	rm5_anom_nino34 = runningMean(anom_nino34, 5)
+
+	# Create a dummy list of the status of the nino34 anomaly running mean based on whether it is above or below .3 deg c, or neither
+	status = []
+	for t in rm5_anom_nino34:
+		if t > .3:
+			status.append('above')
+		elif t < -.3:
+			status.append('below')
+		else:
+			status.append('neither')
+
+	# Cycle over the status list and look for instance of 6-in-a-row of the same
+	current_status = ''
+	counter = 1
+	upper_idx = []
+	count_idx = []
+	for n, s in enumerate(status):
+		if s is current_status:
+			counter += 1
+		else:
+			if counter >= 6:
+				upper_idx.append(n-1)
+				count_idx.append(counter-1)
+			counter = 1
+		current_status = s
+
+	# Do it one last time in case the last months are included
+	if counter >= 6:
+		upper_idx.append(n-1)
+		count_idx.append(counter-1)
+
+	lower_idx = np.array(upper_idx) - np.array(count_idx)
+
+	# Now, find the nino and nina dates that correspond to these anomalies
+	nino_dates = []
+	nina_dates = []
+	for n in range(len(lower_idx)):
+		l = lower_idx[n]
+		u = upper_idx[n]
+		s = status[l]
+		if s is 'above':
+			nino_dates.append(dates[l:u+1])
+		if s is 'below':
+			nina_dates.append(dates[l:u+1])
+
+	# Flatten the lists
+	nino_dates = [item for sublist in nino_dates for item in sublist]
+	nina_dates = [item for sublist in nina_dates for item in sublist]
+
+	print "If all went well, the returned list is of nino then nina dates"
+	return [nino_dates, nina_dates]
+
 
 
 ###############
