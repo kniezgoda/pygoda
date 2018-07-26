@@ -662,7 +662,7 @@ def ensoDates(sy, ey):
 	returns: a list of two lists. index 0 is the nino dates, index 1 is the nina dates.
 
 	the method for determining nino/nina dates is from:
-	Trenberth, K. E. (1997) The Definition of El Niño. Bulletin of the American Meteorological Society, 78, 2771-2777.
+	Trenberth, K. E. (1997) The Definition of El Nino. Bulletin of the American Meteorological Society, 78, 2771-2777.
 
 	basically, compute nino3.4 sst monthly anomalies, compute the 5-month running mean of these anomalies, then look for
 	instances when the 5-month running mean is > .3 deg c (nino) or < -.3 deg c (nina) for 6 months in a row at least.
