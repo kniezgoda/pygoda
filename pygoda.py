@@ -1441,9 +1441,17 @@ class popgoda:
 		self.dims = [d for d in self.dataset.dimensions]
 		self.vars = [v for v in self.dataset.variables]
 		self.dimlen = [len(self.dataset.dimensions[d]) for d in self.dims]
-		self.ulat = self.dataset.variables['ULAT'][:]
-		self.ulon = self.dataset.variables['ULONG'][:]
 		
+		# Keeping the self.ulat name because I don't feel like going back through the code to change ulat to lat even if the variable is tlat
+		try:
+			self.ulat = self.dataset.variables['ULAT'][:]
+		except NameError:
+			self.ulat = self.dataset.variables['TLAT'][:]
+		try:
+			self.ulon = self.dataset.variables['ULONG'][:]
+		except NameError:
+			self.ulon = self.dataset.variables['TLONG'][:]
+	
 		self.var = ''
 		self.units = ''
 		self.long_name = ''
