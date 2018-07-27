@@ -1445,11 +1445,11 @@ class popgoda:
 		# Keeping the self.ulat name because I don't feel like going back through the code to change ulat to lat even if the variable is tlat
 		try:
 			self.ulat = self.dataset.variables['ULAT'][:]
-		except NameError:
+		except KeyError:
 			self.ulat = self.dataset.variables['TLAT'][:]
 		try:
 			self.ulon = self.dataset.variables['ULONG'][:]
-		except NameError:
+		except KeyError:
 			self.ulon = self.dataset.variables['TLONG'][:]
 	
 		self.var = ''
