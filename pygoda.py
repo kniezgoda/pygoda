@@ -1301,7 +1301,14 @@ d18OV and dDV : returns 2d numpy array data.
 		self.var = "rh"
 		self.vartype = "3d"
 		return RH
-
+	
+	def SST(self, box = None):
+		ts = self.variable("TS", box, setData = False)
+		ocnfrac = self.variable("OCNFRAC", box, setData = False)
+		mask = ocnfrac > .9
+		self.data = ts*mask
+		return ts*mask
+		
 	def HadleyCellInfo(self, box = None):
 		from pygoda import HadleyCellInfo
 		self.psi(box = box)
@@ -1412,6 +1419,14 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = self.data**(.5)
 			self.long_name = "Square root of PRECT"
 			self.units = "sqrt(mm/day)"
+		elif var = "SST":
+			ts = self.variable("TS", box, setData = False)
+			ocnfrac = self.variable("OCNFRAC", box, setData = False)
+			mask = ocnfrac > .9
+			self.data = ts*mask
+			self.long_name = "SST"
+			self.units = "deg C"
+			
 		# Regular variables inside the netcdf file
 		else:
 			try:
