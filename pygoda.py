@@ -1413,10 +1413,10 @@ d18OV and dDV : returns 2d numpy array data.
 			self.long_name = "Square root of PRECT"
 			self.units = "sqrt(mm/day)"
 		elif var == "SST":
+			import numpy as np
 			ts = self.variable("TS", box, setData = False)
 			ocnfrac = self.variable("OCNFRAC", box, setData = False)
-			mask = ocnfrac > .9
-			self.data = ts*mask
+			self.data = ts*np.where(ocnfrac < .9, np.nan, ocnfrac) - 273.15
 			self.long_name = "SST"
 			self.units = "deg C"
 			
