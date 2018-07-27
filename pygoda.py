@@ -1463,11 +1463,8 @@ class popgoda:
 			self.ntime = self.dimlen[self.dims.index("time")]
 			if self.ntime == 1:
 				self.isTime = False
-	def boxMean(self, var, box = None, lev = 0, setData = True):
-		from pygoda import find_indices
-		import xarray as xr
+	def boxMean(self, var, box = None, lev = None, setData = True):
 		import numpy as np
-		from scipy.interpolate import griddata
 		# Extract the data
 		DATA = self.dataset.variables[var]
 		data = DATA[:].squeeze()
@@ -1477,8 +1474,11 @@ class popgoda:
 		else:
 			space_bool = (self.ulat > b) * (self.ulat < u) * ~((self.ulon < l) * (self.ulon > r))
 		
-		idx0, idx1 = np.where(space_bool)	
-		return np.nanmean(data[lev, idx0, idx1])
+		idx0, idx1 = np.where(space_bool)
+		if lev is not None: # assume 3-d data 
+			return np.nanmean(data[lev, idx0, idx1])
+		else: # assume 2-d data (e.g. the "selected_*.nc" files)
+			return np.nanmean(data[idx0,idx1])
 		
 		
 	def surface(self, var, box = None, setData = True):
