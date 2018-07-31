@@ -1308,7 +1308,16 @@ d18OV and dDV : returns 2d numpy array data.
 		self.Hadley = HadleyCellInfo(self.isobar(50000), self.boxlat)
 		return self.Hadley
 
-
+	def LandMask(self):
+		import numpy as np
+		ocnfrac = self.variable("OCNFRAC", box = (nc.boxlat[0], nc.boxlat[-1], nc.boxlon[0], nc.boxlon[-1]), setData = False)
+		return self.data*np.where(ocnfrac < .9, np.nan, ocnfrac)
+	
+	def OceanMask(self):
+		import numpy as np
+		ocnfrac = self.variable("OCNFRAC", box = (nc.boxlat[0], nc.boxlat[-1], nc.boxlon[0], nc.boxlon[-1]), setData = False)
+		return self.data*np.where(ocnfrac > .9, np.nan, ocnfrac)
+		
 	def ExtractData(self, V, box = None, returnData = False):
 		# The main function for extracting data, everything else is just behind the scenes stuff
 		var_is_3d = False
