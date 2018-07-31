@@ -1311,12 +1311,12 @@ d18OV and dDV : returns 2d numpy array data.
 	def LandMask(self):
 		import numpy as np
 		landfrac = self.variable("LANDFRAC", box = self.box, setData = False)
-		return self.data*np.where(landfrac > .9, np.nan, landfrac)
+		return self.data*np.where(landfrac > .9, 1, np.nan)
 	
 	def OceanMask(self):
 		import numpy as np
 		ocnfrac = self.variable("OCNFRAC", box = self.box, setData = False)
-		return self.data*np.where(ocnfrac > .9, np.nan, ocnfrac)
+		return self.data*np.where(ocnfrac > .9, 1, np.nan)
 		
 	def ExtractData(self, V, box = None, returnData = False):
 		# The main function for extracting data, everything else is just behind the scenes stuff
