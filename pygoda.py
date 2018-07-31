@@ -1310,8 +1310,8 @@ d18OV and dDV : returns 2d numpy array data.
 
 	def LandMask(self):
 		import numpy as np
-		ocnfrac = self.variable("OCNFRAC", box = self.box, setData = False)
-		return self.data*np.where(ocnfrac < .9, np.nan, ocnfrac)
+		landfrac = self.variable("LANDFRAC", box = self.box, setData = False)
+		return self.data*np.where(landfrac > .9, np.nan, landfrac)
 	
 	def OceanMask(self):
 		import numpy as np
