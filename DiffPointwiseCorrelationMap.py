@@ -143,8 +143,10 @@ for n, d in enumerate(dates):
 	
 	if n == 0:
 		cnc.ExtractData(v1, box) # This sets boxlat and boxlon
-		hold = np.zeros(shape = (len(cnc.boxlat), len(cnc.boxlon), len(dates), 2, 2)) # lat, lon, dates, var, state
-	
+		lats = cnc.boxlat
+		lons = cnc.boxlon
+		hold = np.zeros(shape = (len(lats), len(lons), len(dates), 2, 2)) # lat, lon, dates, var, state
+
 	hold[:,:,n,0,0] = cnc.ExtractData(v1, box, returnData = True)
 	hold[:,:,n,0,1] = tnc.ExtractData(v1, box, returnData = True)
 	hold[:,:,n,1,0] = cnc.ExtractData(v2, box, returnData = True)
