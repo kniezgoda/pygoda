@@ -165,7 +165,7 @@ for i in range(nlats):
 		corr_array[i,j,1] = corr(hold[i,j,:,0,1], hold[i,j,:,1,1])
 		#r, pval = regress(diffv1_master[:,i,j], diffv2_master[:,i,j])
 
-corr_array[:,:,2] = corr_array[:,:1] - corr_array[:,:,0]
+corr_array[:,:,2] = corr_array[:,:,1] - corr_array[:,:,0]
 
 llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[-1], lons[0], lons[-1]]
 if 0 in lons[1:-2]: # if we cross the gml
