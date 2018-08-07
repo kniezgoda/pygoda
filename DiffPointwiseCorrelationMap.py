@@ -1,7 +1,7 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-from pygoda import camgoda, camdates, findClimoFile
+from pygoda import camgoda, camdates, findClimoFile, corr
 import numpy as np
-from scipy.stats import pearsonr as regress
+#from scipy.stats import pearsonr as regress
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap as bm
 import argparse
@@ -140,70 +140,31 @@ for n, d in enumerate(dates):
 	# Open the file
 	cnc = camgoda(cpath)
 	tnc = camgoda(tpath)
-
-	cnc.ExtractData(v1, box)
-	cv1_hold = np.expand_dims(cnc.data, 0)
-	cnc.ExtractData(v2, box)
-	cv2_hold = np.expand_dims(cnc.data, 0)
-
-	tnc.ExtractData(v1, box)
-	tv1_hold = np.expand_dims(tnc.data, 0)
-	tnc.ExtractData(v2, box)
-	tv2_hold = np.expand_dims(tnc.data, 0)
-
-
+	
 	if n == 0:
-		cv1_master = cv1_hold
-		cv2_master = cv2_hold
-		tv1_master = tv1_hold
-		tv2_master = tv2_hold
-
-		lats = cnc.boxlat
-		lons = cnc.boxlon
-
-	else:
-		cv1_master = np.concatenate((cv1_master, cv1_hold), axis = 0)
-		cv2_master = np.concatenate((cv2_master, cv2_hold), axis = 0)
-
-		tv1_master = np.concatenate((tv1_master, tv1_hold), axis = 0)
-		tv2_master = np.concatenate((tv2_master, tv2_hold), axis = 0)
-
-
-diffv1_master = tv1_master - cv1_master
-diffv2_master = tv2_master - cv2_master
+		hold = np.zeros(shape = (len(cnc.boxat), len(cnc.boxlon), len(dates), 2, 2)) # lat, lon, dates, var, state
+	
+	hold[:,:,n,0,0] = cnc.ExtractData(v1, box, ReturnData = True)
+	hold[:,:,n,0,1] = tnc.ExtractData(v1, box, ReturnData = True)
+	hold[:,:,n,1,0] = cnc.ExtractData(v2, box, ReturnData = True)
+	hold[:,:,n,1,1] = tnc.ExtractData(v2, box, ReturnData = True)
+	
 
 print "All data extracted, computing correlations..."
 
-ntime, nlats, nlons = cv1_master.shape
-ccorr_array = np.zeros((nlats, nlons))
-tcorr_array = np.zeros((nlats, nlons))
-#corr_array = np.zeros((nlats, nlons))
+# Removed stiple ability when changed to using pygoda.corr instead of scipy correlate
+stiple = False 
+nlats, nlons, ntimes, nvars, nstates = hold.shape
+corr_array = np.zeros(shape = (nlats, nlons, 2)) # lats, lons, state
 for i in range(nlats):
 	print i
 	for j in range(nlons):
 		print j
-		cr, cpval = regress(cv1_master[:,i,j], cv2_master[:,i,j])
-		tr, tpval = regress(tv1_master[:,i,j], tv2_master[:,i,j])
+		corr_array[i,j,0] = corr(hold[i,j,:,0,0], hold[i,j,:,1,0])
+		corr_array[i,j,1] = corr(hold[i,j,:,0,1], hold[i,j,:,1,1])
 		#r, pval = regress(diffv1_master[:,i,j], diffv2_master[:,i,j])
-		if stiple:
-			#if pval > alpha:
-			#	corr_array[i,j] = np.nan
-			#else:
-			#	corr_array[i,j] = r
-			if cpval > alpha:
-				ccorr_array[i,j] = np.nan
-			else:
-				ccorr_array[i,j] = cr
-			if tpval > alpha:
-				tcorr_array[i,j] = np.nan
-			else:
-				tcorr_array[i,j] = tr
-		else:
-			#corr_array[i,j] = r
-			ccorr_array[i,j] = cr
-			tcorr_array[i,j] = tr
 
-corr_array = tcorr_array - ccorr_array
+corr_array[:,:,2] = corr_array[:,:1] - corr_array[:,:,0]
 
 llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[-1], lons[0], lons[-1]]
 if 0 in lons[1:-2]: # if we cross the gml
@@ -218,7 +179,7 @@ m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcr
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 11)
-cs = m.contourf(bmlon, bmlat, tcorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, corr_array[:,:,1], clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("test")
@@ -228,7 +189,7 @@ m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcr
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 11)
-cs = m.contourf(bmlon, bmlat, ccorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, corr_array[:,:,0], clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("control")
@@ -237,8 +198,8 @@ plt.subplot(3,1,3)
 m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
-clevs = np.linspace(-1.2, 1.2, 13)
-cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+clevs = np.linspace(-.5, .5, 11)
+cs = m.contourf(bmlon, bmlat, corr_array[:,:,1]-corr_array[:,:,0], clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 
