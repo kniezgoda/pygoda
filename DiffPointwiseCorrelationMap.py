@@ -130,8 +130,8 @@ cloc_var_master = []
 
 for n, d in enumerate(dates):
 	# Find the file
-	cpath, cfilename = findClimoFile(cdir + "/" + '*' + grep + "*" + d + '*')
-	tpath, tfilename = findClimoFile(tdir + "/" + '*' + grep + "*" + d + '*')
+	cpath, cfilename = findClimoFile('*' + grep + "*" + d + '*', directory = cdir)
+	tpath, tfilename = findClimoFile('*' + grep + "*" + d + '*', directory = tdir)
 	print tfilename
 	print cfilename
 	
