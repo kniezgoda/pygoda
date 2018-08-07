@@ -142,6 +142,7 @@ for n, d in enumerate(dates):
 	tnc = camgoda(tpath)
 	
 	if n == 0:
+		cnc.ExtractData(v1, box) # This sets boxlat and boxlon
 		hold = np.zeros(shape = (len(cnc.boxlat), len(cnc.boxlon), len(dates), 2, 2)) # lat, lon, dates, var, state
 	
 	hold[:,:,n,0,0] = cnc.ExtractData(v1, box, ReturnData = True)
