@@ -156,7 +156,7 @@ print "All data extracted, computing correlations..."
 # Removed stiple ability when changed to using pygoda.corr instead of scipy correlate
 stiple = False 
 nlats, nlons, ntimes, nvars, nstates = hold.shape
-corr_array = np.zeros(shape = (nlats, nlons, 2)) # lats, lons, state
+corr_array = np.zeros(shape = (nlats, nlons, 3)) # lats, lons, state
 for i in range(nlats):
 	print i
 	for j in range(nlons):
