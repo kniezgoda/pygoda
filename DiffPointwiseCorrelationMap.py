@@ -27,6 +27,7 @@ parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= 2, default = ["PRECT", "PRECT_d18O"])
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [10,30])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
+parser.add_argument('-days', dest = 'days', action = "store_true")
 parser.add_argument('-alpha', '--alpha', dest = 'alpha', default = .05)
 parser.add_argument('-stiple', '--stiple', dest = 'stiple', action = "store_true")
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
@@ -38,6 +39,7 @@ cdir = ARGS.cdir
 tdir = ARGS.tdir
 start, end = [int(x) for x in ARGS.years]
 months = [int(m) for m in ARGS.months]
+days = ARGS.days
 v1, v2 = [v for v in ARGS.variables]
 grep = ARGS.grep
 region = ARGS.region
@@ -56,7 +58,7 @@ if ARGS.developer_mode:
 #############
 
 # Make the date array
-dates = camdates(start, end, months)
+dates = camdates(start, end, months, days)
 
 # Read in each file, extract the local variable at the point and field variable on the globe, track them in a master array
 # Correlate the local variable 1-d array to each grid cell of the field variable array
