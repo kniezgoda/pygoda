@@ -50,7 +50,7 @@ parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default
 parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = "F.C5.2deg.wiso.obs6kSST_kn003")
 parser.add_argument('-grep', dest = 'grep', default = '*cam.h0')
 parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90,90])
-parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [330,329])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
@@ -102,8 +102,8 @@ if (region == "GT") | (region == "GlobalTropics"):
 	region_name = "GlobalTropics"
 	southern_lat = -50
 	northern_lat = 50
-	left_lon = 0
-	right_lon = 360
+	left_lon = 330
+	right_lon = 329
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
 	region_name = "IndianMonsoon"
