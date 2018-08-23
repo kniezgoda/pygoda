@@ -255,7 +255,7 @@ for V in variable:
 	var_is_3d, var, pressure = testdata.ExtractData(V, box)
 	vname = var
 	if pressure is not None:
-		vname += str(pressure/100)
+		vname += str(int(pressure/100))
 	
 	fig = plt.figure()
 	
