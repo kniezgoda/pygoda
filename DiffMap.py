@@ -103,7 +103,7 @@ if (region == "GT") | (region == "GlobalTropics"):
 	southern_lat = -50
 	northern_lat = 50
 	left_lon = 330
-	right_lon = 329
+	right_lon = 328
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
 	region_name = "IndianMonsoon"
