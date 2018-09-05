@@ -828,7 +828,13 @@ d18OV and dDV : returns 2d numpy array data.
 			self.ntime = self.dimlen[self.dims.index("time")]
 			if self.ntime == 1:
 				self.isTime = False
-
+	def setBox(self, box):
+		from pygoda import find_indices
+		self.box = box
+		idxbox = find_indices(box, self.lat, self.lon)
+		self.boxlat = self.lat[idxbox[0]]
+		self.boxlon = self.lon[idxbox[1]]
+		
 	def variable(self, var, box = None, verb = False, setData = True, math = True, idx_add = 0):
 		'''
 		Main function for extracting data from netcdf file
