@@ -1438,6 +1438,13 @@ d18OV and dDV : returns 2d numpy array data.
 			self.data = ts*np.where(ocnfrac < .9, np.nan, ocnfrac) - 273.15
 			self.long_name = "SST"
 			self.units = "deg C"
+		elif var == "SOIL_d18O":
+			soil_h2o = self.variable("SOILLIQICE_10CM_H2OTR", box = box)
+			soil_h218o = self.variable("SOILLIQICE_10CM_H218O", box = box)
+			self.long_name = "Soil 10cm d18O"
+			self.units = "d18O"
+			self.data = (soil_h218o / soil_h2o - 1) * 1000
+			return self.data
 			
 		# Regular variables inside the netcdf file
 		else:
