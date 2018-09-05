@@ -50,7 +50,7 @@ parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default
 parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = "F.C5.2deg.wiso.obs6kSST_kn003")
 parser.add_argument('-grep', dest = 'grep', default = '*cam.h0')
 parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90,90])
-parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [330,329])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [335,333])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
