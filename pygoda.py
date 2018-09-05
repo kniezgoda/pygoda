@@ -1444,7 +1444,6 @@ d18OV and dDV : returns 2d numpy array data.
 			self.long_name = "Soil 10cm d18O"
 			self.units = "d18O"
 			self.data = (soil_h218o / soil_h2o - 1) * 1000
-			return self.data
 			
 		# Regular variables inside the netcdf file
 		else:
