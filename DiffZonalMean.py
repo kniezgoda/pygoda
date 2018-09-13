@@ -78,8 +78,8 @@ for v in variables:
 	lat = cnc.boxlat
 
 	# Zonally average the data
-	cvar_zonalMean = np.mean(cvar, axis = 1)
-	tvar_zonalMean = np.mean(tvar, axis = 1)
+	cvar_zonalMean = np.nanmean(cvar, axis = 1)
+	tvar_zonalMean = np.nanmean(tvar, axis = 1)
 
 	# Compute the difference
 	dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
