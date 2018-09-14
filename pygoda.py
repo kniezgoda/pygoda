@@ -149,6 +149,7 @@ def corr_2d (a,b,axis=0):
 	# The timeseries for each grid point in a (i.e. a[:,i,j]) is correlated against the same gridpoint in b (i.e. b[:,i,j])
 	# This is faster than looping over every grid cell because the means are computed over the entire time axis
 	# However, I don't have a way to compute lagged corelations yet.
+	import numpy as np
 	a = np.array(a)
 	b = np.array(b)
 	a_mu = np.nanmean(a, axis = axis)
