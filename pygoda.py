@@ -142,6 +142,23 @@ def corr(a, b, lag=0):
 		return np.nan
 	return np.nansum((a1 - a1_mu)  * (a2- a2_mu)) / N / (a1_stddev * a2_stddev)
 
+
+def corr_2d (a,b,axis=0):
+	# This function is used for computing timeseries correlation between two 3d arrays
+	# The 0'th dimension should be time, and the 1st and 2nd should be space (i.e. lat, lon)
+	# The timeseries for each grid point in a (i.e. a[:,i,j]) is correlated against the same gridpoint in b (i.e. b[:,i,j])
+	# This is faster than looping over every grid cell because the means are computed over the entire time axis
+	# However, I don't have a way to compute lagged corelations yet.
+	a = np.array(a)
+	b = np.array(b)
+	a_mu = np.nanmean(a, axis = axis)
+	a_sd = np.nanstd(a, axis = axis)
+	b_mu = np.nanmean(b, axis = axis)
+	b_sd = np.nanstd(b, axis = axis)
+	N = np.sum(~np.isnan(a*b), axis = axis)
+	return (np.nansum((a-a_mu) * (b-b_mu), axis = axis) / N / (a_sd*b_sd))
+
+
 def Nstar_auto(a):
 	N = np.sum(~np.isnan(a))
 	hold = []
