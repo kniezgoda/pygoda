@@ -1469,8 +1469,8 @@ d18OV and dDV : returns 2d numpy array data.
 			self.units = "d18O"
 			self.data = (runoff_h218o / runoff_h2o - 1) * 1000
 		elif var == "INFILTRATION_d18O":
-			infil_h2o = self.variable("QINFL_H2OTR", box = box)
-			infil_h218o = self.variable("QINFL_H218O", box = box)
+			infil_h2o = self.mask(self.variable("QINFL_H2OTR", box = box), 'lt', 0)
+			infil_h218o = self.mask(infil_h2o, 'lt', 0, self.variable("QINFL_H218O", box = box))
 			self.long_name = "Infiltration d18O"
 			self.units = "d18O"
 			self.data = (infil_h218o / infil_h2o - 1) * 1000
