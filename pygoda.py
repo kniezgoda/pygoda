@@ -1463,11 +1463,17 @@ d18OV and dDV : returns 2d numpy array data.
 			self.units = "dD"
 			self.data = (soil_hdo / soil_h2o - 1) * 1000
 		elif var == "RUNOFF_d18O":
-			soil_h2o = self.variable("QOVER_H2OTR", box = box)
-			soil_hdo = self.variable("QOVER_H218O", box = box)
+			runoff_h2o = self.variable("QOVER_H2OTR", box = box)
+			runoff_h218o = self.variable("QOVER_H218O", box = box)
 			self.long_name = "Runoff d18O"
 			self.units = "d18O"
-			self.data = (soil_hdo / soil_h2o - 1) * 1000
+			self.data = (runoff_h218o / runoff_h2o - 1) * 1000
+		elif var == "INFILTRATION_d18O":
+			infil_h2o = self.variable("QINFL_H2OTR", box = box)
+			infil_h218o = self.variable("QINFL_H218O", box = box)
+			self.long_name = "Infiltration d18O"
+			self.units = "d18O"
+			self.data = (infil_h218o / infil_h2o - 1) * 1000
 		# Regular variables inside the netcdf file
 		else:
 			try:
