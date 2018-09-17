@@ -133,8 +133,8 @@ if 0 in lons[1:-2]: # if we cross the gml
 color_lev = np.linspace(-5,5,11)
 line_lev = np.linspace(-5,5,11)
 if levs is not None:
-	color_lev = np.linspace(clev[0], clev[1], clev[2])
-	line_lev = np.linspace(clev[3], clev[4], clev[5])
+	color_lev = np.linspace(levs[0], levs[1], levs[2])
+	line_lev = np.linspace(levs[3], levs[4], levs[5])
 
 bmlon, bmlat = np.meshgrid(lons, lats)
 m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
