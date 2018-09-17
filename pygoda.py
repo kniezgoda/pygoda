@@ -1372,8 +1372,9 @@ d18OV and dDV : returns 2d numpy array data.
 		# Returns:
 		# list of 3 is returnData = False, self.data if returnData = True
 		# Always set returnData = True if V is more than one variable!
-		self.setBox(box)
+		import numpy as np
 		variables = [v.strip() for v in var_names.split(",")]
+		self.setBox(box)
 		RETURN = np.zeros(shape = (len(self.boxlat), len(self.boxlon), len(variables))).squeeze()
 		for V in variables:
 			var_is_3d = False
