@@ -3,7 +3,9 @@
 # kniezgo@gmail.com
 
 def runningMean(x, N, mode = 'same'):
-	# Computes the running mean of x over N steps
+	'''
+	Computes the running mean of x over N steps
+	'''
 	import numpy as np
 	return np.convolve(x, np.ones((N,))/N, mode=mode)
 
@@ -1506,7 +1508,7 @@ d18OV and dDV : returns 2d numpy array data.
 				RETURN.append(self.data)		
 		# End of V loop - all data read by this point
 		if returnData:
-			return self.data
+			return RETURN
 		else:
 			return [var_is_3d, var, pressure]
 
