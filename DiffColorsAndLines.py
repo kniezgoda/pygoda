@@ -114,8 +114,8 @@ if (region == "4P") | (region == "FourProxies"):
 
 box = (southern_lat, northern_lat, left_lon, right_lon)
 
-cpath, cfilename = findClimoFile('*' + grep + "*" + d + '*', directory = cdir)
-tpath, tfilename = findClimoFile('*' + grep + "*" + d + '*', directory = tdir)
+cpath, cfilename = findClimoFile('*' + grep + "*", directory = cdir)
+tpath, tfilename = findClimoFile('*' + grep + "*", directory = tdir)
 cnc = camgoda(cpath)
 tnc = camgoda(tpath)
 
