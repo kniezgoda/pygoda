@@ -24,6 +24,7 @@ parser.add_argument('-r', '--region', dest = 'region', default = None)
 parser.add_argument('-grep', dest = 'grep', default = 'cam.h0')
 parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-50,50])
 parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
+parser.add_argument('-levs', dest = 'levs', type = float, nargs = 6, default = None)
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= 2, default = ["PRECT", "PRECT_d18O"])
 parser.add_argument('-alpha', '--alpha', dest = 'alpha', default = .5)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
@@ -33,6 +34,7 @@ parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action 
 ARGS = parser.parse_args()
 cdir = ARGS.cdir
 tdir = ARGS.tdir
+levs = ARGS.levs
 color_var, line_var = [v for v in ARGS.variables]
 grep = ARGS.grep
 region = ARGS.region
@@ -112,8 +114,8 @@ if (region == "4P") | (region == "FourProxies"):
 
 box = (southern_lat, northern_lat, left_lon, right_lon)
 
-cpath, cfilename = findClimoFile('*' + grep + "*", directory = cdir)
-tpath, tfilename = findClimoFile('*' + grep + "*", directory = tdir)
+cpath, cfilename = findClimoFile('*' + grep + "*" + d + '*', directory = cdir)
+tpath, tfilename = findClimoFile('*' + grep + "*" + d + '*', directory = tdir)
 cnc = camgoda(cpath)
 tnc = camgoda(tpath)
 
@@ -128,12 +130,18 @@ llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[-1], lons[0], lons[-1]]
 if 0 in lons[1:-2]: # if we cross the gml
 	llcrnlon = lons[0]-360
 
+color_lev = np.linspace(-5,5,11)
+line_lev = np.linspace(-5,5,11)
+if levs is not None:
+	color_lev = np.linspace(clev[0], clev[1], clev[2])
+	line_lev = np.linspace(clev[3], clev[4], clev[5])
+
 bmlon, bmlat = np.meshgrid(lons, lats)
 m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
-cs = m.contourf(bmlon, bmlat, data[:,:,0,1] - data[:,:,0,0], shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
-cont = m.contour(bmlon, bmlat, data[:,:,1,1] - data[:,:,1,0], shading = 'flat', latlon = True, colors = 'k', alpha = alpha)
+cs = m.contourf(bmlon, bmlat, data[:,:,0,1] - data[:,:,0,0], color_lev, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cont = m.contour(bmlon, bmlat, data[:,:,1,1] - data[:,:,1,0], line_lev, shading = 'flat', latlon = True, colors = 'k', alpha = alpha)
 cbar = m.colorbar(cs, location='right', pad="5%")
 
 
