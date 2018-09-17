@@ -1,7 +1,9 @@
 # A collection of functions useful for manipulating and working with netcdf files in python
-
+# Other statistical and analysis tools have been added over time
+# kniezgo@gmail.com
 
 def runningMean(x, N, mode = 'same'):
+	# Computes the running mean of x over N steps
 	import numpy as np
 	return np.convolve(x, np.ones((N,))/N, mode=mode)
 
@@ -78,6 +80,13 @@ def find_indices(box, lats, lons):
 
 
 def sigmaFilter(a, sigma = 3, n_passes=1):
+	# Filters data based on the distance from the mean in units of SD
+	# Main argument, a, must be a 1-d list or np array
+	# Optional args: 
+	# sigma (default = 3); the number of SD to screen for
+	# n_passes (default = 1); the number of times to apply the filter
+	# (average and sd are re-calculated after each pass)
+	# Returns: the filtered array with np.nan replaced for filtered values
 	import numpy as np
 	avg = np.nanmean(a)
 	stddev = np.nanstd(a)
