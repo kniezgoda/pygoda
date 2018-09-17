@@ -1376,7 +1376,7 @@ d18OV and dDV : returns 2d numpy array data.
 		variables = [v.strip() for v in var_names.split(",")]
 		self.setBox(box)
 		RETURN = np.zeros(shape = (len(self.boxlat), len(self.boxlon), len(variables))).squeeze()
-		for V in variables:
+		for V_idx, V in enumerate(variables):
 			var_is_3d = False
 			if V[:3] == '3d_':
 				var_is_3d = True
@@ -1507,7 +1507,7 @@ d18OV and dDV : returns 2d numpy array data.
 					pressure /= 100
 					self.depth(pressure)
 			if returnData:
-				RETURN.append(self.data)		
+				RETURN[:,:,V_idx] = self.data
 		# End of V loop - all data read by this point
 		if returnData:
 			return RETURN
