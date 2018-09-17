@@ -1352,166 +1352,150 @@ d18OV and dDV : returns 2d numpy array data.
 		ocnfrac = self.variable("OCNFRAC", box = self.box, setData = False)
 		return array*np.where(ocnfrac > .9, 1, np.nan)
 		
-	def ExtractData(self, V, box = None, returnData = False):
+	def ExtractData(self, var_names, box = None, returnData = False):
 		# The main function for extracting data, everything else is just behind the scenes stuff
-		var_is_3d = False
-		if V[:3] == '3d_':
-			var_is_3d = True
-		if not var_is_3d:
-			var = V
-			vname = V
-			pressure = None
-		else:
-			split = V.split("_")
-			if 3 > len(split) > 4:
-				print "Something went wrong parsing the variable name.\nMake sure there are two or three underscores!"
-				return 
-			pressure = float(split[-1]) * 100
-			var = split[1]
-			vname = split[1]
-			if len(split) == 4: # Handle variables like VQ_H2O
-				var += "_" + split[2]
-				vname += "_" + split[2]
-			vname += split[-1]
-		# Extract the variable data
-		# Special variables
-		if var == "PRECT_d18O":
-			self.PRECT_d18O(box)
-		elif var == "PRECT_dD":
-			self.PRECT_dD(box)
-		elif var == "PRECT_dxs":
-			self.PRECT_dxs(box)
-		elif var == "QFLX_d18O":
-			self.QFLX_d18O(box)
-		elif var == "QFLX_dD":
-			self.QFLX_dD(box)
-		elif var == "fluxDelta":
-			self.fluxDelta(box)
-		elif var == "Column_d18OV":
-			self.variable('H2OV', box)
-			denom = self.columnSum(box, setData = False)
-			self.variable('H218OV', box)
-			num  = self.columnSum(box, setData = False)
-			self.data = (num/denom - 1) * 1000
-			self.long_name = "Column d18OV"
-			self.units = "delta 18O"
-		elif var == "Column_dDV":
-			self.variable('Q', box)
-			denom = self.columnSum(box, setData = False)
-			self.variable('HDOV', box)
-			num  = self.columnSum(box, setData = False)
-			self.data = (num/denom - 1) * 1000
-			self.long_name = "Column dDV"
-			self.units = "delta D"
-		elif var == "Column_Q":
-			self.variable("Q", box)
-			self.columnSum(box)
-			self.long_name = "Vertically integrated water"
-			self.units = "g-H2O"
-		elif var == "P_E":
-			data = self.variable('PRECT', box) - self.variable('QFLX', box)
-			self.data = data
-			self.units = "kg/m2/day"
-			self.long_name = "Moisture convergence (P-E)"
-		elif var == "PoverE":
-			import numpy as np
-			prect = self.variable('PRECT', box) # units of kg/m2/day
-			qflx = self.variable('QFLX', box) # kg/m2/day
-			qflx = self.mask(qflx, 'lt', .005) # remove qflx less than 5 g/m2/day ---> pretty much zero
-			self.data = prect/qflx
-			self.units = "unitless (ratio)"
-			self.long_name = "Ratio of precipitation to evaporation P/E"
-		elif var == "convergenceDelta":
-			self.convergenceDelta(box)
-		elif var == "d18OV":
-			self.d18OV(box)
-		elif var == "dDV":
-			self.dDV(box)
-		elif var == "dxsV":
-			self.dxsV(box)
-		elif var == "psi":
-			self.psi(box)
-		elif var == "RH":
-			self.RH(box)
-		elif var == "VQ_d18O":
-			self.VQ_d18O(box)
-		elif var == "VQ_dD":
-			self.VQ_dD(box)
-		elif var == "UQ_d18O":
-			self.UQ_d18O(box)
-		elif var == "UQ_dD":
-			self.UQ_dD(box)
-		elif var == "QFLX_d18O":
-			self.QFLX_d18O(box)
-		elif var == "VQ_d18O":
-			self.VQ_d18O(box)
-		elif var == "PRECTsquared":
-			self.variable("PRECT", box)
-			self.data = self.data**2
-			self.long_name = "PRECT squared"
-			self.units = "(mm/day)^2"
-		elif var == "PRECTsqrt":
-			self.variable("PRECT", box)
-			self.data = self.data**(.5)
-			self.long_name = "Square root of PRECT"
-			self.units = "sqrt(mm/day)"
-		elif var == "SST":
-			import numpy as np
-			ts = self.variable("TS", box, setData = False)
-			ocnfrac = self.variable("OCNFRAC", box, setData = False)
-			self.data = ts*np.where(ocnfrac < .9, np.nan, ocnfrac) - 273.15
-			self.long_name = "SST"
-			self.units = "deg C"
-		elif var == "SOIL_d18O":
-			soil_h2o = self.variable("H2OSOI", box = box)
-			soil_h218o = self.variable("H2OSOI_H218O", box = box)
-			self.long_name = "Soil d18O"
-			self.units = "d18O"
-			self.data = (soil_h218o / soil_h2o - 1) * 1000
-		elif var == "SOIL_dD":
-			soil_h2o = self.variable("H2OSOI", box = box)
-			soil_hdo = self.variable("H2OSOI_HDO", box = box)
-			self.long_name = "Soil dD"
-			self.units = "dD"
-			self.data = (soil_hdo / soil_h2o - 1) * 1000
-		elif var == "SOIL10CM_d18O":
-			soil_h2o = self.variable("SOILLIQICE_10CM_H2OTR", box = box)
-			soil_h218o = self.variable("SOILLIQICE_10CM_H218O", box = box)
-			self.long_name = "Soil 10cm d18O"
-			self.units = "d18O"
-			self.data = (soil_h218o / soil_h2o - 1) * 1000
-		elif var == "SOIL10CM_dD":
-			soil_h2o = self.variable("SOILLIQICE_10CM_H2OTR", box = box)
-			soil_hdo = self.variable("SOILLIQICE_10CM_HDO", box = box)
-			self.long_name = "Soil 10cm dD"
-			self.units = "dD"
-			self.data = (soil_hdo / soil_h2o - 1) * 1000
-		elif var == "RUNOFF_d18O":
-			runoff_h2o = self.variable("QOVER_H2OTR", box = box)
-			runoff_h218o = self.variable("QOVER_H218O", box = box)
-			self.long_name = "Runoff d18O"
-			self.units = "d18O"
-			self.data = (runoff_h218o / runoff_h2o - 1) * 1000
-		elif var == "INFILTRATION_d18O":
-			infil_h2o = self.mask(self.variable("QINFL_H2OTR", box = box), 'lt', 0)
-			infil_h218o = self.mask(infil_h2o, 'lt', 0, self.variable("QINFL_H218O", box = box))
-			self.long_name = "Infiltration d18O"
-			self.units = "d18O"
-			self.data = (infil_h218o / infil_h2o - 1) * 1000
-		# Regular variables inside the netcdf file
-		else:
-			try:
-				self.variable(var, box)
-			except KeyError:
-				print "From camgoda.ExtractData:\nNot able to extract variable " + var + "...\nSkipping this variable."
-				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
-				return
-		if var_is_3d:
-			if self.model == "CAM":
-				self.isobar(pressure)
-			elif self.model == "CLM":
-				pressure /= 100
-				self.depth(pressure)
+		# Args: 
+		# V - variables to be read in, separated by a comma if more than one
+		# box - bottom lat (-90,90), top lat (-90,90), left lon (0,360), right lon (0,360)
+		# returnData - default to False but usually used as True, need to fix legacy code in order for default to be changed to true
+		# Returns:
+		# list of 3 is returnData = False, self.data if returnData = True
+		# Always set returnData = True if V is more than one variable!
+		RETURN = []
+		variables = [v.strip() for v in var_names.split(",")]
+		for V in variables:
+			var_is_3d = False
+			if V[:3] == '3d_':
+				var_is_3d = True
+			if not var_is_3d:
+				var = V
+				vname = V
+				pressure = None
+			else:
+				split = V.split("_")
+				if 3 > len(split) > 4:
+					print "Something went wrong parsing the variable name.\nMake sure there are two or three underscores!"
+					return 
+				pressure = float(split[-1]) * 100
+				var = split[1]
+				vname = split[1]
+				if len(split) == 4: # Handle variables like VQ_H2O
+					var += "_" + split[2]
+					vname += "_" + split[2]
+				vname += split[-1]
+			# Extract the variable data
+			# Special variables
+			if var == "PRECT_d18O":
+				self.PRECT_d18O(box)
+			elif var == "PRECT_dD":
+				self.PRECT_dD(box)
+			elif var == "PRECT_dxs":
+				self.PRECT_dxs(box)
+			elif var == "QFLX_d18O":
+				self.QFLX_d18O(box)
+			elif var == "QFLX_dD":
+				self.QFLX_dD(box)
+			elif var == "fluxDelta":
+				self.fluxDelta(box)
+			elif var == "Column_d18OV":
+				self.variable('H2OV', box)
+				denom = self.columnSum(box, setData = False)
+				self.variable('H218OV', box)
+				num  = self.columnSum(box, setData = False)
+				self.data = (num/denom - 1) * 1000
+				self.long_name = "Column d18OV"
+				self.units = "delta 18O"
+			elif var == "Column_dDV":
+				self.variable('Q', box)
+				denom = self.columnSum(box, setData = False)
+				self.variable('HDOV', box)
+				num  = self.columnSum(box, setData = False)
+				self.data = (num/denom - 1) * 1000
+				self.long_name = "Column dDV"
+				self.units = "delta D"
+			elif var == "Column_Q":
+				self.variable("Q", box)
+				self.columnSum(box)
+				self.long_name = "Vertically integrated water"
+				self.units = "g-H2O"
+			elif var == "P_E":
+				data = self.variable('PRECT', box) - self.variable('QFLX', box)
+				self.data = data
+				self.units = "kg/m2/day"
+				self.long_name = "Moisture convergence (P-E)"
+			elif var == "PoverE":
+				import numpy as np
+				prect = self.variable('PRECT', box) # units of kg/m2/day
+				qflx = self.variable('QFLX', box) # kg/m2/day
+				qflx = self.mask(qflx, 'lt', .005) # remove qflx less than 5 g/m2/day ---> pretty much zero
+				self.data = prect/qflx
+				self.units = "unitless (ratio)"
+				self.long_name = "Ratio of precipitation to evaporation P/E"
+			elif var == "convergenceDelta":
+				self.convergenceDelta(box)
+			elif var == "d18OV":
+				self.d18OV(box)
+			elif var == "dDV":
+				self.dDV(box)
+			elif var == "dxsV":
+				self.dxsV(box)
+			elif var == "psi":
+				self.psi(box)
+			elif var == "RH":
+				self.RH(box)
+			elif var == "VQ_d18O":
+				self.VQ_d18O(box)
+			elif var == "VQ_dD":
+				self.VQ_dD(box)
+			elif var == "UQ_d18O":
+				self.UQ_d18O(box)
+			elif var == "UQ_dD":
+				self.UQ_dD(box)
+			elif var == "QFLX_d18O":
+				self.QFLX_d18O(box)
+			elif var == "VQ_d18O":
+				self.VQ_d18O(box)
+			elif var == "PRECTsquared":
+				self.variable("PRECT", box)
+				self.data = self.data**2
+				self.long_name = "PRECT squared"
+				self.units = "(mm/day)^2"
+			elif var == "PRECTsqrt":
+				self.variable("PRECT", box)
+				self.data = self.data**(.5)
+				self.long_name = "Square root of PRECT"
+				self.units = "sqrt(mm/day)"
+			elif var == "SST":
+				import numpy as np
+				ts = self.variable("TS", box, setData = False)
+				ocnfrac = self.variable("OCNFRAC", box, setData = False)
+				self.data = ts*np.where(ocnfrac < .9, np.nan, ocnfrac) - 273.15
+				self.long_name = "SST"
+				self.units = "deg C"
+			elif var == "SOIL_d18O":
+				soil_h2o = self.variable("SOILLIQICE_10CM_H2OTR", box = box)
+				soil_h218o = self.variable("SOILLIQICE_10CM_H218O", box = box)
+				self.long_name = "Soil 10cm d18O"
+				self.units = "d18O"
+				self.data = (soil_h218o / soil_h2o - 1) * 1000
+				
+			# Regular variables inside the netcdf file
+			else:
+				try:
+					self.variable(var, box)
+				except KeyError:
+					print "From camgoda.ExtractData:\nNot able to extract variable " + var + "...\nSkipping this variable."
+					print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
+					return
+			if var_is_3d:
+				if self.model == "CAM":
+					self.isobar(pressure)
+				elif self.model == "CLM":
+					pressure /= 100
+					self.depth(pressure)
+			if returnData:
+				RETURN.append(self.data)		
+		# End of V loop - all data read by this point
 		if returnData:
 			return self.data
 		else:
