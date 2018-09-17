@@ -106,7 +106,7 @@ if (region == "SA") | (region == "SouthAmerica"):
 if (region == "4P") | (region == "FourProxies"):
 	region_name = "FourProxies"
 	southern_lat = -25
-  northern_lat = 30
+	northern_lat = 30
 	left_lon = 85
 	right_lon = 160
 
