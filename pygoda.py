@@ -1534,7 +1534,10 @@ d18OV and dDV : returns 2d numpy array data.
 					pressure /= 100
 					self.depth(pressure)
 			if returnData:
-				RETURN[:,:,V_idx] = self.data
+				if len(variables) == 1:
+					RETURN = self.data
+				else:
+					RETURN[:,:,V_idx] = self.data
 		# End of V loop - all data read by this point
 		if returnData:
 			return RETURN
