@@ -1486,11 +1486,29 @@ d18OV and dDV : returns 2d numpy array data.
 				self.long_name = "SST"
 				self.units = "deg C"
 			elif var == "SOIL_d18O":
-				soil_h2o = self.variable("SOILLIQICE_10CM_H2OTR", box = box)
-				soil_h218o = self.variable("SOILLIQICE_10CM_H218O", box = box)
-				self.long_name = "Soil 10cm d18O"
+				soil_h2o = self.variable("H2OSOI", box = box)
+				soil_h218o = self.variable("H2OSOI_H218O", box = box)
+				self.long_name = "Soil d18O"
 				self.units = "d18O"
 				self.data = (soil_h218o / soil_h2o - 1) * 1000
+			elif var == "SOIL_dD":
+				soil_h2o = self.variable("H2OSOI", box = box)
+				soil_hdo = self.variable("H2OSOI_HDO", box = box)
+				self.long_name = "Soil dD"
+				self.units = "dD"
+				self.data = (soil_hdo / soil_h2o - 1) * 1000
+			elif var == "RUNOFF_d18O":
+				runoff_h2o = self.variable("QOVER_H2OTR", box = box)
+				runoff_h218o = self.variable("QOVER_H218O", box = box)
+				self.long_name = "Runoff d18O"
+				self.units = "d18O"
+				self.data = (runoff_h218o / runoff_h2o - 1) * 1000
+			elif var == "INFILTRATION_d18O":
+				infil_h2o = self.mask(self.variable("QINFL_H2OTR", box = box), 'lt', 0)
+				infil_h218o = self.mask(infil_h2o, 'lt', 0, self.variable("QINFL_H218O", box = box))
+				self.long_name = "Infiltration d18O"
+				self.units = "d18O"
+				self.data = (infil_h218o / infil_h2o - 1) * 1000
 				
 			# Regular variables inside the netcdf file
 			else:
