@@ -999,6 +999,10 @@ d18OV and dDV : returns 2d numpy array data.
 		return VAR
 
 	def depth(self, d, setData = True, verb = False):
+		'''
+		Only works when the camgoda instance is of a CLM file.
+		d should be in cm
+		'''
 		if self.model is not "CLM":
 			print "Can not run camgoda.depth() on a CAM file! Read in a CLM file to run this method."
 			return
@@ -1009,16 +1013,17 @@ d18OV and dDV : returns 2d numpy array data.
 			print "Current .data attribute is 2-dimensional, no depth data.\nRead in a 3d variable first before running this method."
 			return
 		import numpy as np
+		d_m = float(d) / 100. # Convert d to meters, which is the unit of the model
 		data = self.data
 		depths = self.depths
 		VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
 		for i in range(len(self.boxlat)):
 			for j in range(len(self.boxlon)):
-				VAR[i,j] = np.interp(d, depths, data[:,i,j])
+				VAR[i,j] = np.interp(d_m, depths, data[:,i,j])
 
 		if setData:
 			self.data = VAR
-			self.long_name += " @" + str(d) + "m"
+			self.long_name += " @" + str(d) + "cm"
 
 		return VAR
 
@@ -1364,14 +1369,16 @@ d18OV and dDV : returns 2d numpy array data.
 		return array*np.where(ocnfrac > .9, 1, np.nan)
 		
 	def ExtractData(self, var_names, box = None, returnData = False):
-		# The main function for extracting data, everything else is just behind the scenes stuff
-		# Args: 
-		# V - variables to be read in, separated by a comma if more than one
-		# box - bottom lat (-90,90), top lat (-90,90), left lon (0,360), right lon (0,360)
-		# returnData - default to False but usually used as True, need to fix legacy code in order for default to be changed to true
-		# Returns:
-		# list of 3 is returnData = False, self.data if returnData = True
-		# Always set returnData = True if V is more than one variable!
+		'''
+		The main function for extracting data, everything else is just behind the scenes stuff
+		Args: 
+		V - variables to be read in, separated by a comma if more than one
+		box - bottom lat (-90,90), top lat (-90,90), left lon (0,360), right lon (0,360)
+		returnData - default to False but usually used as True, need to fix legacy code in order for default to be changed to true
+		Returns:
+		list of 3 is returnData = False, self.data if returnData = True
+		Always set returnData = True if V is more than one variable!
+		'''
 		import numpy as np
 		variables = [v.strip() for v in var_names.split(",")]
 		self.setBox(box)
@@ -1522,6 +1529,8 @@ d18OV and dDV : returns 2d numpy array data.
 				if self.model == "CAM":
 					self.isobar(pressure)
 				elif self.model == "CLM":
+					# This functionality was bolted on and doesnt break old code.
+					# So, although it's not the prettiest way to approach things, there are no bugs.
 					pressure /= 100
 					self.depth(pressure)
 			if returnData:
