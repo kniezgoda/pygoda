@@ -254,9 +254,14 @@ for V in variable:
 	var_is_3d, var, pressure = controldata.ExtractData(V, box)
 	var_is_3d, var, pressure = testdata.ExtractData(V, box)
 	vname = var
+	model = controldata.model
 	if pressure is not None:
-		vname += str(int(pressure/100))
+		if model == "CAM":
+			vname += str(int(pressure/100))
+		if model == "CLM":
+			vname += str(int(pressure)) + "cm"
 	
+			
 	fig = plt.figure()
 	
 	testdata.clevs = RegularClev(testdata.data) # This sets the clevs
