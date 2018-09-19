@@ -126,7 +126,7 @@ data[:,:,1] = tnc.ExtractData(var, box, returnData = True)
 
 lats = cnc.boxlat
 lons = cnc.boxlon
-llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [lats[0], lats[-1], lons[0], lons[-1]]
+llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [southern_lat, northern_lat, left_lon, right_lon]
 if llcrnlon > urcrnrlon: # if we cross the gml
 	llcrnlon -= 360
 
