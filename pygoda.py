@@ -11,26 +11,25 @@ def runningMean(x, N, mode = 'same'):
 
 # =========================================================================================== #
 
-def boxOut(camgoda, box, lat_axis = -2, lon_axis = -1):
-	'''
-	This function is intended to be used with camgoda instances.
-	The instance must have the attributes camgoda.boxlat and camgoda.boxlon defined to run this.
-	These attributes can be set using camgoda.setBox(box).
-	
+def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg"):
+	'''	
 	The idea here is to replace the existing technique for extracting data from a box.
 	At first, to save time on computing, I would extract the data only from the box I wanted, and then do the analysis.
 	However, it has become necessary to often change boxes, and this requires a complete reload of all the data, which is time consuming.
 	This function allows for the user to read in all the spatial data (i.e. box = None), and then choose the box after the data has been read in
-	which can be faster if the analysis requires a constant testing of different boxes.
+	which can be faster if the analysis requires a constant testing of different boxes. This function is NOT intended to be used on 
+	data that has been spatially sliced (i.e. box != None) because it assumes the spatial extent is -90:90 and 0:360 nominally.
 	
-	This function works on camgoda.data, camgoda.boxlat, and camgoda.boxlon. These attributes must be set in the camgoda instance 
-	for the function to work.
+	This function works on a data array of any shape, as long as two of the axes represent lats and lons.
 	
 	Args: 
 	1) camgoda; a camgoda instance with .data, .boxlat, and .boxlon set
 	2) box; a list, np.array, or tuple of the form (bottom_lat, top_lat, left_lon, right_lon) with bounds
 	(-90:90, -90:90, 0:360, 0:360)
-	3) lat/lon_axis; the axes for latitude and longitude, defaulted to -2 (lat) -1 (lon)
+	OPTIONAL
+	3/4) lat_axis/lon_axis; the axes for latitude and longitude, defaulted to -2 (lat) -1 (lon)
+	5) grid ["2deg" or "1deg"]; this defines the latitudes and longitudes. Default behavior is to set to the default CAM nominal 2-deg FV grid.
+	
 	
 	Returns:
 	The boxed-out data array 
@@ -38,8 +37,20 @@ def boxOut(camgoda, box, lat_axis = -2, lon_axis = -1):
 	import numpy as np
 	from pygoda import find_indices
 	
-	idxs = find_indices(box, camgoda.boxlat, camgoda.boxlon)
-	return np.take(np.take(camgoda.data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
+	if grid == "2deg":
+		boxlat = np.linspace(-90,90,96)
+		boxlon = np.linspace(0,357.5,144)
+	
+	elif grid == "1deg":
+		boxlat = np.linspace(-90,90,192)
+		boxlon = np.linspace(0,358.75,288)
+	
+	else:
+		print "Grid argument must be either '2deg' or '1deg' --- returning None"
+		return None
+	
+	idxs = find_indices(box, boxlat, boxlon)
+	return np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
 
 ####################
 ### find_indices ### 
