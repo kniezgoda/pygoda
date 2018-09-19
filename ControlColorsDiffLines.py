@@ -123,6 +123,7 @@ cnc = camgoda(cpath)
 tnc = camgoda(tpath)
 
 # Read in the data
+cnc.setBox(box)
 data = np.zeros(shape = (len(cnc.boxlat), len(cnc.boxlon), 2))
 data[:,:,0] = cnc.ExtractData(var, box, returnData = True)
 data[:,:,1] = tnc.ExtractData(var, box, returnData = True)
