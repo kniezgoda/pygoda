@@ -112,23 +112,31 @@ if (region == "4P") | (region == "FourProxies"):
 	left_lon = 85
 	right_lon = 160
 
+	
+# Set the boxlat and boxlon
 box = (southern_lat, northern_lat, left_lon, right_lon)
+cnc.setBox(box)
+
+# Create bm coords from region bounds
+# bm lonitude coords need to be 0 < coord < 360 
+bmlon, bmlat = np.meshgrid(controldata.boxlon, controldata.boxlat)
+
+# Reset the lat and lon bounds so that maps don't show grey areas 
+southern_lat, northern_lat = np.array(controldata.boxlat)[[0,-1]]
+
+# Change lons to be negative if 180 < lon < 360 because that's how bm works for 'cea' projection
+left_lon, right_lon = np.array(controldata.boxlon)[[0,-1]]
+if 0 in controldata.boxlon[1:-2]: # if we cross the gml
+	left_lon = controldata.boxlon[0]-360
 
 cpath, cfilename = findClimoFile('*' + grep + "*", directory = cdir)
 tpath, tfilename = findClimoFile('*' + grep + "*", directory = tdir)
 cnc = camgoda(cpath)
 tnc = camgoda(tpath)
 
-cnc.setBox(box)
 data = np.zeros(shape = (len(cnc.boxlat), len(cnc.boxlon), 2))
 data[:,:,0] = cnc.ExtractData(var, box, returnData = True)
 data[:,:,1] = tnc.ExtractData(var, box, returnData = True)
-
-lats = cnc.boxlat
-lons = cnc.boxlon
-llcrnlat, urcrnlat, llcrnlon, urcrnrlon = [southern_lat, northern_lat, left_lon, right_lon]
-if llcrnlon > urcrnrlon: # if we cross the gml
-	llcrnlon -= 360
 
 lev = np.linspace(0,10,11)
 difflev = np.linspace(-5,5,11)
@@ -137,7 +145,7 @@ if levs is not None:
 	difflev = np.linspace(levs[3], levs[4], levs[5])
 
 bmlon, bmlat = np.meshgrid(lons, lats)
-m = bm(projection = 'cea', llcrnrlat=llcrnlat,urcrnrlat=urcrnlat, llcrnrlon=llcrnlon,urcrnrlon=urcrnrlon,resolution='c')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 cs = m.contourf(bmlon, bmlat, data[:,:,0], lev, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
