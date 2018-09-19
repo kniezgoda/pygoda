@@ -146,7 +146,6 @@ if levs is not None:
 	lev = np.linspace(levs[0], levs[1], levs[2])
 	difflev = np.linspace(levs[3], levs[4], levs[5])
 
-bmlon, bmlat = np.meshgrid(lons, lats)
 m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
