@@ -23,7 +23,7 @@ parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2
 parser.add_argument('-r', '--region', dest = 'region', default = None)
 parser.add_argument('-grep', dest = 'grep', default = 'cam.h0')
 parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-50,50])
-parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [333,335])
 parser.add_argument('-levs', dest = 'levs', type = float, nargs = 6, default = None)
 parser.add_argument('-v', '--variable', dest = 'variable', default = "PRECT")
 parser.add_argument('-alpha', '--alpha', dest = 'alpha', default = .5)
