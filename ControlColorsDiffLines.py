@@ -115,28 +115,29 @@ if (region == "4P") | (region == "FourProxies"):
 	
 # Set the boxlat and boxlon
 box = (southern_lat, northern_lat, left_lon, right_lon)
-cnc.setBox(box)
 
-# Create bm coords from region bounds
-# bm lonitude coords need to be 0 < coord < 360 
-bmlon, bmlat = np.meshgrid(controldata.boxlon, controldata.boxlat)
-
-# Reset the lat and lon bounds so that maps don't show grey areas 
-southern_lat, northern_lat = np.array(controldata.boxlat)[[0,-1]]
-
-# Change lons to be negative if 180 < lon < 360 because that's how bm works for 'cea' projection
-left_lon, right_lon = np.array(controldata.boxlon)[[0,-1]]
-if 0 in controldata.boxlon[1:-2]: # if we cross the gml
-	left_lon = controldata.boxlon[0]-360
-
+# Open the files
 cpath, cfilename = findClimoFile('*' + grep + "*", directory = cdir)
 tpath, tfilename = findClimoFile('*' + grep + "*", directory = tdir)
 cnc = camgoda(cpath)
 tnc = camgoda(tpath)
 
+# Read in the data
 data = np.zeros(shape = (len(cnc.boxlat), len(cnc.boxlon), 2))
 data[:,:,0] = cnc.ExtractData(var, box, returnData = True)
 data[:,:,1] = tnc.ExtractData(var, box, returnData = True)
+
+# Create bm coords from region bounds
+# bm lonitude coords need to be 0 < coord < 360 
+bmlon, bmlat = np.meshgrid(cnc.boxlon, cnc.boxlat)
+
+# Reset the lat and lon bounds so that maps don't show grey areas 
+southern_lat, northern_lat = np.array(cnc.boxlat)[[0,-1]]
+
+# Change lons to be negative if 180 < lon < 360 because that's how bm works for 'cea' projection
+left_lon, right_lon = np.array(cnc.boxlon)[[0,-1]]
+if 0 in cnc.boxlon[1:-2]: # if we cross the gml
+	left_lon = cnc.boxlon[0]-360
 
 lev = np.linspace(0,10,11)
 difflev = np.linspace(-5,5,11)
