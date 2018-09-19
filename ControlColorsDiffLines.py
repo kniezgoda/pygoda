@@ -25,7 +25,7 @@ parser.add_argument('-grep', dest = 'grep', default = 'cam.h0')
 parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-50,50])
 parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0,360])
 parser.add_argument('-levs', dest = 'levs', type = float, nargs = 6, default = None)
-parser.add_argument('-v', '--variable', dest = 'variable', nargs= 1, default = ["PRECT"])
+parser.add_argument('-v', '--variable', dest = 'variable', default = "PRECT")
 parser.add_argument('-alpha', '--alpha', dest = 'alpha', default = .5)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
@@ -35,7 +35,7 @@ ARGS = parser.parse_args()
 cdir = ARGS.cdir
 tdir = ARGS.tdir
 levs = ARGS.levs
-var = [v for v in ARGS.variable]
+var = ARGS.variable
 grep = ARGS.grep
 region = ARGS.region
 savefig = ARGS.savefig
