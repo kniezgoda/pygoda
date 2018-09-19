@@ -11,6 +11,35 @@ def runningMean(x, N, mode = 'same'):
 
 # =========================================================================================== #
 
+def boxOut(camgoda, box, lat_axis = -2, lon_axis = -1):
+	'''
+	This function is intended to be used with camgoda instances.
+	The instance must have the attributes camgoda.boxlat and camgoda.boxlon defined to run this.
+	These attributes can be set using camgoda.setBox(box).
+	
+	The idea here is to replace the existing technique for extracting data from a box.
+	At first, to save time on computing, I would extract the data only from the box I wanted, and then do the analysis.
+	However, it has become necessary to often change boxes, and this requires a complete reload of all the data, which is time consuming.
+	This function allows for the user to read in all the spatial data (i.e. box = None), and then choose the box after the data has been read in
+	which can be faster if the analysis requires a constant testing of different boxes.
+	
+	This function works on camgoda.data, camgoda.boxlat, and camgoda.boxlon. These attributes must be set in the camgoda instance 
+	for the function to work.
+	
+	Args: 
+	1) camgoda; a camgoda instance with .data, .boxlat, and .boxlon set
+	2) box; a list, np.array, or tuple of the form (bottom_lat, top_lat, left_lon, right_lon) with bounds
+	(-90:90, -90:90, 0:360, 0:360)
+	3) lat/lon_axis; the axes for latitude and longitude, defaulted to -2 (lat) -1 (lon)
+	
+	Returns:
+	The boxed-out data array 
+	'''
+	import numpy as np
+	from pygoda import find_indices
+	
+	idxs = find_indices(box, camgoda.boxlat, camgoda.boxlon)
+	return np.take(np.take(camgoda.data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
 
 ####################
 ### find_indices ### 
@@ -32,7 +61,7 @@ def find_indices(box, lats, lons):
 	
 	lats = f.variables['lat'][:]
 	lons = f.variables['lons'][:]
-	region = [5, 35, 65, 90]
+	region = [5, 35, 65, 90])
 	bottom_index, top_index, left_index, right_index = find_indices(region, lats, lons)
 	
 	Arguments
@@ -913,14 +942,17 @@ d18OV and dDV : returns 2d numpy array data.
 		
 		# No lev, no time
 		if ndims == 2:
+			dataDims = ('lat', 'lon')
 			data = np.array(xr.DataArray(data)[idxbox[0], idxbox[1]])
 		# Either lev or time but not both
 		if ndims == 3:
 			if not self.isTime:
+				dataDims = ('z', 'lat', 'lon')
 				if setData:
 					self.vartype = "3d"
 			data = np.array(xr.DataArray(data)[:, idxbox[0], idxbox[1]])
 		if ndims == 4:
+			dataDims = ("time", "z", "lat", "lon")
 			if setData:
 				self.vartype = "3d"
 			data = np.array(xr.DataArray(data)[:, :, idxbox[0], idxbox[1]])
@@ -945,6 +977,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.boxlon = self.lon[idxbox[1]]
 		if setData:
 			self.long_name = DATA.long_name
+			self.dataDims = dataDims
 			self.data = data
 		return data
 
@@ -1139,6 +1172,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "d18O of PRECT"
 		self.units = "permil"
 		self.vartype = "2d"
+		self.dataDims = ("lat", "lon")
 		self.data = (h218o / h2o - 1) * 1000
 		# Filter diriculous data
 		self.data = self.mask(self.data, 'gt', 50)
@@ -1152,6 +1186,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "dD of PRECT"
 		self.units = "permil"
 		self.vartype = "2d"
+		self.dataDims = ("lat", "lon")
 		self.data = (hdo / h2o - 1) * 1000
 		return self.data
 
@@ -1162,6 +1197,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "d-excess of PRECT"
 		self.units = "permil"
 		self.vartype = "2d"
+		self.dataDims = ("lat", "lon")
 		self.data = dd - 8 * d18o
 		return self.data
 
@@ -1172,6 +1208,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "d18O of Vapor"
 		self.units = "permil"
 		self.vartype = "3d"
+		self.dataDims = ("z", "lat", "lon")
 		self.data = (h218ov_p / h2ov_p - 1) * 1000
 		return self.data
 
@@ -1182,6 +1219,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "dD of Vapor"
 		self.units = "permil"
 		self.vartype = "3d"
+		self.dataDims = ("z", "lat", "lon")
 		self.data = (hdov_p / h2ov_p - 1) * 1000
 		return self.data
 
@@ -1192,6 +1230,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "d-excess of VAPOR"
 		self.units = "permil"
 		self.vartype = "3d"
+		self.dataDims = ("z", "lat", "lon")
 		self.data = ddv_p - 8 * d18ov_p
 		return self.data
 
@@ -1204,6 +1243,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "VQ_d18O"
 		self.units = "m/s * delta"
 		self.vartype = "3d"
+		self.dataDims = ("z", "lat", "lon")
 		data = (vq_h218o / vq_h2o - 1) * 1000
 		self.data = data
 		return self.data
@@ -1254,6 +1294,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "d18O of QFLX"
 		self.units = "delta 18O"
 		self.vartype = "2d"
+		self.dataDims = ("lat", "lon")
 		self.data = (qflx_h218o / qflx_h2o - 1) * 1000
 		return self.data
 
@@ -1269,6 +1310,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "dD of QFLX"
 		self.units = "delta D"
 		self.vartype = "2d"
+		self.dataDims = ("lat", "lon")
 		self.data = (qflx_hdo / qflx_h2o - 1) * 1000
 		return self.data
 
@@ -1291,6 +1333,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.long_name = "d18O of moisture convergence"
 		self.units = "delta 18O"
 		self.vartype = "2d"
+		self.dataDims = ("lat", "lon")
 		self.data = data
 		return data
 
@@ -1321,6 +1364,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.units = "Kg/s"
 		self.var = "psi"
 		self.vartype = "3d"
+		self.dataDims = ("z", "lat", "lon")
 		self.data = psi
 		return self.data
 
@@ -1346,6 +1390,7 @@ d18OV and dDV : returns 2d numpy array data.
 		self.units = "%"
 		self.var = "rh"
 		self.vartype = "3d"
+		self.dataDims = ("z", "lat", "lon")
 		return RH
 	
 	def HadleyCellInfo(self, box = None):
@@ -1425,6 +1470,7 @@ d18OV and dDV : returns 2d numpy array data.
 				self.data = (num/denom - 1) * 1000
 				self.long_name = "Column d18OV"
 				self.units = "delta 18O"
+				self.dataDims = ("lat", "lon")
 			elif var == "Column_dDV":
 				self.variable('Q', box)
 				denom = self.columnSum(box, setData = False)
@@ -1432,17 +1478,20 @@ d18OV and dDV : returns 2d numpy array data.
 				num  = self.columnSum(box, setData = False)
 				self.data = (num/denom - 1) * 1000
 				self.long_name = "Column dDV"
+				self.dataDims = ("lat", "lon")
 				self.units = "delta D"
 			elif var == "Column_Q":
 				self.variable("Q", box)
 				self.columnSum(box)
 				self.long_name = "Vertically integrated water"
 				self.units = "g-H2O"
+				self.dataDims = ("lat", "lon")
 			elif var == "P_E":
 				data = self.variable('PRECT', box) - self.variable('QFLX', box)
 				self.data = data
 				self.units = "kg/m2/day"
 				self.long_name = "Moisture convergence (P-E)"
+				self.dataDims = ("lat", "lon")
 			elif var == "PoverE":
 				import numpy as np
 				prect = self.variable('PRECT', box) # units of kg/m2/day
@@ -1451,6 +1500,7 @@ d18OV and dDV : returns 2d numpy array data.
 				self.data = prect/qflx
 				self.units = "unitless (ratio)"
 				self.long_name = "Ratio of precipitation to evaporation P/E"
+				self.dataDims = ("lat", "lon")
 			elif var == "convergenceDelta":
 				self.convergenceDelta(box)
 			elif var == "d18OV":
@@ -1492,6 +1542,7 @@ d18OV and dDV : returns 2d numpy array data.
 				self.data = ts*np.where(ocnfrac < .9, np.nan, ocnfrac) - 273.15
 				self.long_name = "SST"
 				self.units = "deg C"
+				self.dataDims = ("lat", "lon")
 			elif var == "SOIL_d18O":
 				soil_h2o = self.variable("H2OSOI", box = box)
 				soil_h218o = self.variable("H2OSOI_H218O", box = box)
