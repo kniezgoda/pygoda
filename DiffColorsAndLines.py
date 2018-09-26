@@ -143,6 +143,6 @@ m.drawmapboundary(fill_color='0.3')
 cs = m.contourf(bmlon, bmlat, data[:,:,0,1] - data[:,:,0,0], color_lev, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cont = m.contour(bmlon, bmlat, data[:,:,1,1] - data[:,:,1,0], line_lev, shading = 'flat', latlon = True, colors = 'k', alpha = alpha)
 cbar = m.colorbar(cs, location='right', pad="5%")
-clabel = plt.clabel(cont, fmt='%2.1f', colors = 'k', fontsize = 10)
+clabel = plt.clabel(cont, fmt='%2.2f', colors = 'k', fontsize = 10)
 
 plt.show()
