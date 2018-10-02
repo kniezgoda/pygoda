@@ -19,13 +19,21 @@ def bandPass(data, axis = 0, low_bound = 0, high_bound = 1):
 	3) low_bound (default 0); the lowest frequency to keep
 	4) high_bound (default 1); the highest frequency to keep
 	
+	Returns:
+	1) the band-passed data array in the same shape as the input array
+	
+	: Notes :
+	For the low_ and high_bound, the frequencies are for each time step.
+	E.g., if data is a monthly timeseries over N years, then to low-pass filter for
+	signals of less than 1 cycle/year, let high_bound to 1./12.
+	To band-pass for signals between 1 and 3 cycles/year set low_bound to 1./12. and high_bound to 3./12.
+	To band-pass for ENSO signals, you should set low_bound to approximately 1./(12.*7.) and 
+	high_bound to approximately 1./(12.*4.) (1 cycle every 4 - 7 years)
+	
 	Leaving axis, low_, and high_bound as defaults will return the same data
 	To high-pass only, set low_bound to the cutoff freq, and leave high_bound as default
 	To low-pass, set high_bound to cutoff freq, leave low_bound as default
 	To band-pass, set both.
-	
-	Returns:
-	1) the band-passed data array in the same shape as the input array
 	'''
 	import numpy as np
 	ndims_data= len(data.shape)
