@@ -10,6 +10,31 @@ def runningMean(x, N, mode = 'same'):
 	return np.convolve(x, np.ones((N,))/N, mode=mode)
 
 # =========================================================================================== #
+def bandPass(data, axis = 0, low_bound = 0, high_bound = 1):
+	'''
+	function used for band-passing data. 
+	Arguments:
+	1) data; np.array of the data you wish to band pass
+	2) axis (default 0); the axis over which to apply the FFT and IFFT
+	3) low_bound (default 0); the lowest frequency to keep
+	4) high_bound (default 1); the highest frequency to keep
+	
+	Leaving axis, low_, and high_bound as defaults will return the same data
+	To high-pass only, set low_bound to the cutoff freq, and leave high_bound as default
+	To low-pass, set high_bound to cutoff freq, leave low_bound as default
+	To band-pass, set both.
+	
+	Returns:
+	1) the band-passed data array in the same shape as the input array
+	'''
+	import numpy as np
+	ndims_data= len(data.shape)
+	fft_freqs = np.abs(np.fft.fftfreq(data.shape[axis]))
+	mask = (fft_freqs >= low_bound) * (fft_freqs <= high_bound)
+	# make mask the same shape as data by adding new axes
+	for i in range(ndims_data - 1):
+		mask = mask[...,np.newaxis]
+	return np.fft.ifft(np.fft.fft(data, axis = 0)*mask, axis = 0)
 
 def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg"):
 	'''	
