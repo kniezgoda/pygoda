@@ -150,7 +150,7 @@ for var in variables:
 
 	plt.subplot(2,1,2)
 	plt.plot(data[:,1]-data[:,0], np.array(pressures)/100)
-	plt.gca().invert_xaxis()
+	plt.gca().invert_yaxis()
 
 	# fig.suptitle(control.long_name, fontweight = 'bold', fontsize = 14)
 	# plt.figtext(.25, .02,"Averaged over longitudes " + str(left_lon) + " and " + str(right_lon), fontsize = 8)
