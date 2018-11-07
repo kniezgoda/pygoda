@@ -126,7 +126,7 @@ if mkdir:
 
 for var in variables:
 	print "\nPlotting " + var + " data...\n"
-	data = np.zeros(shape = (len(pressure), 2))
+	data = np.zeros(shape = (len(pressures), 2))
 	for p in pressures:
 		print p
 		extractVar = "3d_"+var+str(p/100)
