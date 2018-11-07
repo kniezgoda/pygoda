@@ -144,11 +144,13 @@ for var in variables:
 	plt.subplot(2,1,1)
 	plt.plot(data[:,0], np.array(pressures)/100, label = "control")
 	plt.plot(data[:,1], np.array(pressures)/100, label = "test")
-	plt.yticks(aty, laby)
+	#plt.yticks(aty, laby)
+	plt.gca().invert_yaxis()
 	plt.legend()
 
 	plt.subplot(2,1,2)
 	plt.plot(data[:,1]-data[:,0], np.array(pressures)/100)
+	plt.gca().invert_xaxis()
 
 	# fig.suptitle(control.long_name, fontweight = 'bold', fontsize = 14)
 	# plt.figtext(.25, .02,"Averaged over longitudes " + str(left_lon) + " and " + str(right_lon), fontsize = 8)
