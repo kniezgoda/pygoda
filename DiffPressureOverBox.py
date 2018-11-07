@@ -142,8 +142,8 @@ for var in variables:
 	fig = plt.figure()
 
 	plt.subplot(2,1,1)
-	plt.plot(data[:,0], pressures/100, label = "control")
-	plt.plot(data[:,1], pressures/100, label = "test")
+	plt.plot(data[:,0], np.array(pressures)/100, label = "control")
+	plt.plot(data[:,1], np.array(pressures)/100, label = "test")
 	plt.yticks(aty, laby)
 	plt.legend()
 
