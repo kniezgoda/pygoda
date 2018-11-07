@@ -129,7 +129,7 @@ for var in variables:
 	data = np.zeros(shape = (len(pressures), 2))
 	for p in pressures:
 		print p
-		extractVar = "3d_"+var+str(p/100)
+		extractVar = "3d_"+var+"_"+str(p/100)
 		data[p_idx, 0] = np.nanmean(control.ExtractData(extractVar, box, returnData = True))
 		data[p_idx, 1] = np.nanmean(test.ExtractData(extractVar, box, returnData = True))
 
