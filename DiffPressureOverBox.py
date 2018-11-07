@@ -127,7 +127,7 @@ if mkdir:
 for var in variables:
 	print "\nPlotting " + var + " data...\n"
 	data = np.zeros(shape = (len(pressures), 2))
-	for p in pressures:
+	for p_idx, p in enumerate(pressures):
 		print p
 		extractVar = "3d_"+var+"_"+str(p/100)
 		data[p_idx, 0] = np.nanmean(control.ExtractData(extractVar, box, returnData = True))
