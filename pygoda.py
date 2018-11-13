@@ -44,7 +44,7 @@ def bandPass(data, axis = 0, low_bound = 0, high_bound = 1):
 		mask = mask[...,np.newaxis]
 	return np.fft.ifft(np.fft.fft(data, axis = 0)*mask, axis = 0)
 
-def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg"):
+def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = False):
 	'''	
 	The idea here is to replace the existing technique for extracting data from a box.
 	At first, to save time on computing, I would extract the data only from the box I wanted, and then do the analysis.
@@ -83,7 +83,15 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg"):
 		return None
 	
 	idxs = find_indices(box, boxlat, boxlon)
-	return np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
+	
+	# This is the data
+	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
+	
+	# This is included if the user wants the boxlat and boxlon data as well
+	if returnGrid:
+		RETURN = [RETURN, np.take(boxlat, idxs[0]), np.take(boxlon, idxs[1])]
+	
+	return RETURN
 
 ####################
 ### find_indices ### 
