@@ -1163,25 +1163,25 @@ d18OV and dDV : returns 2d numpy array data.
 		return VAR
 	
 	def isotherm(self, val, setData = True):
-		import numpy as np
-		import scipy.interpolate as interp
-		ret = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
-		for i in range(len(self.boxlat)):
-			for j in range(len(self.boxlon)):
-				current_ij = self.data[:,i,j]
-				mask = np.where(current_ij > 1e36, np.nan, 1)
-				current_ij_masked = current_ij * mask
-				if sum(~np.isnan(current_ij_masked)) == 0:
-					ret[i,j] = np.nan
-				else:
-					f = interp.interp1d(current_ij_masked[:,i,j],self.depths)
-					try:
-						ret[i,j] = f(val)
-					except ValueError:
-						ret[i,j] = np.nan
-		if setData:
-			self.data = ret
-		return ret
+import numpy as np
+import scipy.interpolate as interp
+ret = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
+for i in range(len(self.boxlat)):
+	for j in range(len(self.boxlon)):
+		current_ij = self.data[:,i,j]
+		mask = np.where(current_ij > 1e36, np.nan, 1)
+		current_ij_masked = current_ij * mask
+		if sum(~np.isnan(current_ij_masked)) == 0:
+			ret[i,j] = np.nan
+		else:
+			f = interp.interp1d(current_ij_masked,self.depths)
+			try:
+				ret[i,j] = f(val)
+			except ValueError:
+				ret[i,j] = np.nan
+if setData:
+	self.data = ret
+return ret
 	
 	def columnSum(self, box = None, setData = True):
 		if self.vartype is not "3d":
