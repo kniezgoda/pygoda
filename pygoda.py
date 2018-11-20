@@ -1184,6 +1184,43 @@ d18OV and dDV : returns 2d numpy array data.
 			self.units = "cm"
 			self.long_name = "depth of 15 degC isotherm"
 		return ret
+	
+	def isotherm_fast(self, temp, setData = True):
+		if model is not "POP":
+			print "Not a POP file, can not run isotherm_fast! Exiting..."
+			return None
+		d = self.data
+		depths = self.depths
+		y = np.zeros(shape = (d.shape[1], d.shape[2], 2))
+		z = np.zeros(shape = (d.shape[1], d.shape[2], 2))
+		for i in range(d.shape[1]):
+			for j in range(d.shape[2]):
+			    dij = d[:,i,j]
+			    dij_mask = np.where(dij > 1e36, np.nan, 1)
+			    dij_masked = dij*dij_mask
+			    if sum(~np.isnan(dij_masked)) == 0:
+				y[i,j,:] = np.nan
+				z[i,j,:] = np.nan
+				continue
+			    dij_nonan = dij_masked[~np.isnan(dij_masked)]
+			    try:
+				y1 = dij_nonan[dij_nonan-15<0][0]
+				y2 = dij_nonan[dij_nonan-15>0][-1]
+				z1 = depths[np.where(dij_nonan == y1)[0][0]]
+				z2 = depths[np.where(dij_nonan == y2)[0][0]]
+				y[i,j,0] = y1
+				y[i,j,1] = y2
+				z[i,j,0] = z1
+				z[i,j,1] = z2
+			    except IndexError:
+				y[i,j,:] = np.nan
+				z[i,j,:] = np.nan
+		y1 = y[...,0]
+		y2 = y[...,1]
+		z1 = z[...,0]
+		z2 = z[...,1]
+		return ((temp-y1) / ((y1-y2)/(z1-z2))) + z1
+
 
 	def columnSum(self, box = None, setData = True):
 		if self.vartype is not "3d":
@@ -1711,7 +1748,7 @@ d18OV and dDV : returns 2d numpy array data.
 					self.depth(pressure)
 				elif self.model == "POP":
 					pressure /= 100
-					self.isotherm(pressure)
+					self.isotherm_fast(pressure)
 			if returnData:
 				if len(variables) == 1:
 					RETURN = self.data
