@@ -54,7 +54,9 @@ user_control_plot_title = None
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--files', dest = 'files', nargs = "*")
-parser.add_argument('-r', '--region', dest = 'region', default = 'GlobalTropics')
+parser.add_argument('-r', '--region', dest = 'region', default = 'None')
+parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-40,40])
+parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [335,333])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
@@ -96,14 +98,18 @@ if model is 'cam' or model is 'clm':
 	from pygoda import camgoda
 if model == 'pop':
 	from pygoda import popgoda as camgoda
-	
+
 # Set the lat bounds
-# Default global tropics
-region_name = "GlobalTropics"
-southern_lat = -85
-northern_lat = 85
-left_lon = 0
-right_lon = 355
+region_name = "Box"
+southern_lat, northern_lat = [int(l) for l in ARGS.lats]
+left_lon, right_lon = [int(l) for l in ARGS.lons]
+
+if (region == "GT") | (region == "GlobalTropics"):
+	region_name = "GlobalTropics"
+	southern_lat = -85
+	northern_lat = 85
+	left_lon = 0
+	right_lon = 355
 
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
