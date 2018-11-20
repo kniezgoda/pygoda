@@ -1174,7 +1174,7 @@ d18OV and dDV : returns 2d numpy array data.
 				if sum(~np.isnan(current_ij_masked)) == 0:
 					ret[i,j] = np.nan
 				else:
-					f = interp.interp1d(temp[:,i,j],self.depths)
+					f = interp.interp1d(current_ij_masked[:,i,j],self.depths)
 					try:
 						ret[i,j] = f(val)
 					except ValueError:
