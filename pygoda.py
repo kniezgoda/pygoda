@@ -967,6 +967,9 @@ d18OV and dDV : returns 2d numpy array data.
 		if any(v == "levgrnd" for v in self.vars):
 			self.model = "CLM"
 			self.depths = self.dataset.variables['levgrnd'][:]
+		if any(v == "z_t" for v in self.vars):
+			self.model = "POP"
+			self.depths = self.dataset.variables['z_t'][:]
 
 		# Some variables that don't need to be caluclated more than once
 		self.PressureCalculated = False
@@ -1131,8 +1134,8 @@ d18OV and dDV : returns 2d numpy array data.
 		Only works when the camgoda instance is of a CLM file.
 		d should be in cm
 		'''
-		if self.model is not "CLM":
-			print "Can not run camgoda.depth() on a CAM file! Read in a CLM file to run this method."
+		if self.model is "CAM":
+			print "Can not run camgoda.depth() on a CAM file! Read in a CLM or POP file to run this method."
 			return
 		if self.var == '':
 			print "No variable read in yet.\nUse self.variable() to read a variable first."
@@ -1141,7 +1144,9 @@ d18OV and dDV : returns 2d numpy array data.
 			print "Current .data attribute is 2-dimensional, no depth data.\nRead in a 3d variable first before running this method."
 			return
 		import numpy as np
-		d_m = float(d) / 100. # Convert d to meters, which is the unit of the model
+		d_m = d
+		if model = "CLM":
+			d_m = float(d) / 100. # Convert d to meters, which is the unit of the model
 		data = self.data
 		depths = self.depths
 		VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
