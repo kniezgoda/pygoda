@@ -1186,7 +1186,8 @@ d18OV and dDV : returns 2d numpy array data.
 		return ret
 	
 	def isotherm_fast(self, temp, setData = True):
-		if model is not "POP":
+		import numpy as np
+		if self.model is not "POP":
 			print "Not a POP file, can not run isotherm_fast! Exiting..."
 			return None
 		d = self.data
@@ -1219,7 +1220,12 @@ d18OV and dDV : returns 2d numpy array data.
 		y2 = y[...,1]
 		z1 = z[...,0]
 		z2 = z[...,1]
-		return ((temp-y1) / ((y1-y2)/(z1-z2))) + z1
+		ret = ((temp-y1) / ((y1-y2)/(z1-z2))) + z1
+		if setData:
+			self.data = ret
+			self.units = "cm"
+			self.long_name = "depth of " + str(temp) + " degC isotherm"
+		return ret
 
 
 	def columnSum(self, box = None, setData = True):
