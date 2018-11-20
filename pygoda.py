@@ -1181,6 +1181,8 @@ d18OV and dDV : returns 2d numpy array data.
 						ret[i,j] = np.nan
 		if setData:
 			self.data = ret
+			self.units = "cm"
+			self.long_name = "depth of 15 degC isotherm"
 		return ret
 
 	def columnSum(self, box = None, setData = True):
