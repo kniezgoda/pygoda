@@ -11,7 +11,7 @@ def runningMean(x, N, mode = 'same'):
 
 # =========================================================================================== #
 
-def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg"):
+def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = False):
 	'''	
 	The idea here is to replace the existing technique for extracting data from a box.
 	At first, to save time on computing, I would extract the data only from the box I wanted, and then do the analysis.
@@ -19,38 +19,78 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg"):
 	This function allows for the user to read in all the spatial data (i.e. box = None), and then choose the box after the data has been read in
 	which can be faster if the analysis requires a constant testing of different boxes. This function is NOT intended to be used on 
 	data that has been spatially sliced (i.e. box != None) because it assumes the spatial extent is -90:90 and 0:360 nominally.
-	
 	This function works on a data array of any shape, as long as two of the axes represent lats and lons.
-	
 	Args: 
-	1) camgoda; a camgoda instance with .data, .boxlat, and .boxlon set
+	1) data; a numpy array with axes corresponding to lat and lon. The lat and lon range should be the entire cam grid
 	2) box; a list, np.array, or tuple of the form (bottom_lat, top_lat, left_lon, right_lon) with bounds
 	(-90:90, -90:90, 0:360, 0:360)
 	OPTIONAL
 	3/4) lat_axis/lon_axis; the axes for latitude and longitude, defaulted to -2 (lat) -1 (lon)
 	5) grid ["2deg" or "1deg"]; this defines the latitudes and longitudes. Default behavior is to set to the default CAM nominal 2-deg FV grid.
-	
-	
 	Returns:
 	The boxed-out data array 
 	'''
 	import numpy as np
 	from pygoda import find_indices
-	
 	if grid == "2deg":
 		boxlat = np.linspace(-90,90,96)
 		boxlon = np.linspace(0,357.5,144)
-	
 	elif grid == "1deg":
 		boxlat = np.linspace(-90,90,192)
 		boxlon = np.linspace(0,358.75,288)
-	
 	else:
 		print "Grid argument must be either '2deg' or '1deg' --- returning None"
 		return None
-	
 	idxs = find_indices(box, boxlat, boxlon)
-	return np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
+	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
+	if returnGrid:
+		RETURN = [RETURN, np.take(boxlat, idxs[0]), np.take(boxlon, idxs[1])]
+	return RETURN
+
+
+def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
+    '''
+    *
+    *** This function aggregates d along a specified axis based on a corresponding grouping array.
+    *
+    *** len(d) along the specified axis must equal len(group)
+    i.e., each element of group should correspond to the index-aligned element of d along the axis.
+    *
+    *** fun can either be "mean" or "sum"
+    *
+    *** d is first indexed along the specified axis by each unique element of group, 
+    the function (mean or sum) is applied, 
+    and then the resultants are arranged into an array of shape (len(group), ...) 
+    where the remaining axes are preserved from the original shape of d.
+    *
+    *** If axis != 0, then the shape will be (..., len(group), ...) where len(group) is 
+    placed at the axis position specified in the arguments
+    '''
+    import numpy as np
+    if len(group) != np.ma.size(d, axis = axis):
+        print "group and d are not the same length, exiting..."
+        return
+    group = np.array(group)
+    unique_groups = np.unique(group)
+    group_idx = [np.where(g == group) for g in unique_groups]
+    d_grouped = [np.take(d, idxs, axis = axis).squeeze() for idxs in group_idx]
+    if fun == "mean":
+        if rm_nan:
+            ret = np.array([np.nanmean(dgrouped, axis = axis) for dgrouped in d_grouped])
+        else:
+            ret = np.array([np.mean(dgrouped, axis = axis) for dgrouped in d_grouped])
+    elif fun == "sum":
+        if rm_nan:
+            ret = np.array([np.nansum(dgrouped, axis = axis) for dgrouped in d_grouped])
+        else:
+            ret = np.array([np.sum(dgrouped, axis = axis) for dgrouped in d_grouped])
+    else: 
+        print "fun argument must be 'mean' or 'sum', exiting..."
+        return
+    return ret
+
+
+
 
 ####################
 ### find_indices ### 
@@ -297,8 +337,8 @@ def PressureCalc(A, B, PS):
 
 	Arguments
 	---------
-	A : list of length n where n is the number of vertical levels
-	B : same as A
+	A : list of length n where n is the number of vertical levels (hyam)
+	B : same as A (hybm)
 	PS : 2-d array of surface pressure values
 
 	Returns
@@ -811,6 +851,14 @@ def ensoDates(sy, ey, directory, returnSSTs = False):
 		return [nino_dates, nina_dates]
 
 
+def nino34(ts_data, time_axis = 0, lat_axis = -2, lon_axis = -1, grid = "2deg"):
+	from pygoda import boxOut
+	import numpy as np
+	nino34_box = (-5,5,190,240)
+	data_nino34Box = boxOut(data, nino34_box, lat_axis = lat_axis, lon_axis = lon_axis, grid = grid)
+	data_nino34Box_avg = np.nanmean(data_nino34Box, axis = (lat_axis, lon_axis))
+
+
 
 ###############
 ### camgoda ###
@@ -883,6 +931,9 @@ d18OV and dDV : returns 2d numpy array data.
 		if any(v == "levgrnd" for v in self.vars):
 			self.model = "CLM"
 			self.depths = self.dataset.variables['levgrnd'][:]
+		if any(v == "z_t" for v in self.vars):
+			self.model = "POP"
+			self.depths = self.dataset.variables['z_t'][:]
 
 		# Some variables that don't need to be caluclated more than once
 		self.PressureCalculated = False
@@ -1441,6 +1492,7 @@ d18OV and dDV : returns 2d numpy array data.
 		RETURN = np.zeros(shape = (len(self.boxlat), len(self.boxlon), len(variables))).squeeze()
 		for V_idx, V in enumerate(variables):
 			var_is_3d = False
+			var_is_ColumnMean = False
 			if V[:3] == '3d_':
 				var_is_3d = True
 			if not var_is_3d:
@@ -1452,7 +1504,11 @@ d18OV and dDV : returns 2d numpy array data.
 				if 3 > len(split) > 4:
 					print "Something went wrong parsing the variable name.\nMake sure there are two or three underscores!"
 					return 
-				pressure = float(split[-1]) * 100
+				if split[-1] == "ColumnMean":
+					var_is_3d = False
+					var_is_ColumnMean = True
+				else:
+					pressure = float(split[-1]) * 100
 				var = split[1]
 				vname = split[1]
 				if len(split) == 4: # Handle variables like VQ_H2O
@@ -1595,6 +1651,8 @@ d18OV and dDV : returns 2d numpy array data.
 					# So, although it's not the prettiest way to approach things, there are no bugs.
 					pressure /= 100
 					self.depth(pressure)
+			if var_is_ColumnMean:
+					self.ColumnMean(box, setData = True)
 			if returnData:
 				if len(variables) == 1:
 					RETURN = self.data
