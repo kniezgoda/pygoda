@@ -962,6 +962,8 @@ d18OV and dDV : returns 2d numpy array data.
 		self.dimlen = [len(self.dataset.dimensions[d]) for d in self.dims]
 		self.lat = self.dataset.variables['lat'][:]
 		self.lon = self.dataset.variables['lon'][:]
+		self.boxlat = self.lat
+		self.boxlon = self.lon
 		
 		self.model = "CAM"
 		if any(v == "levgrnd" for v in self.vars):
@@ -1159,7 +1161,27 @@ d18OV and dDV : returns 2d numpy array data.
 			self.long_name += " @" + str(d) + "cm"
 
 		return VAR
-
+	
+	def isotherm(self, val, setData = True):
+		import numpy as np
+		ret = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
+		for i in range(len(self.boxlat)):
+			for j in range(len(self.boxlon)):
+				current_ij = self.data[:,i,j]
+				mask = np.where(current_ij > 1e36, np.nan, 1)
+				current_ij_masked = current_ij * mask
+				if sum(~np.isnan(current_ij_masked)) == 0:
+					ret[i,j] = np.nan
+				else:
+					f = interp.interp1d(temp[:,i,j],self.depths)
+					try:
+						ret[i,j] = f(val)
+					except ValueError:
+						ret[i,j] = np.nan
+		if setData:
+			self.data = ret
+		return ret
+	
 	def columnSum(self, box = None, setData = True):
 		if self.vartype is not "3d":
 			print "Var type is not 3d, cannot compute column sum! Exiting..."
@@ -1684,6 +1706,9 @@ d18OV and dDV : returns 2d numpy array data.
 					# So, although it's not the prettiest way to approach things, there are no bugs.
 					pressure /= 100
 					self.depth(pressure)
+				elif self.model == "POP":
+					pressure /= 100
+					self.isotherm(pressure)
 			if returnData:
 				if len(variables) == 1:
 					RETURN = self.data
