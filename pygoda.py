@@ -1041,6 +1041,7 @@ d18OV and dDV : returns 2d numpy array data.
 		'''
 		
 		# No lev, no time
+		dataDims = "N/A"
 		if ndims == 2:
 			dataDims = ('lat', 'lon')
 			data = np.array(xr.DataArray(data)[idxbox[0], idxbox[1]])
