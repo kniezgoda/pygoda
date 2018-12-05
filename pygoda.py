@@ -133,7 +133,7 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
     else: 
         print "fun argument must be 'mean' or 'sum', exiting..."
         return
-    return ret
+    return ret, unique_groups
 
 
 ####################
