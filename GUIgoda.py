@@ -122,8 +122,6 @@ class DiffZonalMean:
 	def runDiffZonalMean(self):
 		self.box = self.Box_Text.get("1.0",'end-1c') # end-1c deletes the newline char at the end of text boxes
 		self.variable = self.Variable_Text.get("1.0", "end-1c")
-		self.clev = self.ColorLevel_Text.get("1.0", "end-1c")
-		self.diffclev = self.DiffColorLevel_Text.get("1.0", "end-1c")
 		self.savefig = self.savefigbool.get()
 		self.showfig = self.showfigbool.get()
 		# Build the string line by line to pass into os.system()
