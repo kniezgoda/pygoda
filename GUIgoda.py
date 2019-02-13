@@ -33,7 +33,7 @@ class InitMapper:
 		diffmap = DiffMap(root2)
 		root2.mainloop()
 		
-	def runZonalMean(self):
+	def runDiffZonalMean(self):
 		root2 = Tk()
 		diffzonalmean = DiffZonalMean(root2)
 		root2.mainloop()
