@@ -1,3 +1,5 @@
+#!/home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
+
 import sys, re, os
 if sys.version_info[0] < 3:
     vers=2
