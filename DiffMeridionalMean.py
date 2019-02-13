@@ -15,7 +15,7 @@ parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= '*', default = None)
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
-parser.add_argument('-dox', dest = 'dox', nargs = 4, default = [-90, 90, 0, 360])
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-90, 90, 0, 360])
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 
 ARGS = parser.parse_args()
