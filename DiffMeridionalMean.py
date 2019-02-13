@@ -15,8 +15,7 @@ parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= '*', default = None)
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
-parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-90, 90])
-parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [0, 360])
+parser.add_argument('-dox', dest = 'dox', nargs = 4, default = [-90, 90, 0, 360])
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 
 ARGS = parser.parse_args()
@@ -25,8 +24,7 @@ tdir = ARGS.tdir
 grep = ARGS.grep
 cfile = ARGS.controldatafname
 tfile = ARGS.testdatafname
-bottom_lat, top_lat = [int(l) for l in ARGS.lats]
-left_lon, right_lon = [int(l) for l in ARGS.lons]
+bottom_lat, top_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
 box = [bottom_lat, top_lat, left_lon, right_lon]
 variables = [str(V) for V in ARGS.variable]
 savefig = ARGS.savefig
@@ -43,27 +41,27 @@ if ARGS.developer_mode:
 # Find the file
 if (cfile is None) or (tfile is None):
 	print "\nLooking for control " + grep + " files in " + cdir + "..."
-	controldatafname, controlfn = findClimoFile("*" + grep + "*", cdir)
+	cfile, controlfn = findClimoFile("*" + grep + "*", cdir)
 	if not controldatafname:
 		sys.exit()
 	else:
 		print "Found file " + controlfn
 	print "\nLooking for test " + grep + " files in " + tdir + "..."
-	testdatafname, testfn = findClimoFile("*" + grep + "*", tdir)
+	tfile, testfn = findClimoFile("*" + grep + "*", tdir)
 	if not testdatafname:
 		sys.exit()
 	else:
 		print "Found file " + testfn
 
 else:
-	print "\nControl file is " + cfile
-	print "\nTest file is " + tfile
 	controlfn = os.path.splitext(os.path.split(cfile)[1])[0]
 	testfn = os.path.splitext(os.path.split(tfile)[1])[0]
-
+	print "\nControl file is " + controlfn
+	print "\nTest file is " + testfn
+	
 # Open the file
-cnc = camgoda(controldatafname)
-tnc = camgoda(testdatafname)
+cnc = camgoda(cfile)
+tnc = camgoda(tfile)
 
 for v in variables:
 	# Extract the variable
