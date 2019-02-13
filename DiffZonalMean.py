@@ -60,8 +60,8 @@ else:
 	testfn = os.path.splitext(os.path.split(tfile)[1])[0]
 
 # Open the file
-cnc = camgoda(controldatafname)
-tnc = camgoda(testdatafname)
+cnc = camgoda(cfile)
+tnc = camgoda(tfile)
 
 for v in variables:
 	# Extract the variable
