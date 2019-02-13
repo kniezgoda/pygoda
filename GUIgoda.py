@@ -39,7 +39,7 @@ class InitMapper:
 		root2.mainloop()
 		
 class DiffZonalMean:
-	def __init__(self, parent, control_file = '', test_file = '', box = [-40,40,335,333], var = "PRECT", clev = '', diffclev = ''):
+	def __init__(self, parent, control_file = '', test_file = '', box = [-90,90,0,360], var = "PRECT"):
 		self.begin = parent
 		self.begin.title("Choose input data...")
 		# Things that need defaults
@@ -53,8 +53,6 @@ class DiffZonalMean:
 			self.test_filename = self.test_filepath.split("/")[-1]
 		self.box = str(box[0]) + " " + str(box[1]) + " " + str(box[2]) + " " + str(box[3])
 		self.variable = var
-		self.clev = clev
-		self.diffclev = diffclev
 		# Add stuff to click on and type in
 		self.frame = Frame(self.begin,bd=2,relief=GROOVE)
 		self.frame.pack(pady=2,fill=X)
@@ -82,18 +80,6 @@ class DiffZonalMean:
 		self.Variable_Text = Text(self.frame,height=1,bd=2,relief=RIDGE)
 		self.Variable_Text.insert(END, self.variable)
 		self.Variable_Text.pack(anchor = "center")
-		# clev text
-		self.ColorLevel_Label = Label(self.frame, text = "Color level for control and test plots (min max nlev)\nLeave blank for default:",height=2)
-		self.ColorLevel_Label.pack(pady=4, anchor = "center")
-		self.ColorLevel_Text = Text(self.frame,height=1,bd=2,relief=RIDGE)
-		self.ColorLevel_Text.insert(END, self.clev)
-		self.ColorLevel_Text.pack(anchor = "center")
-		# diffclev text
-		self.DiffColorLevel_Label = Label(self.frame, text = "Color level for difference plot (min max nlev)\nLeave blank for default:",height=2)
-		self.DiffColorLevel_Label.pack(pady=4, anchor = "center")
-		self.DiffColorLevel_Text = Text(self.frame,height=1,bd=2,relief=RIDGE)
-		self.DiffColorLevel_Text.insert(END, self.diffclev)
-		self.DiffColorLevel_Text.pack(anchor = "center")
 		# Save and show check boxes
 		self.savefigbool = BooleanVar() 
 		self.savefigbool.set(False) # set to false by default
@@ -104,9 +90,9 @@ class DiffZonalMean:
 		self.Show_Checkbutton = Checkbutton(self.frame, text = "Show file", variable = self.showfigbool)
 		self.Show_Checkbutton.pack(anchor = 'center')
 		# Run button
-		self.Run_Button = Button(self.frame, text = "RUN", command = self.runDiffMap, height = 1)
+		self.Run_Button = Button(self.frame, text = "RUN", command = self.runDiffZonalMean, height = 1)
 		self.Run_Button.pack(anchor = "center")
-	#
+
 	def OnFileChooseClick(self, which):
 		title = "Select"
 		if which == 0: 
@@ -132,8 +118,8 @@ class DiffZonalMean:
 			self.test_filename = hold
 			self.TestFileChoose_Text.delete(1.0, END)
 			self.TestFileChoose_Text.insert(END, self.test_filename)
-	#
-	def runDiffMap(self):
+
+	def runDiffZonalMean(self):
 		self.box = self.Box_Text.get("1.0",'end-1c') # end-1c deletes the newline char at the end of text boxes
 		self.variable = self.Variable_Text.get("1.0", "end-1c")
 		self.clev = self.ColorLevel_Text.get("1.0", "end-1c")
@@ -142,16 +128,12 @@ class DiffZonalMean:
 		self.showfig = self.showfigbool.get()
 		# Build the string line by line to pass into os.system()
 		pythonloc = '/home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python'
-		codeloc = '/home/server/student/homes/kniezgod/python/bin/pygoda/DiffMap.py'
+		codeloc = '/home/server/student/homes/kniezgod/python/bin/pygoda/DiffZonalMean.py'
 		execute = pythonloc + " " + codeloc
 		execute += " -c " + self.control_filepath
 		execute += " -t " + self.test_filepath
 		execute += " -box " + self.box
 		execute += " -v " + self.variable
-		if self.clev is not '':
-			execute += " -clev " + self.clev
-		if self.diffclev is not '':
-			execute += " -diffclev " + self.diffclev
 		if not self.savefig:
 			execute += " -nosave "
 		if self.showfig:
