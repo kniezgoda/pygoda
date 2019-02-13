@@ -30,7 +30,7 @@ class InitMapper:
 		self.DiffZonalMean_Button = Button(self.frame, text="DiffZonalMean", command = self.runDiffZonalMean, height = 1)		
 		self.DiffZonalMean_Button.pack(anchor = "center")
 		# DiffMeridiondalMean
-		self.DiffMeridiondalMean_Button = Button(self.frame, text="DiffMeridiondalMean", command = self.runDiffMeridiondalMean, height = 1)		
+		self.DiffMeridiondalMean_Button = Button(self.frame, text="DiffMeridiondalMean", command = self.runDiffMeridionalMean, height = 1)		
 		self.DiffMeridiondalMean_Button.pack(anchor = "center")
 		
 	def runDiffMap(self):
@@ -43,9 +43,9 @@ class InitMapper:
 		diffzonalmean = DiffZonalMean(root2)
 		root2.mainloop()
 		
-	def runDiffMeridiondalMean(self):
+	def runDiffMeridionalMean(self):
 		root2 = Tk()
-		diffmeridionalmean = DiffMeridiondalMean(root2)
+		diffmeridionalmean = DiffMeridionalMean(root2)
 		root2.mainloop()
 		
 class DiffZonalMean:
