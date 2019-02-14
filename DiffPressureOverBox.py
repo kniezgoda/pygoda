@@ -31,6 +31,7 @@ if (testdatafname is not None) & (controldatafname is not None):
 	findFile = False
 testdir = ARGS.testdir
 controldir = ARGS.controldir
+mkdir = True
 savefig = ARGS.savefig # default is True
 showfig = ARGS.showfig # default is false
 variables = ARGS.variables
