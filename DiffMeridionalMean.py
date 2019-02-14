@@ -84,17 +84,22 @@ for v in variables:
 	# Compute the difference
 	dvar_zonalMean = tvar_zonalMean - cvar_zonalMean
 
+	atx = [int(x) for x in np.linspace(0, len(lon)-1, 5)]
+	labx = lon[atx]
+	
 	# Plot the data
 	fig = plt.figure()
 
 	plt.subplot(211)
-	plt.plot(lon, tvar_zonalMean, label = "test")
-	plt.plot(lon, cvar_zonalMean, label = "control")
+	plt.plot(tvar_zonalMean, label = "test")
+	plt.plot(cvar_zonalMean, label = "control")
+	plt.xticks(atx, labx)
 	plt.ylabel(units)
 	plt.legend()
 
 	plt.subplot(212)
-	plt.plot(lon, dvar_zonalMean, color = 'k')
+	plt.plot(dvar_zonalMean, color = 'k')
+	plt.xticks(atx, labx)
 	plt.ylabel("Difference in " + units)
 
 	fig.suptitle(long_name + "\nAveraged over longitudes " + str(bottom_lat) + " - " + str(top_lat))
