@@ -222,20 +222,9 @@ class Input:
 		title = "Select " + case + " file"
 		dlg=filedialog.Open(title = title)
 		filepath = dlg.show()
-		self.files[case] = filepath
 		textbox.delete(1.0, END)
 		textbox.insert(END, filepath)
-		#if which == 0:
-		#	self.control_filepath = temp
-		#	self.control_filename = hold
-		#	self.ControlFileChoose_Text.delete(1.0, END)
-		#	self.ControlFileChoose_Text.insert(END, self.control_filepath)
-		#if which == 1:
-		#	self.test_filepath = temp
-		#	self.test_filename = hold
-		#	self.TestFileChoose_Text.delete(1.0, END)
-		#	self.TestFileChoose_Text.insert(END, self.test_filepath)
-	#
+
 	def OnRunClick(self):
 		# Build the execute string line by line based on what info is provided
 		# Not the prettiest way to do things
@@ -244,9 +233,11 @@ class Input:
 		codeloc = os.path.expanduser("~/python/bin/pygoda/") + self.code # Works for cheyenne and climate
 		execute = pythonloc + " " + codeloc
 		if "control" in self.widgets:
-			execute += " -c " + self.control_filepath
+			self.control_path = self.ControlFileChoose_Text.get("1.0",'end-1c')
+			execute += " -c " + self.control_path
 		if "test" in self.widgets:
-			execute += " -t " + self.test_filepath
+			self.test_path = self.TestFileChoose_Text.get("1.0",'end-1c')
+			execute += " -t " + self.test_path
 		if "box" in self.widgets:
 			getbox = self.Box_Text.get("1.0",'end-1c') # end-1c deletes the newline char at the end of text boxes
 			self.box = getbox
