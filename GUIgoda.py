@@ -156,6 +156,7 @@ class Input:
 		self.showfigbool.set(True) # set to true by default
 		self.Show_Checkbutton = Checkbutton(self.saveshowframe, text = "Show file", variable = self.showfigbool)
 		self.Show_Checkbutton.pack(anchor = 'center')
+		self.Show_Checkbutton.select()
 		# Frame for run button
 		self.runframe = Frame(self.begin,bd = 2, relief = GROOVE)
 		self.runframe.pack(pady=2,fill=Y)
