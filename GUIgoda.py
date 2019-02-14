@@ -62,7 +62,7 @@ class Chooser:
 	def close_all_windows(self):
 		try:
 			self.root2.destroy()
-		except NameError:
+		except AttributeError:
 			pass
 		root.destroy()
 	#
