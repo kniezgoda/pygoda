@@ -165,17 +165,18 @@ class Input:
 		self.Quit_Button = Button(self.runframe, text = "QUIT", command = self.close_all_windows, height = 1)
 		self.Quit_Button.pack(anchor = "center",side = LEFT)
 		self.widgets = []
+		self.files = {}
 	#
 	def AddControlFile(self):
 		self.widgets.append("control")
-		self.ControlFileChoose_Button = Button(self.topframe, text="Choose control file", command = lambda: self.OnFileChooseClick(0), height = 1)		
+		self.ControlFileChoose_Button = Button(self.topframe, text="Choose control file", command = lambda: self.OnFileChooseClick("control", self.ControlFileChoose_Text), height = 1)		
 		self.ControlFileChoose_Button.pack(anchor = "center")
 		self.ControlFileChoose_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
 		self.ControlFileChoose_Text.pack(anchor = "center")
 	#
 	def AddTestFile(self):
 		self.widgets.append("test")
-		self.TestFileChoose_Button = Button(self.topframe, text="Choose test file", command = lambda: self.OnFileChooseClick(1), height = 1)		
+		self.TestFileChoose_Button = Button(self.topframe, text="Choose test file", command = lambda: self.OnFileChooseClick("test", self.TestFileChoose_Text), height = 1)		
 		self.TestFileChoose_Button.pack(anchor = "center")
 		self.TestFileChoose_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
 		self.TestFileChoose_Text.pack(anchor = "center")
@@ -217,31 +218,23 @@ class Input:
 			None
 		root.destroy()
 	#
-	def OnFileChooseClick(self, which):
-		title = "Select"
-		if which == 0: 
-			title += " control file"
-		if which == 1: 
-			title += " test file"
+	def OnFileChooseClick(self, case, textbox):
+		title = "Select " + case + " file"
 		dlg=filedialog.Open(title = title)
-		#assign the path name of the selected file to temp
-		temp = dlg.show()
-		if temp is '':
-			return None
-		#assign the file name only to hold
-		hold=re.split('/',temp)
-		hold=hold[len(hold)-1]
-		#insert text to the next avaiable input text box 
-		if which == 0:
-			self.control_filepath = temp
-			self.control_filename = hold
-			self.ControlFileChoose_Text.delete(1.0, END)
-			self.ControlFileChoose_Text.insert(END, self.control_filename)
-		if which == 1:
-			self.test_filepath = temp
-			self.test_filename = hold
-			self.TestFileChoose_Text.delete(1.0, END)
-			self.TestFileChoose_Text.insert(END, self.test_filename)
+		filepath = dlg.show()
+		files[case] = filepath
+		textbox.delete(1.0, END)
+		textbox.insert(END, filepath)
+		#if which == 0:
+		#	self.control_filepath = temp
+		#	self.control_filename = hold
+		#	self.ControlFileChoose_Text.delete(1.0, END)
+		#	self.ControlFileChoose_Text.insert(END, self.control_filepath)
+		#if which == 1:
+		#	self.test_filepath = temp
+		#	self.test_filename = hold
+		#	self.TestFileChoose_Text.delete(1.0, END)
+		#	self.TestFileChoose_Text.insert(END, self.test_filepath)
 	#
 	def OnRunClick(self):
 		# Build the execute string line by line based on what info is provided
