@@ -154,9 +154,9 @@ class Input:
 		self.Save_Checkbutton.pack(anchor = 'center')
 		self.showfigbool = BooleanVar()
 		self.showfigbool.set(True) # set to true by default
-		self.Show_Checkbutton = Checkbutton(self.saveshowframe, text = "Show file", variable = self.showfigbool)
+		self.Show_Checkbutton = Checkbutton(self.saveshowframe, text = "Show image", variable = self.showfigbool)
 		self.Show_Checkbutton.pack(anchor = 'center')
-		self.Show_Checkbutton.select()
+		self.Show_Checkbutton.select() # Actually not necessary, but this just puts a check on the Show image box for reassurance
 		# Frame for run button
 		self.runframe = Frame(self.begin,bd = 2, relief = GROOVE)
 		self.runframe.pack(pady=2,fill=Y)
