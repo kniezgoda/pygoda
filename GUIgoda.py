@@ -222,7 +222,7 @@ class Input:
 		title = "Select " + case + " file"
 		dlg=filedialog.Open(title = title)
 		filepath = dlg.show()
-		files[case] = filepath
+		self.files[case] = filepath
 		textbox.delete(1.0, END)
 		textbox.insert(END, filepath)
 		#if which == 0:
