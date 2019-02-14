@@ -63,7 +63,7 @@ class Chooser:
 		try:
 			self.root2.destroy()
 		except NameError:
-			None
+			pass
 		root.destroy()
 	#
 	def runDiffMap(self):
