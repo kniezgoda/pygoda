@@ -56,8 +56,8 @@ parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
-parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = None)
-parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = 3, default = None)
+parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = '')
+parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = 3, default = '')
 parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
 
 
@@ -271,11 +271,11 @@ for V in variable:
 	
 	dclev = niceClev(testdata.data - controldata.data)
 	
-	if clev is not None:
+	if clev is not '':
 		testdata.clevs = np.linspace(clev[0], clev[1], clev[2])
 		controldata.clevs = np.linspace(clev[0], clev[1], clev[2])	
 		
-	if diffclev is not None:
+	if diffclev is not '':
 		dclev = np.linspace(diffclev[0], diffclev[1], diffclev[2]) 
 
 	# test data

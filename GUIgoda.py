@@ -53,6 +53,8 @@ class Chooser:
 		self.DiffPressureVsLong_Button.pack(anchor = "center")
 		self.DiffPressureVsLat_Button = Button(self.frame, text="DiffPressureVsLat", command = self.runDiffPressureVsLat, height = 1)		
 		self.DiffPressureVsLat_Button.pack(anchor = "center")
+		self.DiffCorrelationMap_Button = Button(self.frame, text="DiffCorrelationMap", command = self.runDiffCorrelationMap, height = 1)		
+		self.DiffCorrelationMap_Button.pack(anchor = "center")
 		# Add a quit button to shut it all down
 		self.bottomframe = Frame(self.begin,bd = 2, relief = GROOVE)
 		self.bottomframe.pack(pady=2,fill=X)
@@ -62,70 +64,94 @@ class Chooser:
 	def close_all_windows(self):
 		try:
 			self.root2.destroy()
-		except AttributeError:
+		except (AttributeError, TclError):
 			pass
 		root.destroy()
 	#
 	def runDiffMap(self):
-		self.root2 = Tk()
+		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffMap")
-		window.AddControlFile()
-		window.AddTestFile()
-		window.AddBox('-40 40 335 333')
-		window.AddVariable("PRECT")
-		window.AddClev()
-		window.AddDiffClev()
+		window.AddChooseFile("c", "Select control file")
+		window.AddChooseFile("t", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-40 40 335 333')
+		window.AddText('v', 'Enter variable name', default = "PRECT")
+		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
 		self.root2.mainloop()
 	#
 	def runDiffZonalMean(self):
-		self.root2 = Tk()
+		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffZonalMean")
-		window.AddControlFile()
-		window.AddTestFile()
-		window.AddBox('-90 90 0 360')
-		window.AddVariable("PRECT")
+		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("test", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
+		window.AddText('v', 'Enter variable name', default = "PRECT")
 		self.root2.mainloop()
 	#
 	def runDiffMeridionalMean(self):
-		self.root2 = Tk()
+		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffMeridionalMean")
-		window.AddControlFile()
-		window.AddTestFile()
-		window.AddBox('-90 90 0 360')
-		window.AddVariable("PRECT")
+		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("test", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
+		window.AddText('v', 'Enter variable name', default = "PRECT")
 		self.root2.mainloop()
 	#
 	def runDiffPressureOverBox(self):
-		self.root2 = Tk()
+		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffPressureOverBox")
-		window.AddControlFile()
-		window.AddTestFile()
-		window.AddBox('-90 90 0 360')
-		window.AddVariable("T")
+		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("test", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
+		window.AddText('v', 'Enter variable name', default = "T")
 		self.root2.mainloop()
 	#
 	def runDiffPressureVsLong(self):
-		self.root2 = Tk()
+		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffPressureVsLong")
-		window.AddControlFile()
-		window.AddTestFile()
-		window.AddBox('-90 90 0 360')
-		window.AddVariable("T")
-		window.AddClev()
-		window.AddDiffClev()
+		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("test", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
+		window.AddText('v', 'Enter variable name', default = "T")
+		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
 		self.root2.mainloop()
 	#
 	def runDiffPressureVsLat(self):
-		self.root2 = Tk()
+		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffPressureVsLat")
-		window.AddControlFile()
-		window.AddTestFile()
-		window.AddBox('-90 90 0 360')
-		window.AddVariable("T")
-		window.AddClev()
-		window.AddDiffClev()
+		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("test", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
+		window.AddText('v', 'Enter variable name', default = "T")
+		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
 		self.root2.mainloop()
 	#
+	def runDiffPressureVsLat(self):
+		self.root2 = Toplevel()
+		window = Input(self.root2, "DiffCorrelationMap")
+		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("test", "Select test file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
+		window.AddText('v', 'Enter variable name', default = "T")
+		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
+		self.root2.mainloop()
+	
+	def runDiffCorrelationMap(self):
+		self.root2 = Toplevel()
+		window = Input(self.root2, "DiffCorrelationMap")
+		window.AddChooseFile("cdir", "Set control directory")
+		window.AddChooseFile("tdir", "Set test directory")
+		window.AddText('field_var', 'Enter global variable name', default = 'PRECT')
+		window.AddText('loc_var', 'Enter local (point) variable name', default = "PRECT_d18O")
+		window.AddText('latlon', 'Enter lat/lon coordinate of the point (2 numbers)', default = '0 0')
+		window.AddText('del', 'Enter delta - the number of degrees to make a box around the lat/lon coordinate', default = '2')
+		window.AddText('grep_pre', 'Enter expression for grep before date string', default = '')
+		window.AddText('grep_post', 'Enter expression for grep after date string', default = '')
+		window.AddDate(years = True, months = True, days = False)
+		self.root2.mainloop()
 
 class Input:
 	'''
@@ -148,11 +174,11 @@ class Input:
 		# Frame for save and show figure checkbuttons
 		self.saveshowframe = Frame(self.begin, bd = 2, relief = GROOVE)
 		self.saveshowframe.pack(pady=2,fill=Y)
-		self.savefigbool = BooleanVar() 
+		self.savefigbool = IntVar() 
 		self.savefigbool.set(False) # set to false by default
 		self.Save_Checkbutton = Checkbutton(self.saveshowframe, text = "Save file", variable = self.savefigbool)
 		self.Save_Checkbutton.pack(anchor = 'center')
-		self.showfigbool = BooleanVar()
+		self.showfigbool = IntVar()
 		self.showfigbool.set(True) # set to true by default
 		self.Show_Checkbutton = Checkbutton(self.saveshowframe, text = "Show image", variable = self.showfigbool)
 		self.Show_Checkbutton.pack(anchor = 'center')
@@ -164,62 +190,75 @@ class Input:
 		self.Run_Button.pack(anchor = "center",side = LEFT)
 		self.Quit_Button = Button(self.runframe, text = "QUIT", command = self.close_all_windows, height = 1)
 		self.Quit_Button.pack(anchor = "center",side = LEFT)
+		# Set a bunch of empty dicts to keep track of what's been added (is there a better way to do this? Probably...)
+		self.doDates = False
 		self.widgets = []
-		self.files = {}
-	#
-	def AddControlFile(self):
-		self.widgets.append("control")
-		self.ControlFileChoose_Button = Button(self.topframe, text="Choose control file", command = lambda: self.OnFileChooseClick("control", self.ControlFileChoose_Text), height = 1)		
-		self.ControlFileChoose_Button.pack(anchor = "center")
-		self.ControlFileChoose_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.ControlFileChoose_Text.pack(anchor = "center")
-	#
-	def AddTestFile(self):
-		self.widgets.append("test")
-		self.TestFileChoose_Button = Button(self.topframe, text="Choose test file", command = lambda: self.OnFileChooseClick("test", self.TestFileChoose_Text), height = 1)		
-		self.TestFileChoose_Button.pack(anchor = "center")
-		self.TestFileChoose_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.TestFileChoose_Text.pack(anchor = "center")
-	#
-	def AddBox(self, box):
-		self.widgets.append("box")
-		self.Box_Label = Label(self.topframe, text = "Box (bottom, top, left, right):",height=1)
-		self.Box_Label.pack(pady=4, anchor = "center")
-		self.Box_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.Box_Text.insert(END, box)
-		self.Box_Text.pack(anchor = "center")
-	#
-	def AddVariable(self, variable):
-		self.widgets.append("variable")
-		self.Variable_Label = Label(self.topframe, text = "Variable:",height=1)
-		self.Variable_Label.pack(pady=4, anchor = "center")
-		self.Variable_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.Variable_Text.insert(END, variable)
-		self.Variable_Text.pack(anchor = "center")
-	#
-	def AddClev(self):
-		self.widgets.append("clev")
-		self.ColorLevel_Label = Label(self.topframe, text = "Color level for control and test plots (min max nlev)\nLeave blank for default:",height=2)
-		self.ColorLevel_Label.pack(pady=4, anchor = "center")
-		self.ColorLevel_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.ColorLevel_Text.pack(anchor = "center")
-	#
-	def AddDiffClev(self):
-		self.widgets.append("diffclev")
-		self.DiffColorLevel_Label = Label(self.topframe, text = "Color level for difference plot (min max nlev)\nLeave blank for default:",height=2)
-		self.DiffColorLevel_Label.pack(pady=4, anchor = "center")
-		self.DiffColorLevel_Text = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.DiffColorLevel_Text.pack(anchor = "center")
-	#
+		self.Buttons = {}
+		self.Labels = {}
+		self.Texts = {}
+
+	def AddChooseFile(self, name, label):
+		self.widgets.append(name)
+		self.Buttons[name] = Button(self.topframe, text=label, command = lambda: self.OnFileChooseClick(name, self.Texts[name]), height = 1)		
+		self.Buttons[name].pack(anchor = "center")
+		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
+		self.Texts[name].pack(anchor = "center")
+
+	def AddText(self, name, label, default=''):
+		self.widgets.append(name)
+		self.Labels[name] = Label(self.topframe, text = label,height=1)
+		self.Labels[name].pack(pady=4, anchor = "center")
+		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
+		self.Texts[name].insert(END, default)
+		self.Texts[name].pack(anchor = "center")
+
+	def AddDate(self, years = True, months = True, days = True):
+		self.doDates = True
+		self.datesToAdd = []
+		if years:
+			self.datesToAdd.append('years')
+			self.Labels['years'] = Label(self.topframe, text = 'Set the years (2 numbers: start_year end_year', height=1)
+			self.Labels['years'].pack(anchor = "center")
+			self.Texts['years'] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
+			self.Texts['years'].pack(anchor = "center")
+		if months:
+			self.datesToAdd.append('months')
+			self.MonthCheckButtons = {}
+			self.monthframe = Frame(self.topframe, bd = 2, relief = GROOVE)
+			self.monthframe.pack(pady=2,fill=Y)
+			months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+			self.monthbools = []
+			for i, month in enumerate(months):
+				self.monthbools.append(IntVar())
+				self.MonthCheckButtons[i] = Checkbutton(self.monthframe, text = month, variable = self.monthbools[i])
+				self.MonthCheckButtons[i].pack(anchor = 'center', side = LEFT)
+				self.MonthCheckButtons[i].select()
+			self.AllCheckbutton = Checkbutton(self.topframe, text = "ANN", command = lambda: checkMonths(range(12)))
+			self.AllCheckbutton.pack(side = LEFT)
+			self.JJACheckbutton = Checkbutton(self.topframe, text = "JJA", command = lambda: checkMonths([5,6,7]))
+			self.JJACheckbutton.pack(side = LEFT)
+			self.DJFCheckbutton = Checkbutton(self.topframe, text = "DJF", command = lambda: checkMonths([0,1,11]))
+			self.DJFCheckbutton.pack(side = LEFT)
+			self.JJASCheckbutton = Checkbutton(self.topframe, text = "JJAS", command = lambda: checkMonths([5,6,7,8]))
+			self.JJASCheckbutton.pack(side = LEFT)
+			def checkMonths(months = range(12)): # defaults all months
+				for i in range(12):
+					self.MonthCheckButtons[i].deselect()
+				for i in months:
+					self.MonthCheckButtons[i].select()
+		if days:
+			self.widgets.append('days')
+
+
 	def close_all_windows(self):
 		try:
 			self.begin.destroy()
-		except NameError:
+		except (AttributeError, TclError):
 			None
 		root.destroy()
 	#
-	def OnFileChooseClick(self, case, textbox):
-		title = "Select " + case + " file"
+	def OnFileChooseClick(self, name, textbox):
+		title = "Select file or directory for -" + name
 		dlg=filedialog.Open(title = title)
 		filepath = dlg.show()
 		textbox.delete(1.0, END)
@@ -232,39 +271,26 @@ class Input:
 		pythonloc = "python" # Forces user to set shell env variable python to the correct interpreter
 		codeloc = os.path.expanduser("~/python/bin/pygoda/") + self.code # Works for cheyenne and climate
 		execute = pythonloc + " " + codeloc
-		if "control" in self.widgets:
-			self.control_path = self.ControlFileChoose_Text.get("1.0",'end-1c')
-			execute += " -c " + self.control_path
-		if "test" in self.widgets:
-			self.test_path = self.TestFileChoose_Text.get("1.0",'end-1c')
-			execute += " -t " + self.test_path
-		if "box" in self.widgets:
-			getbox = self.Box_Text.get("1.0",'end-1c') # end-1c deletes the newline char at the end of text boxes
-			self.box = getbox
-			execute += " -box " + self.box
-		if "variable" in self.widgets:
-			self.variable = self.Variable_Text.get("1.0", "end-1c")
-			execute += " -v " + self.variable
-		if "clev" in self.widgets:
-			self.clev = self.ColorLevel_Text.get("1.0", "end-1c")
-			if self.clev is not '':
-				execute += " -clev " + self.clev
-		if "diffclev" in self.widgets:
-			self.diffclev = self.DiffColorLevel_Text.get("1.0", "end-1c")
-			if self.diffclev is not '':
-				execute += " -diffclev " + self.diffclev
-		self.savefig = self.savefigbool.get()
-		self.showfig = self.showfigbool.get()
-		if not self.savefig:
+		for widget in self.widgets:
+			execute += ' -' + widget + " " + self.Texts[widget].get("1.0",'end-1c')
+		if not self.savefigbool.get():
 			execute += " -nosave "
-		if self.showfig:
+		if self.showfigbool.get():
 			execute += " -show "
+		if self.doDates:
+			if 'years' in self.datesToAdd:
+				execute += " -years " + str(self.Texts['years'].get("1.0",'end-1c'))
+			if 'months' in self.datesToAdd:
+				execute += " -months "
+				months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+				for i, month in enumerate(months):
+					if self.monthbools[i].get():
+						execute += " " + month
 		print(execute)
-		os.system(execute)
+		# os.system(execute)
 
 
 root = Tk()
 first = Chooser(root)
 root.mainloop()
-
 
