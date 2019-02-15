@@ -142,8 +142,8 @@ class Chooser:
 	def runDiffCorrelationMap(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffCorrelationMap")
-		window.AddChooseFile("cdir", "Set control directory")
-		window.AddChooseFile("tdir", "Set test directory")
+		window.AddChooseDir("cdir", "Set control directory")
+		window.AddChooseDir("tdir", "Set test directory")
 		window.AddText('field_var', 'Enter global variable name', default = 'PRECT')
 		window.AddText('loc_var', 'Enter local (point) variable name', default = "PRECT_d18O")
 		window.AddText('latlon', 'Enter lat/lon coordinate of the point (2 numbers)', default = '0 0')
@@ -204,6 +204,13 @@ class Input:
 		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
 		self.Texts[name].pack(anchor = "center")
 
+	def AddChooseDir(self, name, label):
+		self.widgets.append(name)
+		self.Buttons[name] = Button(self.topframe, text=label, command = lambda: self.OnDirChooseClick(name, self.Texts[name]), height = 1)		
+		self.Buttons[name].pack(anchor = "center")
+		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
+		self.Texts[name].pack(anchor = "center")
+
 	def AddText(self, name, label, default=''):
 		self.widgets.append(name)
 		self.Labels[name] = Label(self.topframe, text = label,height=1)
@@ -258,11 +265,17 @@ class Input:
 		root.destroy()
 	#
 	def OnFileChooseClick(self, name, textbox):
-		title = "Select file or directory for -" + name
+		title = "Select file for -" + name
 		dlg=filedialog.Open(title = title)
 		filepath = dlg.show()
 		textbox.delete(1.0, END)
 		textbox.insert(END, filepath)
+	
+	def OnDirChooseClick(self, name, textbox):
+		title = "Select directory for -" + name
+		dlg=filedialog.askdirectory(title = title)
+		textbox.delete(1.0, END)
+		textbox.insert(END, dlg)
 
 	def OnRunClick(self):
 		# Build the execute string line by line based on what info is provided
