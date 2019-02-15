@@ -27,4 +27,3 @@ The code should always be able to handle multiple input files and multiple varia
 
 7) -t TFILE -c CFILE {None None}                           : a specified test and control file. If set, these will override any -cdir/-tdir and grep functionality. 
 
-Let's see if I've got this...
