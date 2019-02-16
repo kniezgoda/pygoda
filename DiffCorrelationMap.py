@@ -1,5 +1,5 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-from pygoda import camgoda, camdates, findClimoFile, corr2d, boxOut
+from pygoda import camgoda, camdates, findClimoFile, corr_2d, boxOut
 import numpy as np
 from scipy.stats import pearsonr as regress
 import matplotlib.pyplot as plt
