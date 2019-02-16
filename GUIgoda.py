@@ -55,8 +55,8 @@ class Chooser:
 		self.DiffPressureVsLat_Button.pack(anchor = "center")
 		self.DiffCorrelationMap_Button = Button(self.frame, text="DiffCorrelationMap", command = self.runDiffCorrelationMap, height = 1)		
 		self.DiffCorrelationMap_Button.pack(anchor = "center")
-		self.DiffEOFMap_Button = Button(self.frame, text="DiffEOFMap", command = self.runDiffEOFMap, height = 1)		
-		self.DiffEOFMap_Button.pack(anchor = "center")
+		self.DiffEOFmap_Button = Button(self.frame, text="DiffEOFmap", command = self.runDiffEOFmap, height = 1)		
+		self.DiffEOFmap_Button.pack(anchor = "center")
 		# Add a quit button to shut it all down
 		self.bottomframe = Frame(self.begin,bd = 2, relief = GROOVE)
 		self.bottomframe.pack(pady=2,fill=X)
@@ -155,9 +155,9 @@ class Chooser:
 		window.AddDate(years = True, months = True, days = False)
 		self.root2.mainloop()
 
-	def runDiffEOFMap(self):
+	def runDiffEOFmap(self):
 		self.root2 = Toplevel()
-		window = Input(self.root2, "DiffEOFMap")
+		window = Input(self.root2, "DiffEOFmap")
 		window.AddChooseDir("cdir", "Set control directory")
 		window.AddChooseDir("tdir", "Set test directory")
 		window.AddText('v', 'Enter variable name', default = 'PRECT')
