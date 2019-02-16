@@ -161,10 +161,10 @@ class Chooser:
 		window.AddChooseDir("cdir", "Set control directory")
 		window.AddChooseDir("tdir", "Set test directory")
 		window.AddText('v', 'Enter variable name', default = 'PRECT')
-		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-50, 50, 0, 360')
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-50 50 0 360')
 		window.AddText('n', 'Enter number of EOFs to plot', default = '1')
 		window.AddText('grep_pre', 'Enter expression for grep before date string', default = '*cam.h0')
-		window.AddText('grep_post', 'Enter expression for grep after date string', default = '.nc')
+		window.AddText('grep_post', 'Enter expression for grep after date string', default = 'climo*nc')
 		window.AddDate(years = True, months = True, days = False)
 		self.root2.mainloop()
 
