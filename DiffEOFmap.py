@@ -31,12 +31,11 @@ variable = ARGS.variable
 box = [int(b) for b in ARGS.box]
 num_eofs = int(ARGS.num_eofs)
 start, end = ARGS.years
+start = int(start)
+end = int(end)
 if start is -1 and end is -1:
 	start = None
 	end = None
-if start is not None and end is not None:
-	start = int(start)
-	end = int(end)
 months = [int(m) for m in ARGS.months]
 days = ARGS.days
 grep_pre = ARGS.grep_pre
