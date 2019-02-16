@@ -300,7 +300,7 @@ class Input:
 					if self.monthbools[i].get():
 						execute += " " + month
 		print(execute)
-		# os.system(execute)
+		os.system(execute)
 
 
 root = Tk()
