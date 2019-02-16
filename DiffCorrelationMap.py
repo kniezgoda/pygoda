@@ -1,5 +1,5 @@
 #! /home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python
-from pygoda import camgoda, camdates, findClimoFile
+from pygoda import camgoda, camdates, findClimoFile, corr2d, boxOut
 import numpy as np
 from scipy.stats import pearsonr as regress
 import matplotlib.pyplot as plt
@@ -80,8 +80,8 @@ tloc_var_master = []
 cloc_var_master = []
 for n, d in enumerate(dates):
 	# Find the file
-	cpath, cfilename = findClimoFile(cdir + "/" + grep_pre+'*'+d+'*'+grep_post)
-	tpath, tfilename = findClimoFile(tdir + "/" + grep_pre+'*'+d+'*'+grep_post)
+	cpath, cfilename = findClimoFile(grep_pre+'*'+d+'*'+grep_post,cdir)
+	tpath, tfilename = findClimoFile(grep_pre+'*'+d+'*'+grep_post,tdir)
 	print tfilename
 	print cfilename
 	
