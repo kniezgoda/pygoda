@@ -55,6 +55,8 @@ class Chooser:
 		self.DiffPressureVsLat_Button.pack(anchor = "center")
 		self.DiffCorrelationMap_Button = Button(self.frame, text="DiffCorrelationMap", command = self.runDiffCorrelationMap, height = 1)		
 		self.DiffCorrelationMap_Button.pack(anchor = "center")
+		self.DiffEOFMap_Button = Button(self.frame, text="DiffEOFMap", command = self.runDiffEOFMap, height = 1)		
+		self.DiffEOFMap_Button.pack(anchor = "center")
 		# Add a quit button to shut it all down
 		self.bottomframe = Frame(self.begin,bd = 2, relief = GROOVE)
 		self.bottomframe.pack(pady=2,fill=X)
