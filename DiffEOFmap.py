@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-cdir', '--control_directory', dest = 'cdir', default = 'fc5.2deg.wiso.piControl_kn028/atm/hist')
 parser.add_argument('-tdir', '--test_directory', dest = 'tdir', default = 'fc5.2deg.wiso.mh6ka_kn032/atm/hist')
 parser.add_argument('-v', '--variable', dest = 'variable', default = None)
-parser.add_argument('-years', dest = 'years', nargs = 2, default = [None, None])
+parser.add_argument('-years', dest = 'years', nargs = 2, default = [-1, -1])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
 parser.add_argument('-days', '--days', dest = 'days', action = 'store_true')
 parser.add_argument('-box', dest = 'box', nargs = 4, default = [-50, 50, 0, 360])
@@ -31,6 +31,9 @@ variable = ARGS.variable
 box = [int(b) for b in ARGS.box]
 num_eofs = int(ARGS.num_eofs)
 start, end = ARGS.years
+if start is -1 and end is -1:
+	start = None
+	end = None
 if start is not None and end is not None:
 	start = int(start)
 	end = int(end)
