@@ -24,6 +24,7 @@ parser.add_argument('-loc_var', '--local_variable', dest = 'lv', default = None)
 parser.add_argument('-field_var', '--field_variable', dest = 'fv', default = None)
 parser.add_argument('-latlon', dest = 'latlon', nargs = 2, default = (0,0))
 parser.add_argument('-del', dest = 'delta', default = 0)
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-40,40,335,333])
 parser.add_argument('-years', dest = 'years', nargs = 2, default = [10,30])
 parser.add_argument('-months', dest = 'months', nargs = '*', default = [1,2,3,4,5,6,7,8,9,10,11,12])
 parser.add_argument('-grep_pre', dest = 'grep_pre', default = '')
@@ -76,6 +77,7 @@ if right > 360:
 	right -= 360
 	
 region = [bottom, top, left, right]
+southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
 tloc_var_master = []
 cloc_var_master = []
 for n, d in enumerate(dates):
