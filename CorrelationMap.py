@@ -92,7 +92,7 @@ for date_idx, date in enumerate(dates):
 lv_ts = np.nanmean(boxOut(data[...,0], region), axis = (-2,-1))
 
 # Box out the fv 
-fv_boxed_ts = boxOut(data[...,1], box)
+fv_boxed_ts, lats, lons  = boxOut(data[...,1], box, returnGrid = True)
 
 corr_array = corr_2d(np.expand_dims(np.expand_dims(lv_ts,-1),-1), fv_boxed_ts, axis = 0)
 
