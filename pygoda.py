@@ -1159,7 +1159,7 @@ d18OV and dDV : returns 2d numpy array data.
 			return
 		import numpy as np
 		d_m = d
-		if model == "CLM":
+		if self.model == "CLM":
 			d_m = float(d) / 100. # Convert d to meters, which is the unit of the model
 		data = self.data
 		depths = self.depths
