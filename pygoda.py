@@ -298,8 +298,13 @@ def corr_2d (a,b,axis=0,minN=0):
 	a_sd = np.nanstd(a, axis = axis)
 	b_mu = np.nanmean(b, axis = axis)
 	b_sd = np.nanstd(b, axis = axis)
-	N = np.sum(~np.isnan(a*b), axis = axis)
-	N = np.array(xr.DataArray(N).where(xr.DataArray(N) > minN))
+	try:
+		N = np.sum(~np.isnan(a*b), axis = axis)
+		N = np.array(xr.DataArray(N).where(xr.DataArray(N) > minN))
+	except ValueError:
+		print "From pygoda.corr_2d: input arrays are not same dimension!"
+		print "Fix inputs or add length-1 dimensions using np.expand_dims(array, -1)!"
+		return
 	return (np.nansum((a-a_mu) * (b-b_mu), axis = axis) / N / (a_sd*b_sd))
 
 
