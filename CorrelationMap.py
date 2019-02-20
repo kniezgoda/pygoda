@@ -104,7 +104,7 @@ m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnr
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
-cs = m.contourf(bmlon, bmlat, corr, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title(lv + " vs global " + fv)
