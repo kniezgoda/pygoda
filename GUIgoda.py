@@ -38,26 +38,33 @@ class Chooser:
 		self.begin = parent
 		self.begin.title("Choose what to plot...")
 		# Main frame
-		self.frame = Frame(self.begin,bd=2,relief=GROOVE)
-		self.frame.pack(pady=2,fill=X)
-		# Control button and text
-		self.DiffMap_Button = Button(self.frame, text="DiffMap", command = self.runDiffMap, height = 1)		
+		self.MainFrame = Frame(self.begin,bd=2,relief=GROOVE)
+		self.MainFrame.pack(pady=2,fill=X)
+		# Left Frame, for Diff code
+		self.LeftFrame = Frame(self.MainFrame,bd=2,relief=GROOVE)
+		self.LeftFrame.pack(pady=2,side=LEFT)
+		self.DiffMap_Button = Button(self.LeftFrame, text="DiffMap", command = self.runDiffMap, height = 1)		
 		self.DiffMap_Button.pack(anchor = "center")
-		self.DiffZonalMean_Button = Button(self.frame, text="DiffZonalMean", command = self.runDiffZonalMean, height = 1)		
+		self.DiffZonalMean_Button = Button(self.LeftFrame, text="DiffZonalMean", command = self.runDiffZonalMean, height = 1)		
 		self.DiffZonalMean_Button.pack(anchor = "center")
-		self.DiffMeridionalMean_Button = Button(self.frame, text="DiffMeridionalMean", command = self.runDiffMeridionalMean, height = 1)		
+		self.DiffMeridionalMean_Button = Button(self.LeftFrame, text="DiffMeridionalMean", command = self.runDiffMeridionalMean, height = 1)		
 		self.DiffMeridionalMean_Button.pack(anchor = "center")
-		self.DiffPressureOverBox_Button = Button(self.frame, text="DiffPressureOverBox", command = self.runDiffPressureOverBox, height = 1)		
+		self.DiffPressureOverBox_Button = Button(self.LeftFrame, text="DiffPressureOverBox", command = self.runDiffPressureOverBox, height = 1)		
 		self.DiffPressureOverBox_Button.pack(anchor = "center")
-		self.DiffPressureVsLong_Button = Button(self.frame, text="DiffPressureVsLong", command = self.runDiffPressureVsLong, height = 1)		
+		self.DiffPressureVsLong_Button = Button(self.LeftFrame, text="DiffPressureVsLong", command = self.runDiffPressureVsLong, height = 1)		
 		self.DiffPressureVsLong_Button.pack(anchor = "center")
-		self.DiffPressureVsLat_Button = Button(self.frame, text="DiffPressureVsLat", command = self.runDiffPressureVsLat, height = 1)		
+		self.DiffPressureVsLat_Button = Button(self.LeftFrame, text="DiffPressureVsLat", command = self.runDiffPressureVsLat, height = 1)		
 		self.DiffPressureVsLat_Button.pack(anchor = "center")
-		self.DiffCorrelationMap_Button = Button(self.frame, text="DiffCorrelationMap", command = self.runDiffCorrelationMap, height = 1)		
+		self.DiffCorrelationMap_Button = Button(self.LeftFrame, text="DiffCorrelationMap", command = self.runDiffCorrelationMap, height = 1)		
 		self.DiffCorrelationMap_Button.pack(anchor = "center")
-		self.DiffEOFmap_Button = Button(self.frame, text="DiffEOFmap", command = self.runDiffEOFmap, height = 1)		
+		self.DiffEOFmap_Button = Button(self.LeftFrame, text="DiffEOFmap", command = self.runDiffEOFmap, height = 1)		
 		self.DiffEOFmap_Button.pack(anchor = "center")
-		self.CorrelationMap_Button = Button(self.frame, text="CorrelationMap", command = self.runCorrelationMap, height = 1)		
+		# Right Frame, for non-diff code
+		self.RightFrame = Frame(self.MainFrame,bd=2,relief=GROOVE)
+		self.RightFrame.pack(pady=2,side=LEFT)
+		self.Map_Button = Button(self.RightFrame, text="Map", command = self.runMap, height = 1)		
+		self.Map_Button.pack(anchor = "center")
+		self.CorrelationMap_Button = Button(self.RightFrame, text="CorrelationMap", command = self.runCorrelationMap, height = 1)		
 		self.CorrelationMap_Button.pack(anchor = "center")
 		# Add a quit button to shut it all down
 		self.bottomframe = Frame(self.begin,bd = 2, relief = GROOVE)
@@ -181,6 +188,15 @@ class Chooser:
 		window.AddText('grep_pre', 'Enter expression for grep before date string', default = ' ')
 		window.AddText('grep_post', 'Enter expression for grep after date string', default = 'climo*nc')
 		window.AddDate(years = True, months = True, days = False)
+		self.root2.mainloop()
+
+	def runMap(self):
+		self.root2 = Toplevel()
+		window = Input(self.root2, "Map")
+		window.AddChooseFile("f", "Select control file")
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-40 40 335 333')
+		window.AddText('v', 'Enter variable name', default = "PRECT")
+		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
 		self.root2.mainloop()
 
 class Input:
