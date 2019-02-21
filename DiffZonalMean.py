@@ -41,14 +41,14 @@ if ARGS.developer_mode:
 # Find the file
 if (cfile is None) or (tfile is None):
 	print "\nLooking for control " + grep + " files in " + cdir + "..."
-	controldatafname, controlfn = findClimoFile("*" + grep + "*", cdir)
-	if not controldatafname:
+	cfile, controlfn = findClimoFile("*" + grep + "*", cdir)
+	if not cfile:
 		sys.exit()
 	else:
 		print "Found file " + controlfn
 	print "\nLooking for test " + grep + " files in " + tdir + "..."
-	testdatafname, testfn = findClimoFile("*" + grep + "*", tdir)
-	if not testdatafname:
+	tfile, testfn = findClimoFile("*" + grep + "*", tdir)
+	if not tfile:
 		sys.exit()
 	else:
 		print "Found file " + testfn
