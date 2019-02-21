@@ -159,6 +159,7 @@ class Chooser:
 		window.AddText('loc_var', 'Enter local (point) variable name', default = "PRECT_d18O")
 		window.AddText('latlon', 'Enter lat/lon coordinate of the point (2 numbers)', default = '0 0')
 		window.AddText('del', 'Enter delta - the number of degrees to make a box around the lat/lon coordinate', default = '2')
+		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-50 50 0 360')
 		window.AddText('grep_pre', 'Enter expression for grep before date string', default = '*cam.h0')
 		window.AddText('grep_post', 'Enter expression for grep after date string', default = '.nc')
 		window.AddDate(years = True, months = True, days = False)
@@ -176,6 +177,7 @@ class Chooser:
 		window.AddText('grep_post', 'Enter expression for grep after date string', default = 'climo*nc')
 		window.AddDate(years = True, months = True, days = False)
 		self.root2.mainloop()
+
 	def runCorrelationMap(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "CorrelationMap")
