@@ -77,7 +77,8 @@ if right > 360:
 	right -= 360
 	
 region = [bottom, top, left, right]
-southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
+box = ARGS.box
+southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in box]
 
 for date_idx, date in enumerate(dates):
 	cpath, cfilename = findClimoFile(grep_pre+'*'+date+'*'+grep_post, cdir)
