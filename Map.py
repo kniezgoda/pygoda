@@ -60,7 +60,7 @@ parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
 parser.add_argument('-ft', '--file_type', dest = 'file_type', default = 'ps')
-parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = None)
+parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = '')
 parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-verb', '--verbose', dest = 'verbose', action = 'store_true')
@@ -247,7 +247,7 @@ for filein in files:
 		ncdata.clevs = RegularClev(ncdata.data)
 		ncdata.prep_map('ANN', region) # This sets the cmap 
 
-		if clev is not None:
+		if clev is not '':
 			ncdata.clevs = np.linspace(clev[0], clev[1], clev[2])
 
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
