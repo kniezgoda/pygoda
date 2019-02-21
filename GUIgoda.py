@@ -86,8 +86,8 @@ class Chooser:
 		window.AddChooseFile("t", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-40 40 335 333')
 		window.AddText('v', 'Enter variable name', default = "PRECT")
-		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
-		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
+		window.AddText('clev', 'Enter clev (min max nlev)')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)')
 		self.root2.mainloop()
 	#
 	def runDiffZonalMean(self):
@@ -124,8 +124,8 @@ class Chooser:
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
-		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
-		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
+		window.AddText('clev', 'Enter clev (min max nlev)')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)')
 		self.root2.mainloop()
 	#
 	def runDiffPressureVsLat(self):
@@ -135,8 +135,8 @@ class Chooser:
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
-		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
-		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
+		window.AddText('clev', 'Enter clev (min max nlev)')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)')
 		self.root2.mainloop()
 	#
 	def runDiffPressureVsLat(self):
@@ -146,8 +146,8 @@ class Chooser:
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
-		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
-		window.AddText('diffclev', 'Enter diffclev (min max nlev)', default = '')
+		window.AddText('clev', 'Enter clev (min max nlev)')
+		window.AddText('diffclev', 'Enter diffclev (min max nlev)')
 		self.root2.mainloop()
 	
 	def runDiffCorrelationMap(self):
@@ -187,7 +187,7 @@ class Chooser:
 		window.AddText('latlon', 'Enter lat/lon coordinate of the point (2 numbers)', default = '0 0')
 		window.AddText('del', 'Enter delta - the number of degrees to make a box around the lat/lon coordinate', default = '2')
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-50 50 0 360')
-		window.AddText('grep_pre', 'Enter expression for grep before date string', default = ' ')
+		window.AddText('grep_pre', 'Enter expression for grep before date string')
 		window.AddText('grep_post', 'Enter expression for grep after date string', default = 'climo*nc')
 		window.AddDate(years = True, months = True, days = False)
 		self.root2.mainloop()
@@ -198,7 +198,7 @@ class Chooser:
 		window.AddChooseFile("f", "Select control file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-40 40 335 333')
 		window.AddText('v', 'Enter variable name', default = "PRECT")
-		window.AddText('clev', 'Enter clev (min max nlev)', default = '')
+		window.AddText('clev', 'Enter clev (min max nlev)')
 		self.root2.mainloop()
 
 class Input:
@@ -246,21 +246,19 @@ class Input:
 		self.Texts = {}
 
 	def AddChooseFile(self, name, title):
-		# self.widgets.append(name)
 		self.Buttons[name] = Button(self.topframe, text=title, command = lambda: self.OnFileChooseClick(name, self.Texts[name]), height = 1)		
 		self.Buttons[name].pack(anchor = "center")
 		self.AddText(name)
 
 	def AddChooseDir(self, name, title):
-		# self.widgets.append(name)
 		self.Buttons[name] = Button(self.topframe, text=title, command = lambda: self.OnDirChooseClick(name, self.Texts[name]), height = 1)		
 		self.Buttons[name].pack(anchor = "center")
 		self.AddText(name)
 
-	def AddText(self, name, label = False, default=''):
+	def AddText(self, name, title = '', default=''):
 		self.widgets.append(name)
-		if label:
-			self.Labels[name] = Label(self.topframe, text = label,height=1)
+		if title is not '':
+			self.Labels[name] = Label(self.topframe, text = title,height=1)
 			self.Labels[name].pack(pady=4, anchor = "center")
 		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
 		self.Texts[name].insert(END, default)
@@ -271,10 +269,7 @@ class Input:
 		self.datesToAdd = []
 		if years:
 			self.datesToAdd.append('years')
-			self.Labels['years'] = Label(self.topframe, text = 'Set the years (2 numbers: start_year end_year) (enter -1 -1 for no years)', height=1)
-			self.Labels['years'].pack(anchor = "center")
-			self.Texts['years'] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-			self.Texts['years'].pack(anchor = "center")
+			self.AddText('years', 'Set the years (2 numbers: start_year end_year) (enter -1 -1 for no years)')
 		if months:
 			self.datesToAdd.append('months')
 			self.MonthCheckButtons = {}
@@ -349,7 +344,7 @@ class Input:
 					if self.monthbools[i].get():
 						execute += " " + month
 		print(execute)
-		os.system(execute)
+		# os.system(execute)
 
 
 root = Tk()
