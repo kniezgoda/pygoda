@@ -78,104 +78,39 @@ if right > 360:
 	
 region = [bottom, top, left, right]
 southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
-tloc_var_master = []
-cloc_var_master = []
-for n, d in enumerate(dates):
-	# Find the file
-	cpath, cfilename = findClimoFile(grep_pre+'*'+d+'*'+grep_post,cdir)
-	tpath, tfilename = findClimoFile(grep_pre+'*'+d+'*'+grep_post,tdir)
-	print tfilename
+
+for date_idx, date in enumerate(dates):
+	cpath, cfilename = findClimoFile(grep_pre+'*'+date+'*'+grep_post, cdir)
+	tpath, tfilename = findClimoFile(grep_pre+'*'+date+'*'+grep_post, tdir)
 	print cfilename
-	
+	print tfilename
 	# Open the file
 	cnc = camgoda(cpath)
 	tnc = camgoda(tpath)
+	if date_idx == 0:
+		data = np.zeros(shape = (len(dates), 2, len(cnc.lat), len(cnc.lon), 2))
+	data[date_idx, 0, ...] = cnc.ExtractData(lv+","+fv, returnData = True)
+	data[date_idx, 1, ...] = tnc.ExtractData(lv+","+fv, returnData = True)
 
-	# Read the local and field variables in
-	# each = 0 ---> lv
-	# each = 1 ---> fc
-	for each in range(2):
-		if each == 0:
-			V = lv
-			box = region
-		else:
-			V = fv
-			box = None
-		
-		tnc.ExtractData(V, box)
-		cnc.ExtractData(V, box)
-		
-		if each == 0:
-			tloc_var = tnc.data
-			cloc_var = cnc.data
-		else:
-			tfield_var = tnc.data
-			cfield_var = cnc.data
+# Box out the lv
+lv_ts = np.nanmean(boxOut(data[...,0], region), axis = (-2,-1))
 
-	tloc_var = np.mean(tloc_var)
-	# Add lv to the master list
-	tloc_var_master.append(tloc_var)
-	
-	cloc_var = np.mean(cloc_var)
-	cloc_var_master.append(cloc_var)
-	    
-	if n == 0:
-		# Create the master array for the field variable
-		tfield_var_master = np.zeros((len(dates),) + tfield_var.shape)
-		cfield_var_master = np.zeros((len(dates),) + cfield_var.shape)
-		lats = cnc.lat
-		lons = cnc.lon
-	# Add fv to the master array
-	tfield_var_master[n,:,:] = tfield_var
-	cfield_var_master[n,:,:] = cfield_var
+# Box out the fv 
+fv_boxed_ts, lats, lons  = boxOut(data[...,1], box, returnGrid = True)
 
-
-# Subtract the test from control for loc var and field var to get the diff arrays
-loc_var_master = np.subtract(tloc_var_master, cloc_var_master)
-field_var_master = np.subtract(tfield_var_master, cfield_var_master)
-
-# We now have the 3-d field variable array and the 1-d local variable array
-# Now correlate the local variable array to each grid cell of the field variable (fielf_var_master[:,i,j])
-# and save the correlation coefficient to a 2-d array
-dim1 = field_var_master.shape[1]
-dim2 = field_var_master.shape[2]
-corr_array = np.zeros((dim1, dim2))
-tcorr_array = np.zeros((dim1, dim2))
-ccorr_array = np.zeros((dim1, dim2))
-for i in range(dim1):
-	for j in range(dim2):
-		cr, cpval = regress(cloc_var_master, cfield_var_master[:,i,j])
-		tr, tpval = regress(tloc_var_master, tfield_var_master[:,i,j])
-		r, pval = regress(loc_var_master, field_var_master[:,i,j])
-		if stiple:
-			if pval > alpha:
-				corr_array[i,j] = np.nan
-			else:
-				corr_array[i,j] = r
-			if cpval > alpha:
-				ccorr_array[i,j] = np.nan
-			else:
-				ccorr_array[i,j] = cr
-			if tpval > alpha:
-				tcorr_array[i,j] = np.nan
-			else:
-				tcorr_array[i,j] = tr
-		else:
-			corr_array[i,j] = r
-			ccorr_array[i,j] = cr
-			tcorr_array[i,j] = tr
-
+# Find the correlation
+corr_array = corr_2d(np.expand_dims(np.expand_dims(lv_ts,-1),-1), fv_boxed_ts, axis = 0)
 
 # Make the map of the corr array
 fig = plt.figure()
 
 plt.subplot(3,1,1)
 bmlon, bmlat = np.meshgrid(lons, lats)
-m = bm(projection = 'cea', llcrnrlat=lat-30-delta,urcrnrlat=lat+30+delta, llcrnrlon=lon-50-delta,urcrnrlon=lon+50+delta,resolution='c')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
-cs = m.contourf(bmlon, bmlat, tcorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, corr_array[1,...], clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("test")
@@ -184,11 +119,11 @@ m.plot(x, y, 'gx')
 
 plt.subplot(3,1,2)
 bmlon, bmlat = np.meshgrid(lons, lats)
-m = bm(projection = 'cea', llcrnrlat=lat-30-delta,urcrnrlat=lat+30+delta, llcrnrlon=lon-50-delta,urcrnrlon=lon+50+delta,resolution='c')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
-cs = m.contourf(bmlon, bmlat, ccorr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, corr_array[0,...], clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("control")
@@ -197,11 +132,11 @@ m.plot(x, y, 'gx')
 
 plt.subplot(3,1,3)
 bmlon, bmlat = np.meshgrid(lons, lats)
-m = bm(projection = 'cea', llcrnrlat=lat-30-delta,urcrnrlat=lat+30+delta, llcrnrlon=lon-50-delta,urcrnrlon=lon+50+delta,resolution='c')
+m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 m.drawcoastlines()
 m.drawmapboundary(fill_color='0.3')
 clevs = np.linspace(-1, 1, 21)
-cs = m.contourf(bmlon, bmlat, corr_array, clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
+cs = m.contourf(bmlon, bmlat, corr_array[1,...]-corr_array[0,...], clevs, shading = 'flat', latlon = True, cmap=plt.cm.RdBu_r)
 cbar = m.colorbar(cs, location='right', pad="5%")
 cbar.set_label("correlation-coefficient", fontsize = 8)
 plt.title("test-control difference")
