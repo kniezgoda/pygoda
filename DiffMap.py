@@ -56,8 +56,8 @@ parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
-parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = '')
-parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = 3, default = '')
+parser.add_argument('-clev', dest = 'clev', type = float, nargs = '*', default = '')
+parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = '*', default = '')
 parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
 
 
