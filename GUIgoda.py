@@ -245,24 +245,23 @@ class Input:
 		self.Labels = {}
 		self.Texts = {}
 
-	def AddChooseFile(self, name, label):
-		self.widgets.append(name)
-		self.Buttons[name] = Button(self.topframe, text=label, command = lambda: self.OnFileChooseClick(name, self.Texts[name]), height = 1)		
+	def AddChooseFile(self, name, title):
+		# self.widgets.append(name)
+		self.Buttons[name] = Button(self.topframe, text=title, command = lambda: self.OnFileChooseClick(name, self.Texts[name]), height = 1)		
 		self.Buttons[name].pack(anchor = "center")
-		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.Texts[name].pack(anchor = "center")
+		self.AddText(name)
 
-	def AddChooseDir(self, name, label):
-		self.widgets.append(name)
-		self.Buttons[name] = Button(self.topframe, text=label, command = lambda: self.OnDirChooseClick(name, self.Texts[name]), height = 1)		
+	def AddChooseDir(self, name, title):
+		# self.widgets.append(name)
+		self.Buttons[name] = Button(self.topframe, text=title, command = lambda: self.OnDirChooseClick(name, self.Texts[name]), height = 1)		
 		self.Buttons[name].pack(anchor = "center")
-		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
-		self.Texts[name].pack(anchor = "center")
+		self.AddText(name)
 
-	def AddText(self, name, label, default=''):
+	def AddText(self, name, label = False, default=''):
 		self.widgets.append(name)
-		self.Labels[name] = Label(self.topframe, text = label,height=1)
-		self.Labels[name].pack(pady=4, anchor = "center")
+		if label:
+			self.Labels[name] = Label(self.topframe, text = label,height=1)
+			self.Labels[name].pack(pady=4, anchor = "center")
 		self.Texts[name] = Text(self.topframe,height=1,bd=2,relief=RIDGE)
 		self.Texts[name].insert(END, default)
 		self.Texts[name].pack(anchor = "center")
@@ -333,7 +332,9 @@ class Input:
 		codeloc = os.path.expanduser("~/python/bin/pygoda/") + self.code # Works for cheyenne and climate
 		execute = pythonloc + " " + codeloc
 		for widget in self.widgets:
-			execute += ' -' + widget + " " + self.Texts[widget].get("1.0",'end-1c')
+			text=self.Texts[widget].get("1.0",'end-1c')
+			if text is not '':
+				execute += ' -' + widget + " " + self.Texts[widget].get("1.0",'end-1c')
 		if not self.savefigbool.get():
 			execute += " -nosave "
 		if self.showfigbool.get():
