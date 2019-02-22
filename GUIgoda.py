@@ -225,12 +225,23 @@ class Input:
 		self.savefigbool = IntVar() 
 		self.savefigbool.set(False) # set to false by default
 		self.Save_Checkbutton = Checkbutton(self.saveshowframe, text = "Save file", variable = self.savefigbool)
-		self.Save_Checkbutton.pack(anchor = 'center')
+		self.Save_Checkbutton.pack(anchor = 'center', side = LEFT)
 		self.showfigbool = IntVar()
 		self.showfigbool.set(True) # set to true by default
 		self.Show_Checkbutton = Checkbutton(self.saveshowframe, text = "Show image", variable = self.showfigbool)
-		self.Show_Checkbutton.pack(anchor = 'center')
+		self.Show_Checkbutton.pack(anchor = 'center', side = LEFT)
 		self.Show_Checkbutton.select() # Actually not necessary, but this just puts a check on the Show image box for reassurance
+		# Frame for machines
+		self.machineframe = Frame(self.begin, bd = 2, relief = GROOVE)
+		self.machineframe.pack(pady=2,fill=Y)
+		self.machine = StringVar()
+		self.NoneRadioButton = Radiobutton(self.machineframe, text = "None", variable = self.machine, value = "None")
+		self.NoneRadioButton.pack(anchor = "center", side = LEFT)
+		self.NoneRadioButton.select()
+		self.ClimateRadioButton = Radiobutton(self.machineframe, text = "Climate", variable = self.machine, value = "Climate")
+		self.ClimateRadioButton.pack(anchor = "center", side = LEFT)
+		self.CheyenneRadioButton = Radiobutton(self.machineframe, text = "Cheyenne", variable = self.machine, value = "Cheyenne")
+		self.CheyenneRadioButton.pack(anchor = "center", side = LEFT)
 		# Frame for run button
 		self.runframe = Frame(self.begin,bd = 2, relief = GROOVE)
 		self.runframe.pack(pady=2,fill=Y)
@@ -323,7 +334,10 @@ class Input:
 		# Build the execute string line by line based on what info is provided
 		# Not the prettiest way to do things
 		# stackoverflow would really make fun of me but it works I guess
+		machine = self.machine.get()
 		pythonloc = "python" # Forces user to set shell env variable python to the correct interpreter
+		if machine == "Climate":
+			pythonloc = "/home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python"
 		codeloc = os.path.expanduser("~/python/bin/pygoda/") + self.code # Works for cheyenne and climate
 		execute = pythonloc + " " + codeloc
 		for widget in self.widgets:
@@ -343,8 +357,8 @@ class Input:
 				for i, month in enumerate(months):
 					if self.monthbools[i].get():
 						execute += " " + month
-		print(execute)
-		os.system(execute)
+		# print(execute)
+		# os.system(execute)
 
 
 root = Tk()
