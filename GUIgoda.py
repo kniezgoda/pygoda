@@ -357,8 +357,8 @@ class Input:
 				for i, month in enumerate(months):
 					if self.monthbools[i].get():
 						execute += " " + month
-		# print(execute)
-		# os.system(execute)
+		print(execute)
+		os.system(execute)
 
 
 root = Tk()
