@@ -45,7 +45,6 @@ if ARGS.developer_mode:
 	mkdir = False
 clev = ARGS.clev
 diffclev = ARGS.diffclev
-print diffclev
 
 # Set the lat bounds
 # Default arguments
@@ -187,7 +186,6 @@ for var in variables:
 	if diffclev is not None:
 		dlev = np.linspace(diffclev[0], diffclev[1], diffclev[2]) 
 
-	print diffclev
 	plt.subplot(3,1,1)
 	tplot = plt.contourf(data[...,1],testclev, cmap = test.cmap)
 	# plt.title("mh", fontsize = 8)
