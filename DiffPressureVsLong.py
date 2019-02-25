@@ -158,13 +158,13 @@ for var in variables:
 	test.ExtractData(var, box)
 	lon = control.boxlon
 	nlon = len(lon)
-	data = np.zeros(shape = (nlon, len(pressures), 2))
+	data = np.zeros(shape = (len(pressures), nlon, 2))
 	
 	for p_idx, p in enumerate(pressures):
 		print p
 		# Average down to 1 horizontal dimension
-		data[:,p_idx,0] = np.nanmean(control.isobar(p, setData = False), axis = 0)
-		data[:,p_idx,1] = np.nanmean(test.isobar(p, setData = False), axis = 0)
+		data[p_idx,:,0] = np.nanmean(control.isobar(p, setData = False), axis = 0)
+		data[p_idx,:,1] = np.nanmean(test.isobar(p, setData = False), axis = 0)
 
 	aty = np.arange(len(pressures), step = 5) 
 	laby = np.array(pressures)[aty]/100
