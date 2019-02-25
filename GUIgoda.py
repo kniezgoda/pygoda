@@ -102,7 +102,7 @@ class Chooser:
 	def runDiffMeridionalMean(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffMeridionalMean")
-		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("c", "Select control file")
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "PRECT")
@@ -111,7 +111,7 @@ class Chooser:
 	def runDiffPressureOverBox(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffPressureOverBox")
-		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("c", "Select control file")
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
@@ -120,7 +120,7 @@ class Chooser:
 	def runDiffPressureVsLong(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffPressureVsLong")
-		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("c", "Select control file")
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
@@ -131,7 +131,7 @@ class Chooser:
 	def runDiffPressureVsLat(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffPressureVsLat")
-		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("c", "Select control file")
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
@@ -142,7 +142,7 @@ class Chooser:
 	def runDiffPressureVsLat(self):
 		self.root2 = Toplevel()
 		window = Input(self.root2, "DiffCorrelationMap")
-		window.AddChooseFile("control", "Select control file")
+		window.AddChooseFile("c", "Select control file")
 		window.AddChooseFile("test", "Select test file")
 		window.AddText('box', 'Enter box bounds (bottom, top, left, right)', default = '-90 90 0 360')
 		window.AddText('v', 'Enter variable name', default = "T")
