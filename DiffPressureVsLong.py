@@ -14,6 +14,8 @@ parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
 parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
 parser.add_argument('-grep', dest = 'grep', default = None)
 parser.add_argument('-box', dest = 'box', nargs = 4, default = [-90,90,0,360])
+parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = None)
+parser.add_argument('-diffclev', dest = 'diffclev',type = float, nargs = 3, default = None)
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
@@ -41,6 +43,9 @@ if ARGS.developer_mode:
 	savefig = False
 	showfig = True
 	mkdir = False
+clev = ARGS.clev
+diffclev = ARGS.diffclev
+
 
 # Set the lat bounds
 # Default arguments
@@ -143,25 +148,6 @@ else:
 control = camgoda(controldatafname)
 test = camgoda(testdatafname)
 
-# Initialize a variable extraction from camgoda so that boxlat and boxlon are set to correct values
-control.variable("T", box)
-lon = control.boxlon
-numlons = len(lon)
-
-class Niezgoda:
-	import numpy as np
-	def __init__(self, dimlength):
-		self.control = np.zeros(dimlength)
-		self.test = np.zeros(dimlength)
-	#
-	def stack(self, control, test):
-		self.control = np.vstack((self.control, control))
-		self.test = np.vstack((self.test, test))
-	#
-	def finish(self):
-		self.control = np.delete(self.control, np.where(np.sum(self.control,1)==0)[0][0], 0)
-		self.test = np.delete(self.test, np.where(np.sum(self.test,1)==0)[0][0], 0)
-
 if mkdir:
 	os.chdir("PressureVsLong/" + region_name + "/" + season)
 
@@ -170,17 +156,15 @@ for var in variables:
 
 	control.ExtractData(var, box)
 	test.ExtractData(var, box)
-	master = Niezgoda(numlons)
-
-	for p in pressures:
+	lon = control.boxlon
+	nlon = len(lon)
+	data = np.zeros(shape = (nlon, len(pressures), 2))
+	
+	for p_idx, p in enumerate(pressures):
 		print p
 		# Average down to 1 horizontal dimension
-		hold_c = np.nanmean(control.isobar(p, setData = False), axis = 0)
-		hold_t = np.nanmean(test.isobar(p, setData = False), axis = 0)
-
-		master.stack(hold_c, hold_t)
-
-	master.finish()
+		data[:,p_idx,0] = np.nanmean(control.isobar(p, setData = False), axis = 0)
+		data[:,p_idx,1] = np.nanmean(test.isobar(p, setData = False), axis = 0)
 
 	aty = np.arange(len(pressures), step = 5) 
 	laby = np.array(pressures)[aty]/100
@@ -192,12 +176,19 @@ for var in variables:
 
 	test.prep_map(season,region)
 	control.prep_map(season, region)
-	testclev = niceClev(master.test)
-	controlclev = niceClev(master.control)
-	diffclev = niceClev(master.test - master.control)
+	testclev = niceClev(data[...,1])
+	controlclev = niceClev(data[...,0])
+	diffclev = niceClev(data[...,1]-data[...,0])
+
+	if clev is not None:
+		testclev = np.linspace(clev[0], clev[1], clev[2])
+		controlclev = np.linspace(clev[0], clev[1], clev[2])	
+		
+	if diffclev is not None:
+		diffclev = np.linspace(diffclev[0], diffclev[1], diffclev[2]) 
 
 	plt.subplot(3,1,1)
-	tplot = plt.contourf(master.test,testclev, cmap = test.cmap)
+	tplot = plt.contourf(data[...,1],testclev, cmap = test.cmap)
 	# plt.title("mh", fontsize = 8)
 	plt.xticks(atx, labx)
 	plt.yticks(aty, laby)
@@ -205,7 +196,7 @@ for var in variables:
 	cbar.set_label(control.units)
 
 	plt.subplot(3,1,2)
-	cplot = plt.contourf(master.control,controlclev, cmap = control.cmap)
+	cplot = plt.contourf(data[...,0],controlclev, cmap = control.cmap)
 	# plt.title("pi", fontsize = 8)
 	plt.xticks(atx, labx)
 	plt.yticks(aty, laby)
@@ -213,7 +204,7 @@ for var in variables:
 	cbar.set_label(control.units)
 
 	plt.subplot(3,1,3)
-	dplot = plt.contourf(master.test - master.control, diffclev, cmap = control.diffcmap)
+	dplot = plt.contourf(data[...,1]-data[...,0], diffclev, cmap = control.diffcmap)
 	# plt.title("diff", fontsize = 8)
 	plt.xticks(atx, labx)
 	plt.yticks(aty, laby)
