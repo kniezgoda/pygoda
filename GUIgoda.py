@@ -338,7 +338,7 @@ class Input:
 		pythonloc = "python" # Forces user to set shell env variable python to the correct interpreter
 		if machine == "Climate":
 			pythonloc = "/home/server/student/homes/kniezgod/.conda/envs/condagoda/bin/python"
-		codeloc = os.path.expanduser("~/python/bin/pygoda/") + self.code # Works for cheyenne and climate
+		codeloc = os.path.expanduser("~/python/Github/pygoda/") + self.code # Works for cheyenne and climate
 		execute = pythonloc + " " + codeloc
 		for widget in self.widgets:
 			text=self.Texts[widget].get("1.0",'end-1c')
