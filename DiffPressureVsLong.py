@@ -45,7 +45,7 @@ if ARGS.developer_mode:
 	mkdir = False
 clev = ARGS.clev
 diffclev = ARGS.diffclev
-
+print diffclev
 
 # Set the lat bounds
 # Default arguments
@@ -178,14 +178,14 @@ for var in variables:
 	control.prep_map(season, region)
 	testclev = niceClev(data[...,1])
 	controlclev = niceClev(data[...,0])
-	diffclev = niceClev(data[...,1]-data[...,0])
+	dlev = niceClev(data[...,1]-data[...,0])
 
 	if clev is not None:
 		testclev = np.linspace(clev[0], clev[1], clev[2])
 		controlclev = np.linspace(clev[0], clev[1], clev[2])	
 		
 	if diffclev is not None:
-		diffclev = np.linspace(diffclev[0], diffclev[1], diffclev[2]) 
+		dlev = np.linspace(diffclev[0], diffclev[1], diffclev[2]) 
 
 	print diffclev
 	plt.subplot(3,1,1)
@@ -205,7 +205,7 @@ for var in variables:
 	cbar.set_label(control.units)
 
 	plt.subplot(3,1,3)
-	dplot = plt.contourf(data[...,1]-data[...,0], diffclev, cmap = control.diffcmap)
+	dplot = plt.contourf(data[...,1]-data[...,0], dlev, cmap = control.diffcmap)
 	# plt.title("diff", fontsize = 8)
 	plt.xticks(atx, labx)
 	plt.yticks(aty, laby)
