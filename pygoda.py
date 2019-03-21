@@ -94,6 +94,7 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = 
 
 
 def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
+<<<<<<< HEAD
     '''
     *
     *** This function aggregates d along a specified axis based on a corresponding grouping array.
@@ -138,6 +139,53 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
         print "fun argument must be 'mean' or 'sum', exiting..."
         return
     return ret
+=======
+	'''
+	*
+	*** This function aggregates d along a specified axis based on a corresponding grouping array.
+	*
+	*** len(d) along the specified axis must equal len(group)
+	i.e., each element of group should correspond to the index-aligned element of d along the axis.
+	*
+	*** fun can either be "mean" or "sum"
+	*
+	*** d is first indexed along the specified axis by each unique element of group, 
+	the function (mean or sum) is applied, 
+	and then the resultants are arranged into an array of shape (len(group), ...) 
+	where the remaining axes are preserved from the original shape of d.
+	*
+	*** If axis != 0, then the shape will be (..., len(group), ...) where len(group) is 
+	placed at the axis position specified in the arguments
+	'''
+	import numpy as np
+	if len(group) != np.ma.size(d, axis = axis):
+		print "group and d are not the same length, exiting..."
+		return
+	group = np.array(group)
+	unique_groups = np.unique(group)
+	group_idx = [np.where(g == group) for g in unique_groups]
+	d_grouped = [np.take(d, idxs, axis = axis).squeeze() for idxs in group_idx]
+	if fun == "mean":
+		if rm_nan:
+			ret = np.array([np.nanmean(dgrouped, axis = axis) for dgrouped in d_grouped])
+		else:
+			ret = np.array([np.mean(dgrouped, axis = axis) for dgrouped in d_grouped])
+	elif fun == "sum":
+		if rm_nan:
+			ret = np.array([np.nansum(dgrouped, axis = axis) for dgrouped in d_grouped])
+		else:
+			ret = np.array([np.sum(dgrouped, axis = axis) for dgrouped in d_grouped])
+	elif fun == "std":
+		if rm_nan:
+			ret = np.array([np.nanstd(dgrouped, axis = axis) for dgrouped in d_grouped])
+		else:
+			ret = np.array([np.std(dgrouped, axis = axis) for dgrouped in d_grouped])
+			
+	else: 
+		print "fun argument must be 'mean', 'sum', or 'std', exiting..."
+		return
+	return ret, unique_groups
+>>>>>>> f51c7f76eccf94a365b4c400f88e35ba60d5b504
 
 
 ####################
@@ -296,8 +344,13 @@ def corr_2d (a,b,axis=0,minN=0):
 	a_sd = np.nanstd(a, axis = axis)
 	b_mu = np.nanmean(b, axis = axis)
 	b_sd = np.nanstd(b, axis = axis)
-	N = np.sum(~np.isnan(a*b), axis = axis)
-	N = np.array(xr.DataArray(N).where(xr.DataArray(N) > minN))
+	try:
+		N = np.sum(~np.isnan(a*b), axis = axis)
+		N = np.array(xr.DataArray(N).where(xr.DataArray(N) > minN))
+	except ValueError:
+		print "From pygoda.corr_2d: input arrays are not same dimension!"
+		print "Fix inputs or add length-1 dimensions using np.expand_dims(array, -1)!"
+		return
 	return (np.nansum((a-a_mu) * (b-b_mu), axis = axis) / N / (a_sd*b_sd))
 
 
@@ -974,6 +1027,8 @@ d18OV and dDV : returns 2d numpy array data.
 		self.dimlen = [len(self.dataset.dimensions[d]) for d in self.dims]
 		self.lat = self.dataset.variables['lat'][:]
 		self.lon = self.dataset.variables['lon'][:]
+		self.boxlat = self.lat
+		self.boxlon = self.lon
 		
 		self.model = "CAM"
 		if any(v == "levgrnd" for v in self.vars):
@@ -1051,6 +1106,7 @@ d18OV and dDV : returns 2d numpy array data.
 		'''
 		dataDims = "Undefined"
 		# No lev, no time
+		dataDims = "N/A"
 		if ndims == 2:
 			dataDims = ('lat', 'lon')
 			data = np.array(xr.DataArray(data)[idxbox[0], idxbox[1]])
@@ -1146,8 +1202,8 @@ d18OV and dDV : returns 2d numpy array data.
 		Only works when the camgoda instance is of a CLM file.
 		d should be in cm
 		'''
-		if self.model is not "CLM":
-			print "Can not run camgoda.depth() on a CAM file! Read in a CLM file to run this method."
+		if self.model is "CAM":
+			print "Can not run camgoda.depth() on a CAM file! Read in a CLM or POP file to run this method."
 			return
 		if self.var == '':
 			print "No variable read in yet.\nUse self.variable() to read a variable first."
@@ -1156,7 +1212,9 @@ d18OV and dDV : returns 2d numpy array data.
 			print "Current .data attribute is 2-dimensional, no depth data.\nRead in a 3d variable first before running this method."
 			return
 		import numpy as np
-		d_m = float(d) / 100. # Convert d to meters, which is the unit of the model
+		d_m = d
+		if self.model == "CLM":
+			d_m = float(d) / 100. # Convert d to meters, which is the unit of the model
 		data = self.data
 		depths = self.depths
 		VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
@@ -1169,6 +1227,72 @@ d18OV and dDV : returns 2d numpy array data.
 			self.long_name += " @" + str(d) + "cm"
 
 		return VAR
+	
+	def isotherm(self, val, setData = True):
+		import numpy as np
+		import scipy.interpolate as interp
+		ret = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
+		for i in range(len(self.boxlat)):
+			for j in range(len(self.boxlon)):
+				current_ij = self.data[:,i,j]
+				mask = np.where(current_ij > 1e36, np.nan, 1)
+				current_ij_masked = current_ij * mask
+				if sum(~np.isnan(current_ij_masked)) == 0:
+					ret[i,j] = np.nan
+				else:
+					f = interp.interp1d(current_ij_masked,self.depths)
+					try:
+						ret[i,j] = f(val)
+					except ValueError:
+						ret[i,j] = np.nan
+		if setData:
+			self.data = ret
+			self.units = "cm"
+			self.long_name = "depth of 15 degC isotherm"
+		return ret
+	
+	def isotherm_fast(self, temp, setData = True):
+		import numpy as np
+		if self.model is not "POP":
+			print "Not a POP file, can not run isotherm_fast! Exiting..."
+			return None
+		d = self.data
+		depths = self.depths
+		y = np.zeros(shape = (d.shape[1], d.shape[2], 2))
+		z = np.zeros(shape = (d.shape[1], d.shape[2], 2))
+		for i in range(d.shape[1]):
+			for j in range(d.shape[2]):
+			    dij = d[:,i,j]
+			    dij_mask = np.where(dij > 1e36, np.nan, 1)
+			    dij_masked = dij*dij_mask
+			    if sum(~np.isnan(dij_masked)) == 0:
+				y[i,j,:] = np.nan
+				z[i,j,:] = np.nan
+				continue
+			    dij_nonan = dij_masked[~np.isnan(dij_masked)]
+			    try:
+				y1 = dij_nonan[dij_nonan-15<0][0]
+				y2 = dij_nonan[dij_nonan-15>0][-1]
+				z1 = depths[np.where(dij_nonan == y1)[0][0]]
+				z2 = depths[np.where(dij_nonan == y2)[0][0]]
+				y[i,j,0] = y1
+				y[i,j,1] = y2
+				z[i,j,0] = z1
+				z[i,j,1] = z2
+			    except IndexError:
+				y[i,j,:] = np.nan
+				z[i,j,:] = np.nan
+		y1 = y[...,0]
+		y2 = y[...,1]
+		z1 = z[...,0]
+		z2 = z[...,1]
+		ret = ((temp-y1) / ((y1-y2)/(z1-z2))) + z1
+		if setData:
+			self.data = ret
+			self.units = "cm"
+			self.long_name = "depth of " + str(temp) + " degC isotherm"
+		return ret
+
 
 	def columnSum(self, box = None, setData = True):
 		if self.vartype is not "3d":
@@ -1699,8 +1823,14 @@ d18OV and dDV : returns 2d numpy array data.
 					# So, although it's not the prettiest way to approach things, there are no bugs.
 					pressure /= 100
 					self.depth(pressure)
+<<<<<<< HEAD
 			if var_is_ColumnMean:
 					self.ColumnMean(box, setData = True)
+=======
+				elif self.model == "POP":
+					pressure /= 100
+					self.isotherm_fast(pressure)
+>>>>>>> f51c7f76eccf94a365b4c400f88e35ba60d5b504
 			if returnData:
 				if len(variables) == 1:
 					RETURN = self.data

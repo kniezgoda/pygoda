@@ -54,12 +54,13 @@ user_control_plot_title = None
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--files', dest = 'files', nargs = "*")
-parser.add_argument('-r', '--region', dest = 'region', default = 'GlobalTropics')
+parser.add_argument('-r', '--region', dest = 'region', default = 'None')
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-40,40,335,333])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variable', dest = 'variable', nargs= "*", default = None)
 parser.add_argument('-ft', '--file_type', dest = 'file_type', default = 'ps')
-parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = None)
+parser.add_argument('-clev', dest = 'clev', type = float, nargs = 3, default = '')
 parser.add_argument('-barbs', '--wind_barb_pressure', dest = 'wind_barb_pressure', nargs = 1, type = float, default = None)
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 parser.add_argument('-verb', '--verbose', dest = 'verbose', action = 'store_true')
@@ -84,9 +85,10 @@ showfig = ARGS.showfig
 variable = ARGS.variable
 ftype = ARGS.file_type
 mkdir = True
+if showfig and not savefig:
+	mkdir = False
 if ARGS.developer_mode:
-	if verbose:
-		print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
+	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
 	savefig = False
 	showfig = True
 	mkdir = False
@@ -96,14 +98,17 @@ if model is 'cam' or model is 'clm':
 	from pygoda import camgoda
 if model == 'pop':
 	from pygoda import popgoda as camgoda
-	
+
 # Set the lat bounds
-# Default global tropics
-region_name = "GlobalTropics"
-southern_lat = -85
-northern_lat = 85
-left_lon = 0
-right_lon = 355
+region_name = "Box"
+southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
+
+if (region == "GT") | (region == "GlobalTropics"):
+	region_name = "GlobalTropics"
+	southern_lat = -85
+	northern_lat = 85
+	left_lon = 0
+	right_lon = 355
 
 # Indian monsoon
 if (region == "IM") | (region == "IndianMonsoon"):
@@ -242,7 +247,7 @@ for filein in files:
 		ncdata.clevs = RegularClev(ncdata.data)
 		ncdata.prep_map('ANN', region) # This sets the cmap 
 
-		if clev is not None:
+		if clev is not '':
 			ncdata.clevs = np.linspace(clev[0], clev[1], clev[2])
 
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')

@@ -16,20 +16,30 @@ parser.add_argument('-box', dest = 'box', nargs = 4, default = [-90,90,0,360])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
+parser.add_argument('-t', '--test', dest = 'testdatafname', default = None)
+parser.add_argument('-c', '--control', dest = 'controldatafname', default = None)
 parser.add_argument('-dev', '--developer_mode', dest = 'developer_mode', action = 'store_true')
 
 ARGS = parser.parse_args()
 region = ARGS.region
 season = '' # This needs to be set to comply with legacy coding schemes
 grep = ARGS.grep
+testdatafname = ARGS.testdatafname
+controldatafname = ARGS.controldatafname
+findFile = True
+if (testdatafname is not None) & (controldatafname is not None):
+	findFile = False
 testdir = ARGS.testdir
 controldir = ARGS.controldir
+mkdir = True
 savefig = ARGS.savefig # default is True
 showfig = ARGS.showfig # default is false
 variables = ARGS.variables
+if showfig and (not savefig):
+	mkdir = False
 if ARGS.developer_mode:
 	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
-	savfig = False
+	savefig = False
 	showfig = True
 	mkdir = False
 	
@@ -105,17 +115,24 @@ if mkdir:
 		os.mkdir("PressureVsLat/" + region_name + "/" + grep)
 		print "Created directory " + "PressureVsLat/" + region_name + "/" + grep
 
-# Look for the climo files in the root directory
-print "\nLooking for control " + grep + " files in " + controldir
-controldatafname, controlfn = findClimoFile("*" + grep + "*", controldir)
-if not controldatafname:
-	sys.exit()
-print "Found control file: " + controlfn
-print "\nLooking for test " + grep + " files in " + testdir
-testdatafname, testfn = findClimoFile("*" + grep + "*", testdir)
-if not testdatafname:
-	sys.exit()
-print "Found test file: " + testfn
+if findFile:
+	# Look for the climo files in the root directory
+	print "\nLooking for control " + grep + " files in " + controldir
+	controldatafname, controlfn = findClimoFile("*" + grep + "*", controldir)
+	if not controldatafname:
+		sys.exit()
+	print "Found control file: " + controlfn
+	print "\nLooking for test " + grep + " files in " + testdir
+	testdatafname, testfn = findClimoFile("*" + grep + "*", testdir)
+	if not testdatafname:
+		sys.exit()
+	print "Found test file: " + testfn
+else:
+	print "\nControl file is " + controldatafname
+	print "\nTest file is " + testdatafname
+	controlfn = os.path.splitext(os.path.split(controldatafname)[1])[0]
+	testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
+
 
 # Read the data
 control = camgoda(controldatafname)

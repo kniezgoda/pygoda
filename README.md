@@ -26,3 +26,4 @@ The code should always be able to handle multiple input files and multiple varia
 6) -grep GREP                               : a string to search for in cdir and tdir. This flag is used as the first argument in findClimoFile, and is surrounded by the "*" wildcard.
 
 7) -t TFILE -c CFILE {None None}                           : a specified test and control file. If set, these will override any -cdir/-tdir and grep functionality. 
+
