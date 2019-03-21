@@ -11,6 +11,40 @@ def runningMean(x, N, mode = 'same'):
 
 # =========================================================================================== #
 
+def bandPass(data, axis = 0, low_bound = 0, high_bound = 1):
+	'''
+	function used for band-passing data. 
+	Arguments:
+	1) data; np.array of the data you wish to band pass
+	2) axis (default 0); the axis over which to apply the FFT and IFFT
+	3) low_bound (default 0); the lowest frequency to keep
+	4) high_bound (default 1); the highest frequency to keep
+	
+	Returns:
+	1) the band-passed data array in the same shape as the input array
+	
+	: Notes :
+	For the low_ and high_bound, the frequencies are for each time step.
+	E.g., if data is a monthly timeseries over N years, then to low-pass filter for
+	signals of less than 1 cycle/year, let high_bound to 1./12.
+	To band-pass for signals between 1 and 3 cycles/year set low_bound to 1./12. and high_bound to 3./12.
+	To band-pass for ENSO signals, you should set low_bound to approximately 1./(12.*7.) and 
+	high_bound to approximately 1./(12.*4.) (1 cycle every 4 - 7 years)
+	
+	Leaving axis, low_, and high_bound as defaults will return the same data
+	To high-pass only, set low_bound to the cutoff freq, and leave high_bound as default
+	To low-pass, set high_bound to cutoff freq, leave low_bound as default
+	To band-pass, set both.
+	'''
+	import numpy as np
+	ndims_data= len(data.shape)
+	fft_freqs = np.abs(np.fft.fftfreq(data.shape[axis]))
+	mask = (fft_freqs >= low_bound) * (fft_freqs <= high_bound)
+	# make mask the same shape as data by adding new axes
+	for i in range(ndims_data - 1):
+		mask = mask[...,np.newaxis]
+	return np.fft.ifft(np.fft.fft(data, axis = 0)*mask, axis = 0)
+
 def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = False):
 	'''	
 	The idea here is to replace the existing technique for extracting data from a box.
@@ -42,9 +76,20 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = 
 		print "Grid argument must be either '2deg' or '1deg' --- returning None"
 		return None
 	idxs = find_indices(box, boxlat, boxlon)
+<<<<<<< HEAD
 	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
 	if returnGrid:
 		RETURN = [RETURN, np.take(boxlat, idxs[0]), np.take(boxlon, idxs[1])]
+=======
+	
+	# This is the data
+	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
+	
+	# This is included if the user wants the boxlat and boxlon data as well
+	if returnGrid:
+		RETURN = [RETURN, np.take(boxlat, idxs[0]), np.take(boxlon, idxs[1])]
+	
+>>>>>>> 5b4f980c23fddc8ace5f44c579cd44ced612a70e
 	return RETURN
 
 
@@ -84,12 +129,15 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
             ret = np.array([np.nansum(dgrouped, axis = axis) for dgrouped in d_grouped])
         else:
             ret = np.array([np.sum(dgrouped, axis = axis) for dgrouped in d_grouped])
+    elif fun == "std":
+    	if rm_nan:
+    		ret = np.array([np.nanstd(dgrouped, axis = axis) for dgrouped in d_grouped])
+        else:
+            ret = np.array([np.std(dgrouped, axis = axis) for dgrouped in d_grouped])
     else: 
         print "fun argument must be 'mean' or 'sum', exiting..."
         return
     return ret
-
-
 
 
 ####################
@@ -1001,7 +1049,7 @@ d18OV and dDV : returns 2d numpy array data.
 		if (0 not in idxbox[1]) and ((len(self.lon)-1) not in idxbox[1]):
 			idxbox[1] = np.append(idxbox[1][0]-idx_add, idxbox[1], idxbox[1][-1]+idx_add)
 		'''
-		
+		dataDims = "Undefined"
 		# No lev, no time
 		if ndims == 2:
 			dataDims = ('lat', 'lon')

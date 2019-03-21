@@ -49,8 +49,7 @@ parser.add_argument('-r', '--region', dest = 'region', default = None)
 parser.add_argument('-cdir', '--control_directory', dest = 'controldir', default = "F.C5.2deg.wiso.defaultSSTICE_kn002")
 parser.add_argument('-tdir', '--test_directory', dest = 'testdir', default = "F.C5.2deg.wiso.obs6kSST_kn003")
 parser.add_argument('-grep', dest = 'grep', default = '*cam.h0')
-parser.add_argument('-lats', dest = 'lats', nargs = 2, default = [-40,40])
-parser.add_argument('-lons', dest = 'lons', nargs = 2, default = [335,333])
+parser.add_argument('-box', dest = 'box', nargs = 4, default = [-40,40,335,333])
 parser.add_argument('-nosave', '--dont_save_figure', dest = 'savefig', action = 'store_false')
 parser.add_argument('-show', '--showfig', dest = 'showfig', action = 'store_true')
 parser.add_argument('-v', '--variables', dest = 'variables', nargs= "*", default = None)
@@ -94,8 +93,7 @@ if ARGS.developer_mode:
 # Set the lat bounds
 # Default global tropics
 region_name = "Box"
-southern_lat, northern_lat = [int(l) for l in ARGS.lats]
-left_lon, right_lon = [int(l) for l in ARGS.lons]
+southern_lat, northern_lat, left_lon, right_lon = [int(l) for l in ARGS.box]
 
 # Global
 if (region == "GT") | (region == "GlobalTropics"):
