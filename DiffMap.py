@@ -329,7 +329,7 @@ for V in variable:
 		plt.savefig(savetitle, bbox_inches='tight', dpi = 500)
 		print("Created " + savetitle + '\n')
 	if showfig:
-		plt.show()
+		fig.show()
 	plt.clf()
 	plt.cla()
 	plt.close(fig)
