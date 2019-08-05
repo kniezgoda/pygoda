@@ -261,7 +261,7 @@ for V in variable:
 		if model == "CLM":
 			vname += str(int(pressure)) + "cm"
 	
-			
+	print "ok"	
 	fig = plt.figure()
 	
 	testdata.clevs = RegularClev(testdata.data) # This sets the clevs
