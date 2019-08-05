@@ -76,11 +76,9 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = 
 		print "Grid argument must be either '2deg' or '1deg' --- returning None"
 		return None
 	idxs = find_indices(box, boxlat, boxlon)
-<<<<<<< HEAD
 	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
 	if returnGrid:
 		RETURN = [RETURN, np.take(boxlat, idxs[0]), np.take(boxlon, idxs[1])]
-=======
 	
 	# This is the data
 	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
@@ -88,58 +86,10 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = 
 	# This is included if the user wants the boxlat and boxlon data as well
 	if returnGrid:
 		RETURN = [RETURN, np.take(boxlat, idxs[0]), np.take(boxlon, idxs[1])]
-	
->>>>>>> 5b4f980c23fddc8ace5f44c579cd44ced612a70e
 	return RETURN
 
 
 def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
-<<<<<<< HEAD
-    '''
-    *
-    *** This function aggregates d along a specified axis based on a corresponding grouping array.
-    *
-    *** len(d) along the specified axis must equal len(group)
-    i.e., each element of group should correspond to the index-aligned element of d along the axis.
-    *
-    *** fun can either be "mean" or "sum"
-    *
-    *** d is first indexed along the specified axis by each unique element of group, 
-    the function (mean or sum) is applied, 
-    and then the resultants are arranged into an array of shape (len(group), ...) 
-    where the remaining axes are preserved from the original shape of d.
-    *
-    *** If axis != 0, then the shape will be (..., len(group), ...) where len(group) is 
-    placed at the axis position specified in the arguments
-    '''
-    import numpy as np
-    if len(group) != np.ma.size(d, axis = axis):
-        print "group and d are not the same length, exiting..."
-        return
-    group = np.array(group)
-    unique_groups = np.unique(group)
-    group_idx = [np.where(g == group) for g in unique_groups]
-    d_grouped = [np.take(d, idxs, axis = axis).squeeze() for idxs in group_idx]
-    if fun == "mean":
-        if rm_nan:
-            ret = np.array([np.nanmean(dgrouped, axis = axis) for dgrouped in d_grouped])
-        else:
-            ret = np.array([np.mean(dgrouped, axis = axis) for dgrouped in d_grouped])
-    elif fun == "sum":
-        if rm_nan:
-            ret = np.array([np.nansum(dgrouped, axis = axis) for dgrouped in d_grouped])
-        else:
-            ret = np.array([np.sum(dgrouped, axis = axis) for dgrouped in d_grouped])
-    elif fun == "std":
-    	if rm_nan:
-    		ret = np.array([np.nanstd(dgrouped, axis = axis) for dgrouped in d_grouped])
-        else:
-            ret = np.array([np.std(dgrouped, axis = axis) for dgrouped in d_grouped])
-    else: 
-        print "fun argument must be 'mean' or 'sum', exiting..."
-        return
-    return ret
-=======
 	'''
 	*
 	*** This function aggregates d along a specified axis based on a corresponding grouping array.
@@ -185,7 +135,6 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
 		print "fun argument must be 'mean', 'sum', or 'std', exiting..."
 		return
 	return ret, unique_groups
->>>>>>> f51c7f76eccf94a365b4c400f88e35ba60d5b504
 
 
 ####################
@@ -1823,14 +1772,8 @@ d18OV and dDV : returns 2d numpy array data.
 					# So, although it's not the prettiest way to approach things, there are no bugs.
 					pressure /= 100
 					self.depth(pressure)
-<<<<<<< HEAD
 			if var_is_ColumnMean:
-					self.ColumnMean(box, setData = True)
-=======
-				elif self.model == "POP":
-					pressure /= 100
-					self.isotherm_fast(pressure)
->>>>>>> f51c7f76eccf94a365b4c400f88e35ba60d5b504
+				self.ColumnMean(box, setData = True)
 			if returnData:
 				if len(variables) == 1:
 					RETURN = self.data
