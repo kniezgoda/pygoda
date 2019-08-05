@@ -216,6 +216,8 @@ if mkdir:
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 for V in variable:
+	plt.clf()
+	plt.cla()
 	# Extract data for wind barbs if needed
 	if show_barbs:
 		test_v = testdata.variable("V", box)
@@ -330,6 +332,3 @@ for V in variable:
 		print("Created " + savetitle + '\n')
 	if showfig:
 		fig.show()
-	plt.clf()
-	plt.cla()
-	plt.close(fig)
