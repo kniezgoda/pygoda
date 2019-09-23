@@ -255,6 +255,8 @@ for filein in files:
 		m.drawmapboundary(fill_color='0.3')
 		print ncdata.data
 		cs = m.contourf(bmlon, bmlat, ncdata.data, ncdata.clevs, shading = 'flat', latlon = True, cmap=ncdata.cmap)
+		if show_barbs:
+			m.quiver(barb_lon, barb_lat, nc_u, nc_v, scale = 50, scale_units = "inches", cmap = plt.cm.autumn, latlon = True)
 		cbar = m.colorbar(cs, location='right', pad="5%")
 		cbar.set_label(ncdata.units, fontsize = 8)
 		if user_control_plot_title is None:
