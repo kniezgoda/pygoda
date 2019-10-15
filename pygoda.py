@@ -406,7 +406,7 @@ def PressureCalc(A, B, PS):
 # =========================================================================================== #
 
 
-def camdates(start_year = None, end_year = None, months = [1,2,3,4,5,6,7,8,9,10,11,12], days = False):
+def camdates(start_year = None, end_year = None, months = [1,2,3,4,5,6,7,8,9,10,11,12], days = False, hours = None):
 	import datetime
 
 	# Compute the end day corresponding to the end month
@@ -433,6 +433,8 @@ def camdates(start_year = None, end_year = None, months = [1,2,3,4,5,6,7,8,9,10,
 
 	d = start_date
 	delta = datetime.timedelta(days = 1)
+	#if hours is not None:
+	#	delta = datetime.timedelta(hours = hours)
 
 	# Loop until the end date is met
 	while d <= end_date:
@@ -461,8 +463,16 @@ def camdates(start_year = None, end_year = None, months = [1,2,3,4,5,6,7,8,9,10,
 				continue
 			for i in range(2-len(DAY)):
 				DAY = '0' + DAY
-			dates.append(YEAR + '-' + MONTH + '-' + DAY)
-			d += delta
+			if hours is not None:
+				for iii in range(int(24/hours)):
+					HOUR = str(hours*iii*60*60)
+					for i in range(5-len(HOUR)):
+						HOUR = '0' + HOUR
+					dates.append(YEAR + '-' + MONTH + '-' + DAY + '-' + HOUR)
+				d += delta
+			else:
+				dates.append(YEAR + '-' + MONTH + '-' + DAY)
+				d += delta
 		else:
 			if d.day != 1:
 				d += delta
