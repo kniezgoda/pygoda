@@ -113,7 +113,7 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
 		return
 	group = np.array(group)
 	unique_groups = np.unique(group)
-	group_idx = [np.where(g == group) for g in unique_groups]
+	group_idx = [np.where(group == g) for g in unique_groups]
 	d_grouped = [np.take(d, idxs, axis = axis).squeeze() for idxs in group_idx]
 	if fun == "mean":
 		if rm_nan:
