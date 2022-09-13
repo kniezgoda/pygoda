@@ -73,7 +73,7 @@ def boxOut(data, box, lat_axis = -2, lon_axis = -1, grid = "2deg", returnGrid = 
 		boxlat = np.linspace(-90,90,192)
 		boxlon = np.linspace(0,358.75,288)
 	else:
-		print "Grid argument must be either '2deg' or '1deg' --- returning None"
+		print("Grid argument must be either '2deg' or '1deg' --- returning None")
 		return None
 	idxs = find_indices(box, boxlat, boxlon)
 	RETURN = np.take(np.take(data, idxs[0], axis = lat_axis), idxs[1], axis = lon_axis)
@@ -109,7 +109,7 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
 	'''
 	import numpy as np
 	if len(group) != np.ma.size(d, axis = axis):
-		print "group and d are not the same length, exiting..."
+		print("group and d are not the same length, exiting...")
 		return
 	group = np.array(group)
 	unique_groups = np.unique(group)
@@ -132,7 +132,7 @@ def aggregate(d, group, axis = 0, fun = "mean", rm_nan = True):
 			ret = np.array([np.std(dgrouped, axis = axis) for dgrouped in d_grouped])
 			
 	else: 
-		print "fun argument must be 'mean', 'sum', or 'std', exiting..."
+		print("fun argument must be 'mean', 'sum', or 'std', exiting...")
 		return
 	return ret, unique_groups
 
@@ -297,8 +297,8 @@ def corr_2d (a,b,axis=0,minN=0):
 		N = np.sum(~np.isnan(a*b), axis = axis)
 		N = np.array(xr.DataArray(N).where(xr.DataArray(N) > minN))
 	except ValueError:
-		print "From pygoda.corr_2d: input arrays are not same dimension!"
-		print "Fix inputs or add length-1 dimensions using np.expand_dims(array, -1)!"
+		print("From pygoda.corr_2d: input arrays are not same dimension!")
+		print("Fix inputs or add length-1 dimensions using np.expand_dims(array, -1)!")
 		return
 	return (np.nansum((a-a_mu) * (b-b_mu), axis = axis) / N / (a_sd*b_sd))
 
@@ -341,7 +341,7 @@ def eof(d, removeMeans = True, verbose = False):
 		if verbose:
 			percent = round(float(ir)/D.size/2 * 100)
 			if percent % 10 == 0:
-				print str(percent) + "% done..."
+				print(str(percent) + "% done...")
 		D[ir,ir] = np.nanmean(d[:,ir] * d[:,ir])
 		# Doing it this way cuts the number of operations in half
 		for ic in range(ir+1,M):
@@ -547,7 +547,7 @@ def findClimoFile(regexp, directory = '.'):
 		name = os.path.splitext(os.path.split(fname[0])[1])[0]
 		return [path, name]
 	except IndexError:
-		print "No file found! Looked for files like " + directory+"/"+regexp
+		print("No file found! Looked for files like " + directory+"/"+regexp)
 		#return [0,0]
 		raise
 
@@ -567,7 +567,7 @@ def niceClev(data, minnstep = 8, maxnstep = 22, alpha = .99, verb = False):
 	noZero = False
 	if (MAX < 0) | (MIN > 0):
 		if verb:
-			print "No way to center color bar on zero"
+			print("No way to center color bar on zero")
 		return 19
 	else:
 		delta = MAX - MIN
@@ -582,7 +582,7 @@ def niceClev(data, minnstep = 8, maxnstep = 22, alpha = .99, verb = False):
 			trace += 1
 			if trace > 1000:
 				if verb:
-					print "Infinite loop in the niceClev function.\nExiting function with return value of 19"
+					print("Infinite loop in the niceClev function.\nExiting function with return value of 19")
 				return 19
 
 	delta = test*2
@@ -629,7 +629,7 @@ def RegularClev(data, minnstep = 8, maxnstep = 22, alpha = .99, verb = False):
 		trace += 1
 		if trace > 1000:
 			if verb:
-				print "Infinite loop in the niceClev function.\nExiting function with return value of 19"
+				print("Infinite loop in the niceClev function.\nExiting function with return value of 19")
 				return 19
 
 	delta = test*2
@@ -847,7 +847,7 @@ def ensoDates(sy, ey, directory, returnSSTs = False):
 	nino34 = []
 	for d in dates:
 		f, fn = findClimoFile("*pop.h."+d+".nc", directory = directory)
-		print fn
+		print(fn)
 		pop = popgoda(f)
 		nino34.append(pop.boxMean("TEMP", box = (-5,5,190,240)))
 
@@ -904,10 +904,10 @@ def ensoDates(sy, ey, directory, returnSSTs = False):
 	nina_dates = [item for sublist in nina_dates for item in sublist]
 
 	if returnSSTs:
-		print "If all went well, the returned list is of nino then nina dates, then the raw SST timeseries"
+		print("If all went well, the returned list is of nino then nina dates, then the raw SST timeseries")
 		return [nino_dates, nina_dates, nino34]
 	else:
-		print "If all went well, the returned list is of nino then nina dates"
+		print("If all went well, the returned list is of nino then nina dates")
 		return [nino_dates, nina_dates]
 
 
@@ -1094,9 +1094,9 @@ d18OV and dDV : returns 2d numpy array data.
 					self.units = units
 				if verb:
 					if (mult != 1) | (add != 0):
-						print "From pygoda.variable(): Converted data as follows:\n\tmultiplied by " + str(mult) + "\n\tadded " + str(add)
+						print("From pygoda.variable(): Converted data as follows:\n\tmultiplied by " + str(mult) + "\n\tadded " + str(add))
 			except ImportError:
-				print "Could not find algebra.py, not able to do conversion!"
+				print("Could not find algebra.py, not able to do conversion!")
 
 		self.boxlat = self.lat[idxbox[0]]
 		self.boxlon = self.lon[idxbox[1]]
@@ -1127,10 +1127,10 @@ d18OV and dDV : returns 2d numpy array data.
 
 	def isobar(self, pressure, setData = True, verb = False):
 		if self.var == '':
-			print "No variable read in yet.\nUse self.variable() to read a variable first."
+			print("No variable read in yet.\nUse self.variable() to read a variable first.")
 			return
 		if self.vartype == "2d":
-			print "Current .data attribute is 2-dimensional, no pressure data.\nRead in a 3d variable first before running this method."
+			print("Current .data attribute is 2-dimensional, no pressure data.\nRead in a 3d variable first before running this method.")
 			return
 		import numpy as np
 		data = self.data
@@ -1141,7 +1141,7 @@ d18OV and dDV : returns 2d numpy array data.
 		elif data.shape[0] == 31:
 			P = self.P_i
 		else:
-			print "self.data does not have either 30 or 31 levels, can not interpolate to the isobar."
+			print("self.data does not have either 30 or 31 levels, can not interpolate to the isobar.")
 			return
 
 		VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
@@ -1162,13 +1162,13 @@ d18OV and dDV : returns 2d numpy array data.
 		d should be in cm
 		'''
 		if self.model is "CAM":
-			print "Can not run camgoda.depth() on a CAM file! Read in a CLM or POP file to run this method."
+			print("Can not run camgoda.depth() on a CAM file! Read in a CLM or POP file to run this method.")
 			return
 		if self.var == '':
-			print "No variable read in yet.\nUse self.variable() to read a variable first."
+			print("No variable read in yet.\nUse self.variable() to read a variable first.")
 			return
 		if self.vartype == "2d":
-			print "Current .data attribute is 2-dimensional, no depth data.\nRead in a 3d variable first before running this method."
+			print("Current .data attribute is 2-dimensional, no depth data.\nRead in a 3d variable first before running this method.")
 			return
 		import numpy as np
 		d_m = d
@@ -1213,7 +1213,7 @@ d18OV and dDV : returns 2d numpy array data.
 	def isotherm_fast(self, temp, setData = True):
 		import numpy as np
 		if self.model is not "POP":
-			print "Not a POP file, can not run isotherm_fast! Exiting..."
+			print("Not a POP file, can not run isotherm_fast! Exiting...")
 			return None
 		d = self.data
 		depths = self.depths
@@ -1255,7 +1255,7 @@ d18OV and dDV : returns 2d numpy array data.
 
 	def columnSum(self, box = None, setData = True):
 		if self.vartype is not "3d":
-			print "Var type is not 3d, cannot compute column sum! Exiting..."
+			print("Var type is not 3d, cannot compute column sum! Exiting...")
 			return
 		import numpy as np
 		g = 9.8
@@ -1273,7 +1273,7 @@ d18OV and dDV : returns 2d numpy array data.
 
 	def columnMean(self, box = None, setData = True, idx_add = 0):
 		if self.vartype is not "3d":
-			print "Var type is not 3d, cannot compute column sum! Exiting..."
+			print("Var type is not 3d, cannot compute column sum! Exiting...")
 			return
 		import numpy as np
 		if not self.PressureCalculated:
@@ -1333,7 +1333,7 @@ d18OV and dDV : returns 2d numpy array data.
 		masked_targetArray = self.mask(array, 'gt', 50, targetArray)
 		'''
 		if (gt_lt is not "gt") and (gt_lt is not "lt"):
-			print "First argument (gt_lt) must be either 'gt' or 'lt'...Exiting method."
+			print("First argument (gt_lt) must be either 'gt' or 'lt'...Exiting method.")
 			return 
 		import xarray as xr
 		import numpy as np
@@ -1344,7 +1344,7 @@ d18OV and dDV : returns 2d numpy array data.
 		# This is the array the will be masked and returned by the method
 		if targetArray is not None:
 			if targetArray.shape != array.shape:
-				print "Target array and input array are not the same shape.\nCan not mask a target array of different shape than the input array!\nExiting..."
+				print("Target array and input array are not the same shape.\nCan not mask a target array of different shape than the input array!\nExiting...")
 				return
 			returnArray = xr.DataArray(targetArray)
 		else:
@@ -1633,7 +1633,7 @@ d18OV and dDV : returns 2d numpy array data.
 			else:
 				split = V.split("_")
 				if 3 > len(split) > 4:
-					print "Something went wrong parsing the variable name.\nMake sure there are two or three underscores!"
+					print("Something went wrong parsing the variable name.\nMake sure there are two or three underscores!")
 					return 
 				if split[-1] == "ColumnMean":
 					var_is_3d = False
@@ -1771,8 +1771,8 @@ d18OV and dDV : returns 2d numpy array data.
 				try:
 					self.variable(var, box)
 				except KeyError:
-					print "From camgoda.ExtractData:\nNot able to extract variable " + var + "...\nSkipping this variable."
-					print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
+					print("From camgoda.ExtractData:\nNot able to extract variable " + var + "...\nSkipping this variable.")
+					print("Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name.")
 					return
 			if var_is_3d:
 				if self.model == "CAM":
@@ -1916,7 +1916,7 @@ class popgoda:
 
 		for i in range(data_regrid.shape[0]):
 			if (float(i) / 60 * 100) % 10 == 0:
-				print var + ' data ' + str(float(i) / 60 * 100) + '% loaded...'
+				print(var + ' data ' + str(float(i) / 60 * 100) + '% loaded...')
 			temp = data[i,:,:].ravel()
 			# Re-grid
 			data_regrid[i,:,:] = griddata((ulon, ulat), temp, (ilon[None,:], ilat[:,None]))
@@ -1956,7 +1956,7 @@ class popgoda:
 			try:
 				self.surface(var, box)
 			except KeyError:
-				print "Not able to plot variable " + var + "...\nSkipping this variable."
-				print "Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name."
+				print("Not able to plot variable " + var + "...\nSkipping this variable.")
+				print("Is this a 3-spatial-dimension variable? If so, append 3d_ to the beginning of the variable name.")
 				return
 
