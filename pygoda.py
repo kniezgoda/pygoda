@@ -894,9 +894,9 @@ def ensoDates(sy, ey, directory, returnSSTs = False):
         l = lower_idx[n]
         u = upper_idx[n]
         s = status[l]
-        if s is 'above':
+        if s == 'above':
             nino_dates.append(dates[l:u+1])
-        if s is 'below':
+        if s == 'below':
             nina_dates.append(dates[l:u+1])
 
     # Flatten the lists
@@ -1161,7 +1161,7 @@ d18OV and dDV : returns 2d numpy array data.
         Only works when the camgoda instance is of a CLM file.
         d should be in cm
         '''
-        if self.model is "CAM":
+        if self.model == "CAM":
             print("Can not run camgoda.depth() on a CAM file! Read in a CLM or POP file to run this method.")
             return
         if self.var == '':
@@ -1254,7 +1254,7 @@ d18OV and dDV : returns 2d numpy array data.
 
 
     def columnSum(self, box = None, setData = True):
-        if self.vartype is not "3d":
+        if self.vartype != "3d":
             print("Var type is not 3d, cannot compute column sum! Exiting...")
             return
         import numpy as np
@@ -1332,7 +1332,7 @@ d18OV and dDV : returns 2d numpy array data.
 
         masked_targetArray = self.mask(array, 'gt', 50, targetArray)
         '''
-        if (gt_lt is not "gt") and (gt_lt is not "lt"):
+        if (gt_lt != "gt") and (gt_lt != "lt"):
             print("First argument (gt_lt) must be either 'gt' or 'lt'...Exiting method.")
             return 
         import xarray as xr
