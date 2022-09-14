@@ -1272,7 +1272,7 @@ d18OV and dDV : returns 2d numpy array data.
         return csum_vertsum
 
     def columnMean(self, box = None, setData = True, idx_add = 0):
-        if self.vartype is not "3d":
+        if self.vartype != "3d":
             print("Var type is not 3d, cannot compute column sum! Exiting...")
             return
         import numpy as np
