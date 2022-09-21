@@ -1140,7 +1140,7 @@ d18OV and dDV : returns 2d numpy array data.
         VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
         for i in range(len(self.boxlat)):
             for j in range(len(self.boxlon)):
-                VAR[i,j] = np.interp(pressure, P_m[:,i,j], data[:,i,j])
+                VAR[i,j] = np.interp(pressure, self.P_m[:,i,j], data[:,i,j])
 
         self.pressure = pressure
         if setData:
