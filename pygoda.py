@@ -1136,18 +1136,11 @@ d18OV and dDV : returns 2d numpy array data.
         data = self.data
         if not self.PressureCalculated:
             self.CalculatePressure(self.box)
-        if data.shape[0] == 30:
-            P = self.P_m
-        elif data.shape[0] == 31:
-            P = self.P_i
-        else:
-            print("self.data does not have either 30 or 31 levels, can not interpolate to the isobar.")
-            return
 
         VAR = np.zeros(shape = (len(self.boxlat), len(self.boxlon)))
         for i in range(len(self.boxlat)):
             for j in range(len(self.boxlon)):
-                VAR[i,j] = np.interp(pressure, P[:,i,j], data[:,i,j])
+                VAR[i,j] = np.interp(pressure, P_m[:,i,j], data[:,i,j])
 
         self.pressure = pressure
         if setData:
