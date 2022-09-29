@@ -87,7 +87,7 @@ mkdir = True
 if showfig and not savefig:
 	mkdir = False
 if ARGS.developer_mode:
-	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
+	print("\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen.")
 	savefig = False
 	showfig = True
 	mkdir = False
@@ -156,33 +156,33 @@ if mkdir:
 	# Create maps directory is it doesn't exist
 	if not os.path.exists("DiffMap"):
 		os.mkdir("DiffMap")
-		print "Created directory " + "DiffMap"
+		print("Created directory " + "DiffMap")
 
 	# Create the region directory if it doesn't already exist
 	if not os.path.exists("DiffMap/" + region_name):
 		os.mkdir("DiffMap/" + region_name)
-		print "Created directory " + "DiffMap/" + region_name
+		print ("Created directory " + "DiffMap/" + region_name)
 
 	# Create grep directory inside region directory
 	if not os.path.exists("DiffMap/" + region_name + "/" + grep):
 		os.mkdir("DiffMap/" + region_name + "/" + grep)
-		print "Created directory " + "DiffMap/" + region_name + "/" + grep
+		print ("Created directory " + "DiffMap/" + region_name + "/" + grep)
 
 if findFile:
 	# Look for the climo files in the root directory
-	print "\nLooking for control " + grep + " files in " + controldir
+	print ("\nLooking for control " + grep + " files in " + controldir)
 	controldatafname, controlfn = findClimoFile("*" + grep + "*", controldir)
 	if not controldatafname:
 		sys.exit()
-	print "Found control file: " + controlfn
-	print "\nLooking for test " + grep + " files in " + testdir
+	print ("Found control file: " + controlfn)
+	print ("\nLooking for test " + grep + " files in " + testdir)
 	testdatafname, testfn = findClimoFile("*" + grep + "*", testdir)
 	if not testdatafname:
 		sys.exit()
-	print "Found test file: " + testfn
+	print ("Found test file: " + testfn)
 else:
-	print "\nControl file is " + controldatafname
-	print "\nTest file is " + testdatafname
+	print ("\nControl file is " + controldatafname)
+	print ("\nTest file is " + testdatafname)
 	controlfn = os.path.splitext(os.path.split(controldatafname)[1])[0]
 	testfn = os.path.splitext(os.path.split(testdatafname)[1])[0]
 
