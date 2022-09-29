@@ -78,7 +78,7 @@ if barbs is not None:
 	show_barbs = True
 
 if verbose:
-	print "Region is " + region
+	print("Region is " + region)
 files = ARGS.files
 savefig = ARGS.savefig
 showfig = ARGS.showfig
@@ -88,7 +88,7 @@ mkdir = True
 if showfig and not savefig:
 	mkdir = False
 if ARGS.developer_mode:
-	print "\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen."
+	print("\nRunning in dev mode. No files will be saved, no directories will be created, and all plots will be printed to the screen.")
 	savefig = False
 	showfig = True
 	mkdir = False
@@ -171,16 +171,16 @@ if mkdir:
 	if not os.path.exists("Map"):
 		os.mkdir("Map")
 		if verbose:
-			print "Created directory " + "Map"
+			print("Created directory " + "Map")
 
 	# Create the region directory if it doesn't already exist
 	if not os.path.exists("Map/" + region_name):
 		os.mkdir("Map/" + region_name)
 		if verbose:
-			print "Created directory " + "Map/" + region_name
+			print ("Created directory " + "Map/" + region_name)
 
 for filein in files:
-	print "Current files is : " + filein + '\n'
+	print ("Current files is : " + filein + '\n')
 	# Read the data
 	ncdata = camgoda(filein)
 
@@ -253,7 +253,7 @@ for filein in files:
 		m = bm(projection = 'cea', llcrnrlat=southern_lat,urcrnrlat=northern_lat, llcrnrlon=left_lon,urcrnrlon=right_lon,resolution='c')
 		m.drawcoastlines()
 		m.drawmapboundary(fill_color='0.3')
-		print ncdata.data
+		print (ncdata.data)
 		cs = m.contourf(bmlon, bmlat, ncdata.data, ncdata.clevs, shading = 'flat', latlon = True, cmap=ncdata.cmap)
 		if show_barbs:
 			m.quiver(barb_lon, barb_lat, nc_u, nc_v, scale = 50, scale_units = "inches", cmap = plt.cm.autumn, latlon = True)
