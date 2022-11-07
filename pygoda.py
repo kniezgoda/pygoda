@@ -1118,9 +1118,9 @@ d18OV and dDV : returns 2d numpy array data.
         self.P_m = PressureCalc(A_m,B_m,PS)
         self.P_i = PressureCalc(A_i,B_i,PS)
         pdel = np.zeros(shape = self.P_m.shape)
-        for i in range(pdel.shape[1]):
-            for j in range(pdel.shape[2]):
-                pdel[:,i,j] = np.diff(self.P_i[:,i,j])
+        for i in range(pdel.shape[-2]):
+            for j in range(pdel.shape[-1]):
+                pdel[...,i,j] = np.diff(self.P_i[...,i,j])
         self.Pdel = pdel
         self.PS = PS
         self.PressureCalculated = True
