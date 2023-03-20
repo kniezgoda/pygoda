@@ -12,6 +12,6 @@ def plotRigid(ax, x, y, rigid, alpha = 1, cmap = plt.cm.binary):
     rigid_bool = np.zeros_like(rigid, dtype = 'bool')
     rigid_bool[:] = rigid[:]
     rigid_mask = np.ma.masked_where(~rigid_bool.data, np.ones(rigid_bool.shape))
-    return ax.pcolormesh(xf,yf,rigid_mask,shading = 'auto', cmap=cmap, alpha = alpha, vmin=0, vmax=1)
+    return ax.pcolormesh(x,y,rigid_mask,shading = 'auto', cmap=cmap, alpha = alpha, vmin=0, vmax=1)
 
 
