@@ -34,3 +34,33 @@ def digi3d(xp,yp,zp,xe,ye,ze):
         hold[int(i),int(j),int(k)] += 1
        
     return hold
+
+
+def digitize(points, edges):
+    # Generalized digi3d to n-dimensional data
+    # Digitize the data into edge bins
+    # Adapted from https://stackoverflow.com/questions/10686847/fast-categorization-binning
+    ndim = len(points)
+    if ndim > 1:
+        if len(points) != len(edges):
+            print("points and edges are not same length, exiting")
+            return None
+
+    holdshape = []
+    for p, e in zip(points, edges):
+        holdshape.append(len(e)+1)
+        
+    hold = np.zeros(shape = holdshape)
+    digis = []
+    for p, e in zip(points, edges):
+        digix = np.digitize(p, e)*np.where(np.isnan(p), np.nan, 1)
+        digix = digix[~np.isnan(digix)]
+        digis.append(digix)
+    
+    for i in range(len(digis[0])):
+        indexer = []
+        for dim in range(3):
+            indexer.append(int(digis[dim][i]))
+        hold[tuple(indexer)] += 1
+
+    return hold
