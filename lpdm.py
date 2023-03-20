@@ -22,11 +22,11 @@ def digi3d(xp,yp,zp,xe,ye,ze):
     ny = len(ye)+1
     nz = len(ze)+1
     hold = np.zeros(shape = (nx,ny,nz))
-    digix = np.digitize(particles_x, edgesx)*np.where(np.isnan(particles_x), np.nan, 1)
+    digix = np.digitize(xp, xe)*np.where(np.isnan(xp), np.nan, 1)
     digix = digix[~np.isnan(digix)]
-    digiy = np.digitize(particles_y, edgesy)*np.where(np.isnan(particles_y), np.nan, 1)
+    digiy = np.digitize(yp, ye)*np.where(np.isnan(yp), np.nan, 1)
     digiy = digiy[~np.isnan(digiy)]
-    digiz = np.digitize(particles_z, edgesz)*np.where(np.isnan(particles_z), np.nan, 1)
+    digiz = np.digitize(zp, ze)*np.where(np.isnan(zp), np.nan, 1)
     digiz = digiz[~np.isnan(digiz)]
     
     # Sum up the digitized indices
