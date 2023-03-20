@@ -2,7 +2,7 @@
 # Other statistical and analysis tools have been added over time
 # kniezgo@gmail.com
 
-def plot_rigid(ax, x, y, rigid, alpha = 1, cmap = plt.cm.binary):
+def plot_rigid(ax, x, y, rigid, alpha = 1):
     '''
     This function returns a plt subplot for drawing the rigid objects on a matplotlib axis
     ax is the axis to plot the rigids on
@@ -14,8 +14,9 @@ def plot_rigid(ax, x, y, rigid, alpha = 1, cmap = plt.cm.binary):
     import matplotlib.pyplot as plt
     rigid_bool = np.zeros_like(rigid, dtype = 'bool')
     rigid_bool[:] = rigid[:]
+    cmap_put = plt.cm.binary
     rigid_mask = np.ma.masked_where(~rigid_bool.data, np.ones(rigid_bool.shape))
-    return ax.pcolormesh(xf,yf,rigid_mask,shading = 'auto', cmap=cmap, alpha = alpha, vmin=0, vmax=1)
+    return ax.pcolormesh(xf,yf,rigid_mask,shading = 'auto', cmap=cmap_put, alpha = alpha, vmin=0, vmax=1)
 
 
 
