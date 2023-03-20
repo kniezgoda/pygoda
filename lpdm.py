@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_rigid(ax, x, y, rigid, alpha = 1, cmap = plt.cm.binary):
+def plotRigid(ax, x, y, rigid, alpha = 1, cmap = plt.cm.binary):
     '''
     This function returns a plt subplot for drawing the rigid objects on a matplotlib axis
     ax is the axis to plot the rigids on
